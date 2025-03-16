@@ -19,9 +19,11 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('profile_image')->nullable();
+            $table->string('verification_code')->nullable();
             $table->tinyInteger('status')->default(1)->comment('1, pending, 2: active, 3: inactive,');
             $table->rememberToken();
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

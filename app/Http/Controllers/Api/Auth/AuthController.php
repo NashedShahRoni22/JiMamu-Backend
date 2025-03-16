@@ -2,14 +2,21 @@
 
 namespace App\Http\Controllers\Api\Auth;
 
+use App\Events\UserRegisteredEvent;
 use App\Exceptions\CustomException;
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\Auth\MakeVerificationCodeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
+    public function __construct(public MakeVerificationCodeService $makeVerificationCodeService)
+    {
+
+    }
     public function register(Request $request)
     {
         $request->validate([
@@ -21,13 +28,18 @@ class AuthController extends Controller
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'password' => bcrypt($request->password),
+            'verification_code' => $this->makeVerificationCodeService->makeEmailVerificationCode(),
+            'email_verification_token' => Str::random(40),
         ]);
 
-        return response()->json([
+        event(new UserRegisteredEvent($user)); // Dispatch event
+
+        return sendResponse(true, 'User registered successfully.', [
             'token' => $user->createToken('auth_token')->plainTextToken,
             'user' => $user
         ]);
+
     }
 
     public function login(Request $request)

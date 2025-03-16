@@ -112,4 +112,8 @@ return Application::configure(basePath: dirname(__DIR__))
                 ], 500);
             }
         });
+        // Handle Custom API Exception
+        $exceptions->render(function (\App\Exceptions\CustomException $e, Request $request) {
+            return $e->render($request);
+        });
     })->create();

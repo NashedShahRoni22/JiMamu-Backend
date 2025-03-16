@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers\Api\Auth;
 
+use App\Exceptions\CustomException;
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -33,18 +36,16 @@ class AuthController extends Controller
             'email' => 'required|email',
             'password' => 'required',
         ]);
+        try {
+            $user = User::where('email', $request->email)->firstOrFail();
 
-        $user = User::where('email', $request->email)->first();
-
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => ['Invalid credentials'],
-            ]);
+            if (!$user || !Hash::check($request->password, $user->password)) {
+                throw new CustomException('Password Not Matched',  404);
+            }
+            return sendResponse(true, 'Login Successfully', ['token' => $user->createToken('auth_token')->plainTextToken]);
+        }catch (\Exception $exception){
+            return sendResponse(false, 'Something Went Wrong', $exception->getCode());
         }
 
-        return response()->json([
-            'token' => $user->createToken('auth_token')->plainTextToken,
-            'user' => $user
-        ]);
     }
 }

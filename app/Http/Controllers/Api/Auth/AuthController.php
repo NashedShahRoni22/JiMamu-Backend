@@ -5,12 +5,14 @@ namespace App\Http\Controllers\Api\Auth;
 use App\Events\OtpGenerated;
 use App\Exceptions\CustomException;
 use App\Http\Controllers\Controller;
+use App\Mail\OtpMail;
 use App\Models\OtpVerify;
 use App\Models\User;
 use App\Services\Auth\MakeVerificationCodeService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 class AuthController extends Controller
@@ -28,7 +30,9 @@ class AuthController extends Controller
                 'otp_expires_at' => now()->addMinutes(3),
                 'otp_type' => "phone_number",
             ]);
-            event(new OtpGenerated(1251)); // Dispatch event
+           // event(new OtpGenerated(1251)); // Dispatch event
+            Mail::to($email)->send(new OtpMail($otp->otp_code));
+
             return sendResponse(true, 'OTP Send successfully.');
         }catch (CustomException $e){
             return $e->getMessage();
@@ -83,7 +87,7 @@ class AuthController extends Controller
         ]);
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        return sendResponse(true, 'OTP Verified successfully.', ["token" => $token]);
+        return sendResponse(true, 'OTP Verified successfully.', ["token" => $token, "status" => 'active']);
     }
 
     public function login(Request $request)

@@ -13,11 +13,7 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable, HasRoles;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
+    static $status = ['pending'=> 1, 'active' => 2, 'inactive' => 3];
     protected $fillable = [
         'name',
         'email',
@@ -25,6 +21,8 @@ class User extends Authenticatable
         'verification_code',
         'profile_image',
         'phone_number',
+        'dod',
+        'gender',
         'status',
 
     ];

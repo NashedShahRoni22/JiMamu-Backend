@@ -19,7 +19,6 @@ class ProfileUpdateController extends Controller
         //return $request->all();
         request()->validate([
             'name' => 'required',
-            'email' => 'required|string|email|exists:users,email',
             'gender' => 'required',
         ]);
         try {
@@ -31,7 +30,6 @@ class ProfileUpdateController extends Controller
                 'dod' => $request->dod,
                 'gender' => $request->gender,
                 'status' => 2,
-
             ]);
             $data =  new profileUpdateResource($user);
             return sendResponse(true, 'User profile updated successfully.', $data, 200);

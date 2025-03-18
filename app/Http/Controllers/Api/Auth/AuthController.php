@@ -61,7 +61,7 @@ class AuthController extends Controller
         $exitsUser = User::where('email', $request->email)->first();
         if($exitsUser){
              $exitsUser->update([
-                'status' => 2,
+                'status' => $exitsUser->status == 1 ? 1 : 2,
             ]);
         }else{
             $user = User::create([

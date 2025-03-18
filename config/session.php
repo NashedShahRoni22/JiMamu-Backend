@@ -54,13 +54,13 @@ return [
     | Session File Location
     |--------------------------------------------------------------------------
     |
-    | When utilizing the "file" session driver, the session files are placed
+    | When utilizing the "file" session driver, the session Files are placed
     | on disk. The default storage location is defined here; however, you
     | are free to provide another location where they should be stored.
     |
     */
 
-    'files' => storage_path('framework/sessions'),
+    'Files' => storage_path('framework/sessions'),
 
     /*
     |--------------------------------------------------------------------------

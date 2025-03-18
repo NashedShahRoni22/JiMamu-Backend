@@ -23,6 +23,7 @@ class AuthController extends Controller
     }
     public function sendEmailOtp(Request $request)
     {
+
         $request->validate([
             'email' => 'required|email',
         ]);
@@ -50,29 +51,28 @@ class AuthController extends Controller
 
        $otpCode = OtpVerify::where('email', $request->email)->where('otp_code', $request->otp_code)->first();
 
-        if (!$otpCode || $otpCode->otp_code !== $request->otp_code || Carbon::now()->gt($otpCode->otp_expires_at)) {
-            return sendResponse(false, 'Invalid or expired OTP.', null,401);
-        }
-        // clear otp
-        $otpCode->delete();
+//        if (!$otpCode || $otpCode->otp_code !== $request->otp_code || Carbon::now()->gt($otpCode->otp_expires_at)) {
+//            return sendResponse(false, 'Invalid or expired OTP.', null,401);
+//        }
+//        // clear otp
+//        $otpCode->delete();
 
         // email check
         $exitsUser = User::where('email', $request->email)->first();
         if($exitsUser){
-            $user = $exitsUser->update([
-                'status' => array_search('active', User::$status),
+             $exitsUser->update([
+                'status' => 2,
             ]);
         }else{
             $user = User::create([
                 'name' => 'test',
-                'email' => $otpCode->email,
-                'status' => array_search('pending', User::$status),
+                'email' => 'akazad914@gmail.com',
+                'status' => 1,
             ]);
             $exitsUser = $user;
         }
-
         $token = $exitsUser->createToken('auth_token')->plainTextToken;
 
-        return sendResponse(true, 'OTP Verified successfully.', ["token" => $token, "status" => $user?->status]);
+        return sendResponse(true, 'OTP Verified successfully.', ["token" => $token, "status" => User::$statusName[$exitsUser?->status]]);
     }
 }

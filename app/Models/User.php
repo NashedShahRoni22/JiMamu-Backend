@@ -14,6 +14,7 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, Notifiable, HasRoles;
 
     static $status = ['pending'=> 1, 'active' => 2, 'inactive' => 3];
+    static $statusName = [1 => 'pending', 2 => 'active', 3=>'inactive'];
     protected $fillable = [
         'name',
         'email',

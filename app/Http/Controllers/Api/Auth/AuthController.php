@@ -64,13 +64,20 @@ class AuthController extends Controller
        // $otpCode->delete();
 
         // Generate Sanctum token
-        $user = User::create([
-            'name' => 'test',
-            'email' => $otpCode->email,
-            'status' => User::$status['active'],
-        ]);
+        $exitsUser = User::where('email', $request->email)->first();
+        if($exitsUser){
+            $user = $exitsUser->update([
+                'status' => array_search('active', User::$status),
+            ]);
+        }else{
+            $user = User::create([
+                'name' => 'test',
+                'email' => $otpCode->email,
+                'status' => array_search('pending', User::$status),
+            ]);
+        }
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        return sendResponse(true, 'OTP Verified successfully.', ["token" => $token, "status" => 'active']);
+        return sendResponse(true, 'OTP Verified successfully.', ["token" => $token, "status" => $user?->status]);
     }
 }

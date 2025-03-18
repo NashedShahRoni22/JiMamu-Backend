@@ -53,17 +53,10 @@ class AuthController extends Controller
         if (!$otpCode || $otpCode->otp_code !== $request->otp_code || Carbon::now()->gt($otpCode->otp_expires_at)) {
             return sendResponse(false, 'Invalid or expired OTP.', null,401);
         }
+        // clear otp
+        $otpCode->delete();
 
-        // Clear OTP after successful verification
-
-//        $otpCode->otp_code = null;
-//        $otpCode->otp_expires_at = null;
-//        $otpCode->verified_at = now();
-//        $otpCode->save();
-//        return 'ok';
-       // $otpCode->delete();
-
-        // Generate Sanctum token
+        // email check
         $exitsUser = User::where('email', $request->email)->first();
         if($exitsUser){
             $user = $exitsUser->update([
@@ -75,8 +68,10 @@ class AuthController extends Controller
                 'email' => $otpCode->email,
                 'status' => array_search('pending', User::$status),
             ]);
+            $exitsUser = $user;
         }
-        $token = $user->createToken('auth_token')->plainTextToken;
+
+        $token = $exitsUser->createToken('auth_token')->plainTextToken;
 
         return sendResponse(true, 'OTP Verified successfully.', ["token" => $token, "status" => $user?->status]);
     }

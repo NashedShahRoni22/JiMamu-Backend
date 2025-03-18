@@ -56,13 +56,12 @@ class AuthController extends Controller
         }
         // clear otp
         $otpCode->delete();
-
         // email check
         $exitsUser = User::where('email', $request->email)->first();
         if(!$exitsUser){
             $user = User::create([
                 'name' => 'test',
-                'email' => 'akazad914@gmail.com',
+                'email' => $request->email,
                 'status' => 1,
             ]);
             $exitsUser = $user;        }

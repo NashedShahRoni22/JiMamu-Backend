@@ -24,7 +24,9 @@ class ProfileUpdateController extends Controller
                 'phone_number' => $request->phone_number,
                 'profile_image' => $request->profile_image,
                 'dod' => $request->dod,
-                'gender' => $request->gender
+                'gender' => $request->gender,
+                'status' => 2,
+
             ]);
             $data =  new profileUpdateResource($user);
             return sendResponse(true, 'User profile updated successfully.', $data, 200);

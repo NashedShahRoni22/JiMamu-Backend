@@ -59,18 +59,13 @@ class AuthController extends Controller
 
         // email check
         $exitsUser = User::where('email', $request->email)->first();
-        if($exitsUser){
-             $exitsUser->update([
-                'status' => $exitsUser->status == 1 ? 1 : 2,
-            ]);
-        }else{
+        if(!$exitsUser){
             $user = User::create([
                 'name' => 'test',
                 'email' => 'akazad914@gmail.com',
                 'status' => 1,
             ]);
-            $exitsUser = $user;
-        }
+            $exitsUser = $user;        }
         $token = $exitsUser->createToken('auth_token')->plainTextToken;
 
         return sendResponse(true, 'OTP Verified successfully.', ["token" => $token, "status" => User::$statusName[$exitsUser?->status]]);

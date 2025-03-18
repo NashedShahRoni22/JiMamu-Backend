@@ -51,11 +51,11 @@ class AuthController extends Controller
 
        $otpCode = OtpVerify::where('email', $request->email)->where('otp_code', $request->otp_code)->first();
 
-//        if (!$otpCode || $otpCode->otp_code !== $request->otp_code || Carbon::now()->gt($otpCode->otp_expires_at)) {
-//            return sendResponse(false, 'Invalid or expired OTP.', null,401);
-//        }
-//        // clear otp
-//        $otpCode->delete();
+        if (!$otpCode || $otpCode->otp_code !== $request->otp_code || Carbon::now()->gt($otpCode->otp_expires_at)) {
+            return sendResponse(false, 'Invalid or expired OTP.', null,401);
+        }
+        // clear otp
+        $otpCode->delete();
 
         // email check
         $exitsUser = User::where('email', $request->email)->first();

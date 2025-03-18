@@ -7,7 +7,7 @@ use App\Http\Controllers\Api\ProfileUpdateController;
 use Laravel\Socialite\Facades\Socialite;
 
 Route::middleware(['json.response'])->prefix('/v1')->group(function() {
-    Route::get('/send/email/otp/{email}', [AuthController::class, 'sendEmailOtp']);
+    Route::post('/send/email/otp', [AuthController::class, 'sendEmailOtp']);
     Route::post('/email/otp/verify', [AuthController::class, 'verifyOtp']);
 
     Route::get('/auth/google', function () {

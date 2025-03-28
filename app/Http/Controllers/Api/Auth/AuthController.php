@@ -9,6 +9,7 @@ use App\Mail\OtpMail;
 use App\Models\OtpVerify;
 use App\Models\User;
 use App\Services\Auth\MakeVerificationCodeService;
+use App\Services\Files\FileService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -17,7 +18,7 @@ use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
-    public function __construct(public MakeVerificationCodeService $makeVerificationCodeService)
+    public function __construct(public MakeVerificationCodeService $makeVerificationCodeService, protected FileService $fileService)
     {
 
     }
@@ -68,5 +69,38 @@ class AuthController extends Controller
         $token = $exitsUser->createToken('auth_token')->plainTextToken;
 
         return sendResponse(true, 'OTP Verified successfully.', ["token" => $token, "status" => User::$statusName[$exitsUser?->status]]);
+    }
+    public function socialLogin(Request $request)
+    {
+        $user = User::where('email', $request->email)->first();
+        // if not have existing user then user will create
+        if(!$user) {
+            $request->validate([
+                'email' => 'required|string|email|unique:users,email',
+                'dod' => 'required|string',
+                'gender' => 'required|string',
+                'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg',
+            ]);
+            $fileName = null;
+            // if profile image not null
+            if ($request->hasFile('profile_image')) {
+                // store profile image using service class
+                $fileName = $this->fileService->uploadFile($request->file('profile_image'), 'user');
+            }
+        }
+        try {
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'profile_image' => $fileName,
+                'dod' => $request->dod,
+                'gender' => $request->gender,
+                'status' => User::$status['active'],
+            ]);
+            $token = $user->createToken('auth_token')->plainTextToken;
+            return sendResponse(true, 'Login Successful.', ["token" => $token, "status" => User::$statusName[$user?->status]]);
+        }catch (\Exception $e){
+            return sendResponse(false, $e->getMessage(), null, 500);
+        }
     }
 }

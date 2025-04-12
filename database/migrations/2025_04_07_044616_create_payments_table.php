@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('user_riders', function (Blueprint $table) {
+        Schema::create('payments', function (Blueprint $table) {
             $table->id();
-            $table->string('user_id', 30);
-            $table->tinyInteger('document_type');
-            $table->string('document');
-            $table->softDeletes();
+            $table->foreignId('order_id');
+            $table->float('amount');
+            $table->tinyInteger('payment_method'); // paypal, stripe, ...
+            $table->tinyInteger('status'); // pending, completed, failed
             $table->timestamps();
         });
     }
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('user_riders');
+        Schema::dropIfExists('payments');
     }
 };

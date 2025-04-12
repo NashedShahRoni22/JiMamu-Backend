@@ -17,6 +17,7 @@ class User extends Authenticatable
 
     static $status = ['pending'=> 1, 'active' => 2, 'inactive' => 3];
     static $statusName = [1 => 'pending', 2 => 'active', 3=>'inactive'];
+    static $userType = ['user' => 'user', 'rider' => 'rider'];
     protected $fillable = [
         'name',
         'email',
@@ -59,5 +60,8 @@ class User extends Authenticatable
             get: fn($value) => asset('storage').'/user/'.$value
             );
 
+    }
+    public function userRiders(){
+        return $this->hasMany(UserRider::class, 'user_id', 'id');
     }
 }

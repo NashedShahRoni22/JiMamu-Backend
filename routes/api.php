@@ -4,6 +4,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\ProfileUpdateController;
+use App\Http\Controllers\Api\Order\OrderRequestController;
+use App\Http\Controllers\Api\Rider\RiderLocationController;
 use Laravel\Socialite\Facades\Socialite;
 
 Route::middleware(['json.response'])->prefix('/v1')->group(function() {
@@ -47,6 +49,12 @@ Route::middleware(['json.response'])->prefix('/v1')->group(function() {
             Route::prefix('/profile')->group(function () {
                 Route::get('/', [ProfileUpdateController::class, 'UserProfileShow']); // Get user profile
                 Route::put('/update', [ProfileUpdateController::class, 'userProfileUpdate']); // Update user profile
+            });
+            Route::post('/location/update', [RiderLocationController::class, 'locationUpdate']);
+        });
+        Route::prefix('/order')->group(function () {
+            Route::prefix('/request')->group(function () {
+                Route::get('/', [OrderRequestController::class, 'orderRequest']); // Get user profile
             });
         });
     });

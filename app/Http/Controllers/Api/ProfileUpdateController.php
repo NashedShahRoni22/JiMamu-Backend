@@ -21,26 +21,45 @@ class ProfileUpdateController extends Controller
         return sendResponse(true, 'User profile fetched successfully.', $data, 200);
     }
     public function userProfileUpdate(Request $request){
-        //return $request->all();
         request()->validate([
             'name' => 'required',
             'gender' => 'required',
         ]);
         try {
             $user = Auth::user();
-            $profileImage = $this->fileService->uploadFile($request->profile_image, 'user');
+            $fileName = $this->fileService->sliceFileUrl($user?->profile_image);
+            if($request->hasFile('profile_image')){
+                $fileName = $this->fileService->uploadFile($request->profile_image, 'user');
+            }
             $user->update([
                 'name' => $request->name,
                 'phone_number' => $request->phone_number,
-                'profile_image' => $profileImage,
+                'profile_image' => $fileName,
                 'dod' => $request->dod,
                 'gender' => $request->gender,
-                'status' => 2,
+                'status' => User::$status['active'],
             ]);
+            if($request->user_type === User::$userType['rider']){
+                $riderDocument = [];
+                if($request->hasFile('nid_file')){
+                    $pathName = $this->fileService->uploadFile($request->nid_file, 'riderDocument');
+                    $riderDocument[] = ['document' => $pathName, 'document_type' => 'nid'];
+                }
+                if($request->hasFile('passport_file')){
+                    $pathName = $this->fileService->uploadFile($request->passport_file, 'riderDocument');
+                    $riderDocument[] = ['document' => $pathName, 'document_type' => 'passport'];
+                }
+                if($request->hasFile('driving_license_file')){
+                    $pathName = $this->fileService->uploadFile($request->driving_license_file, 'riderDocument');
+                    $riderDocument[] = ['document' => $pathName, 'document_type' => 'driving_license'];
+                }
+
+                $user->userRiders()->createMany($riderDocument);
+            }
             $data =  new profileUpdateResource($user);
             return sendResponse(true, 'User profile updated successfully.', $data, 200);
         }catch (\Exception $exception){
-            return sendResponse(false, 'Something went wrong!', null, 500);
+            return sendResponse(false, $exception->getMessage(), null, 500);
         }
 
     }

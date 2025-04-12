@@ -75,13 +75,13 @@ class AuthController extends Controller
         $user = User::where('email', $request->email)->first();
         // if not have existing user then user will create
         if(!$user) {
+            $fileName = $this->fileService->sliceFileUrl($user?->profile_image);
             $request->validate([
                 'email' => 'required|string|email|unique:users,email',
                 'dod' => 'required|string',
                 'gender' => 'required|string',
                 'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg',
             ]);
-            $fileName = null;
             // if profile image not null
             if ($request->hasFile('profile_image')) {
                 // store profile image using service class
@@ -89,14 +89,16 @@ class AuthController extends Controller
             }
         }
         try {
-            $user = User::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'profile_image' => $fileName,
-                'dod' => $request->dod,
-                'gender' => $request->gender,
-                'status' => User::$status['active'],
-            ]);
+            if (!$user){
+                $user = User::create([
+                    'name' => $request->name,
+                    'email' => $request->email,
+                    'profile_image' => $fileName,
+                    'dod' => $request->dod,
+                    'gender' => $request->gender,
+                    'status' => User::$status['active'],
+                ]);
+            }
             $token = $user->createToken('auth_token')->plainTextToken;
             return sendResponse(true, 'Login Successful.', ["token" => $token, "status" => User::$statusName[$user?->status]]);
         }catch (\Exception $e){

@@ -64,8 +64,9 @@ class FileService
     {
         return Storage::disk($this->disk)->url($filePath);
     }
-    public function sliceFileUrl(string $filePath, int $offset = 0): string
+    public function sliceFileUrl(string $filePath=null, int $offset = 0): string
     {
+        $filePath = $filePath ?? env("APP_URL");
         return $relativePath = Str::after($filePath, '/storage/user/');
     }
 }

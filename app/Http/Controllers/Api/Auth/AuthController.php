@@ -46,7 +46,7 @@ class AuthController extends Controller
     public function verifyOtp(Request $request)
     {
         $request->validate([
-            'email' => 'required|string|email|unique:users,email',
+            'email' => 'required|string|email',
             'otp_code' => 'required|digits:4',
         ]);
 
@@ -65,7 +65,8 @@ class AuthController extends Controller
                 'email' => $request->email,
                 'status' => 1,
             ]);
-            $exitsUser = $user;        }
+            $exitsUser = $user;
+        }
         $token = $exitsUser->createToken('auth_token')->plainTextToken;
 
         return sendResponse(true, 'OTP Verified successfully.', ["token" => $token, "status" => User::$statusName[$exitsUser?->status]]);
@@ -78,24 +79,26 @@ class AuthController extends Controller
             $fileName = $this->fileService->sliceFileUrl($user?->profile_image);
             $request->validate([
                 'email' => 'required|string|email|unique:users,email',
+                'user_type' => 'required|string|in:user,rider',
                 'dod' => 'required|string',
                 'gender' => 'required|string',
                 'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg',
             ]);
             // if profile image not null
-            if ($request->hasFile('profile_image')) {
-                // store profile image using service class
-                $fileName = $this->fileService->uploadFile($request->file('profile_image'), 'user');
-            }
         }
         try {
             if (!$user){
+                if ($request->hasFile('profile_image')) {
+                    // store profile image using service class
+                    $fileName = $this->fileService->uploadFile($request->file('profile_image'), 'user');
+                }
                 $user = User::create([
                     'name' => $request->name,
                     'email' => $request->email,
                     'profile_image' => $fileName,
                     'dod' => $request->dod,
                     'gender' => $request->gender,
+                    'user_type' => User::$userType[$request?->user_type],
                     'status' => User::$status['active'],
                 ]);
             }

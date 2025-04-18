@@ -4,13 +4,17 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ProfileUpdateResource;
+use App\Models\RiderBankInformation;
 use App\Models\User;
 use App\Services\Files\FileService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
+
 
 class ProfileUpdateController extends Controller
 {
+    public $fileName = null;
     public function __construct(public FileService $fileService)
     {
 
@@ -21,41 +25,81 @@ class ProfileUpdateController extends Controller
         return sendResponse(true, 'User profile fetched successfully.', $data, 200);
     }
     public function userProfileUpdate(Request $request){
+//        $lat = 23.755613;
+//        $lng = 90.368591;
+//
+//        $response = Http::withHeaders([
+//            'User-Agent' => 'YourAppName/1.0 (your@email.com)'
+//        ])->get("https://nominatim.openstreetmap.org/reverse", [
+//            'format' => 'json',
+//            'lat' => $lat,
+//            'lon' => $lng,
+//            'zoom' => 18,
+//            'addressdetails' => 1,
+//        ]);
+//
+//        $data = $response->json();
+//       return $address = $data['display_name'] ?? null;
         request()->validate([
             'name' => 'required',
             'gender' => 'required',
+            'dob' => 'required',
+            'phone_number' => 'required',
         ]);
         try {
-            $user = Auth::user();
-            $fileName = $this->fileService->sliceFileUrl($user?->profile_image);
+             $user = Auth::user();
+             // assign existing profile image with slice path
+            $this->fileName = $this->fileService->sliceFileUrl($user?->profile_image);
             if($request->hasFile('profile_image')){
-                $fileName = $this->fileService->uploadFile($request->profile_image, 'user');
+                $user->profile_image = $this->fileName;
+                if(!empty($this->fileName)){
+                   $this->fileName = $this->fileService->updateFile($request->profile_image, $this->fileName,  'user');
+                }else{
+                    $this->fileName = $this->fileService->uploadFile($request->profile_image, 'user');
+                }
             }
             $user->update([
                 'name' => $request->name,
                 'phone_number' => $request->phone_number,
-                'profile_image' => $fileName,
+                'profile_image' => $this->fileName,
                 'dod' => $request->dod,
                 'gender' => $request->gender,
                 'status' => User::$status['active'],
             ]);
-            if($request->user_type === User::$userType['rider']){
-                $riderDocument = [];
-                if($request->hasFile('nid_file')){
-                    $pathName = $this->fileService->uploadFile($request->nid_file, 'riderDocument');
-                    $riderDocument[] = ['document' => $pathName, 'document_type' => 'nid'];
+            if($user?->user_type === User::$userType['rider']){
+                if($request->hasFile('document')){
+
+                    $pathName = [];
+                    foreach($request->document as $file){
+                        $pathName[] = $this->fileService->uploadFile($file, "riderDocument/{$request->document_type}");
+                    }
+                  //  $pathName = $this->fileService->uploadMultipleFiles($request->document, "riderDocument/{$request->document_type}");
                 }
-                if($request->hasFile('passport_file')){
-                    $pathName = $this->fileService->uploadFile($request->passport_file, 'riderDocument');
-                    $riderDocument[] = ['document' => $pathName, 'document_type' => 'passport'];
-                }
-                if($request->hasFile('driving_license_file')){
-                    $pathName = $this->fileService->uploadFile($request->driving_license_file, 'riderDocument');
-                    $riderDocument[] = ['document' => $pathName, 'document_type' => 'driving_license'];
+                $user->userRiders()->create([
+                    'document_type' => $request->document_type,
+                    'document_number' => $request->document_number,
+                    'document' => json_encode($pathName)
+                ]);
+                // rider bank information saving..
+                if($request->is_save_card == true){
+                    $user->riderBankInformations()->updateOrCreate(
+                        ['user_id' => $user->id], // Matching condition
+                        [
+                            'name' => $request->name,
+                            'account_number' => $request->card_number,
+                            'cvc_code' => $request->cvc_code,
+                            'expire_date' => $request->expire_date,
+                            'type' => RiderBankInformation::$type[$request->type],
+                        ]
+                    );
                 }
 
-                $user->userRiders()->createMany($riderDocument);
             }
+            $user->load([
+                'riderBankInformations',
+                'userRiders'
+            ]);
+
             $data =  new profileUpdateResource($user);
             return sendResponse(true, 'User profile updated successfully.', $data, 200);
         }catch (\Exception $exception){

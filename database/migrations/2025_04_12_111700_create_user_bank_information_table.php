@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('user_riders', function (Blueprint $table) {
+        Schema::create('user_bank_information', function (Blueprint $table) {
             $table->id();
-            $table->string('user_id', 30);
-            $table->string('document_type');
-            $table->string('document_number')->nullable();
-            $table->string('document');
-            $table->tinyInteger('is_review')->default(1); // pending, accepted
-            $table->softDeletes();
+            $table->foreignId('user_id');
+            $table->string('name');
+            $table->string('account_number');
+            $table->string('cvc_code')->nullable();
+            $table->string('expiry_date')->nullable();
+            $table->tinyInteger('type')->default(0);
             $table->timestamps();
         });
     }
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('user_riders');
+        Schema::dropIfExists('user_bank_information');
     }
 };

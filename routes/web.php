@@ -21,6 +21,15 @@ Route::get('/migrate', function () {
         return $e->getMessage();
     }
 });
+Route::get('/migrate/refresh', function () {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('migrate:refresh --seed --force');  // Run migrations without removing existing data
+        return 'Migrations run successfully!';
+    } catch (\Exception $e) {
+        return $e->getMessage();
+    }
+});
+
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';

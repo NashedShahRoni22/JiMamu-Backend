@@ -23,7 +23,7 @@ class FileService
         $filename = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
         $path = $file->storeAs($folder, $filename, $this->disk);
 
-        return $filename; // Store this in the database
+        return "$folder/$filename"; // Store this in the database
     }
 
     /**
@@ -33,7 +33,7 @@ class FileService
     {
         $paths = [];
         foreach ($files as $file) {
-            $paths[] = $this->uploadFile($file, $folder);
+            $paths[] = $folder."/".$this->uploadFile($file, $folder);
         }
         return $paths;
     }
@@ -46,7 +46,7 @@ class FileService
         if (Storage::disk($this->disk)->exists($oldPath)) {
             Storage::disk($this->disk)->delete($oldPath);
         }
-        return $this->uploadFile($newFile, $folder);
+       return $this->uploadFile($newFile, $folder);
     }
 
     /**
@@ -67,6 +67,6 @@ class FileService
     public function sliceFileUrl(string $filePath=null, int $offset = 0): string
     {
         $filePath = $filePath ?? env("APP_URL");
-        return $relativePath = Str::after($filePath, '/storage/user/');
+        return $relativePath = Str::after($filePath, '/storage/');
     }
 }

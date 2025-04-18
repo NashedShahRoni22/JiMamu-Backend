@@ -13,11 +13,12 @@ use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
+
     use HasApiTokens, HasFactory, Notifiable, HasRoles;
 
     static $status = ['pending'=> 1, 'active' => 2, 'inactive' => 3];
     static $statusName = [1 => 'pending', 2 => 'active', 3=>'inactive'];
-    static $userType = ['user' => 'user', 'rider' => 'rider'];
+    static $userType = ['user' => 1, 'rider' => 2];
     protected $fillable = [
         'name',
         'email',
@@ -27,6 +28,7 @@ class User extends Authenticatable
         'phone_number',
         'dod',
         'gender',
+        'user_type',
         'status',
 
     ];
@@ -57,11 +59,18 @@ class User extends Authenticatable
     public function profileImage() : Attribute
     {
         return Attribute::make(
-            get: fn($value) => asset('storage').'/user/'.$value
+            get: fn($value) => asset('storage/').'/'.$value
             );
 
     }
     public function userRiders(){
         return $this->hasMany(UserRider::class, 'user_id', 'id');
+    }
+    public function riderBankInformations()
+    {
+        return $this->hasMany(RiderBankInformation::class, 'user_id', 'id');
+    }
+    public function userBankInformations(){
+        return $this->hasMany(UserBankInformation::class, 'user_id', 'id');
     }
 }

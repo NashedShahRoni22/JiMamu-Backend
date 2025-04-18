@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('dod')->nullable();
             $table->string('gender')->nullable();
             $table->string('verification_code')->nullable();
+            $table->tinyInteger('user_type')->default(1); // default user/customer
             $table->tinyInteger('status')->default(1)->comment('1, pending, 2: active, 3: inactive,');
             $table->rememberToken();
             $table->timestamps();

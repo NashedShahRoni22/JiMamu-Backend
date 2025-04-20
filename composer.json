@@ -17,6 +17,7 @@
         "laravel/sanctum": "^4.0",
         "laravel/socialite": "^5.18",
         "laravel/tinker": "^2.10.1",
+        "predis/predis": "^2.0",
         "spatie/laravel-permission": "^6.16",
         "tightenco/ziggy": "^2.4"
     },

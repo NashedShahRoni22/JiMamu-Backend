@@ -18,8 +18,13 @@ return new class extends Migration
             $table->string('account_number');
             $table->string('cvc_code')->nullable();
             $table->string('expiry_date')->nullable();
+            $table->boolean('is_default_payment')->default(false);
             $table->tinyInteger('type')->default(0);
             $table->timestamps();
+
+            $table->softDeletes();
+
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

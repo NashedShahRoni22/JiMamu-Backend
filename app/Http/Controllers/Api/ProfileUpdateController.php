@@ -66,10 +66,11 @@ class ProfileUpdateController extends Controller
                 'gender' => $request->gender,
                 'status' => User::$status['active'],
             ]);
-            if($user?->user_type === User::$userType['rider']){
-                if($request->hasFile('document')){
 
-                    $pathName = [];
+            // if user want to an account open as a rider
+            if($request->user_type === 'rider'){
+                $pathName = [];
+                if($request->hasFile('document')){
                     foreach($request->document as $file){
                         $pathName[] = $this->fileService->uploadFile($file, "riderDocument/{$request->document_type}");
                     }
@@ -80,21 +81,31 @@ class ProfileUpdateController extends Controller
                     'document_number' => $request->document_number,
                     'document' => json_encode($pathName)
                 ]);
-                // rider bank information saving..
-                if($request->is_save_card == true){
-                    $user->riderBankInformations()->updateOrCreate(
-                        ['user_id' => $user->id], // Matching condition
-                        [
-                            'name' => $request->name,
-                            'account_number' => $request->card_number,
-                            'cvc_code' => $request->cvc_code,
-                            'expire_date' => $request->expire_date,
-                            'type' => RiderBankInformation::$type[$request->type],
-                        ]
-                    );
+                // assign rider role if not assign role
+                if (!$user->hasRole('rider')) {
+                    $user->assignRole('rider');
                 }
-
+                // rider bank information saving..
+                if (!empty($request->is_default_payment)) {
+                    foreach ($request->is_default_payment as $key => $item) {
+                        $user->riderBankInformations()->updateOrCreate(
+                            [
+                                'id' => $request->id[$key], // Unique condition
+                                'user_id' => $user->id
+                            ],
+                            [
+                                'name' => $request->name[$key],
+                                'account_number' => $request->card_number[$key],
+                                'cvc_code' => $request->cvc_code[$key],
+                                'expire_date' => $request->expire_date[$key],
+                                'type' => RiderBankInformation::$type[$request->type[$key]],
+                                'is_default_payment' => $request->is_default_payment[$key] == 'true' ? true : false,
+                            ]
+                        );
+                    }
+                }
             }
+            // using load functions for relationship model data load
             $user->load([
                 'riderBankInformations',
                 'userRiders'

@@ -22,6 +22,8 @@ class ProfileUpdateResource extends JsonResource
             'profile_image' => $this?->profile_image,
             'dod' => $this->dod,
             'status' => array_search($this->status, User::$status) ?? 'unknown', // Convert integer to string
+            'role' => $this->getRoleNames()->toArray(),
+            'rider_bank_information' => RiderBankInformationResource::collection($this->riderBankInformations),
         ];
     }
 }

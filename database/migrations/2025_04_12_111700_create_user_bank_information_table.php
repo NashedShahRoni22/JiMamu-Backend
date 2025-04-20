@@ -20,6 +20,9 @@ return new class extends Migration
             $table->string('expiry_date')->nullable();
             $table->tinyInteger('type')->default(0);
             $table->timestamps();
+
+            $table->softDeletes();
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

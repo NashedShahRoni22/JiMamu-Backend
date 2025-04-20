@@ -66,10 +66,11 @@ class AuthController extends Controller
                 'status' => 1,
             ]);
             $exitsUser = $user;
+            $user->assignRole('user');
         }
         $token = $exitsUser->createToken('auth_token')->plainTextToken;
 
-        return sendResponse(true, 'OTP Verified successfully.', ["token" => $token, "status" => User::$statusName[$exitsUser?->status]]);
+        return sendResponse(true, 'OTP Verified successfully.', ["token" => $token, "status" => User::$statusName[$exitsUser?->status], 'role' => $exitsUser->getRoleNames()->toArray()]);
     }
     public function socialLogin(Request $request)
     {
@@ -101,9 +102,10 @@ class AuthController extends Controller
                     'user_type' => User::$userType[$request?->user_type],
                     'status' => User::$status['active'],
                 ]);
+                $user->assignRole('user');
             }
             $token = $user->createToken('auth_token')->plainTextToken;
-            return sendResponse(true, 'Login Successful.', ["token" => $token, "status" => User::$statusName[$user?->status]]);
+            return sendResponse(true, 'Login Successful.', ["token" => $token, "status" => User::$statusName[$user?->status], 'role' => $user->getRoleNames()->toArray()]);
         }catch (\Exception $e){
             return sendResponse(false, $e->getMessage(), null, 500);
         }

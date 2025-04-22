@@ -19,7 +19,10 @@ return new class extends Migration
             $table->string('cvc_code')->nullable();
             $table->string('expiry_date')->nullable();
             $table->boolean('is_default_payment')->default(false);
-            $table->tinyInteger('type')->default(0);
+            $table->tinyInteger('type')->default(0); // card or anything else
+            $table->tinyInteger('review_status')->default(1); // pending, accepted, cancel
+            $table->string('remarks')->nullable(); // if cancel with the reason the request
+
             $table->timestamps();
 
             $table->softDeletes();

@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\RiderBankInformation;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -20,7 +21,9 @@ class RiderBankInformationResource extends JsonResource
             'account_number' => $this->account_number,
             'cvc_code' => $this->cvc_code,
             'expiry_date' => $this->expiry_date,
-            'is_default_payment' => $this->is_default_payment
+            'is_default_payment' => $this->is_default_payment,
+            'review_status' => RiderBankInformation::$REVIEW_STATUS[$this->review_status]
+
         ];
     }
 }

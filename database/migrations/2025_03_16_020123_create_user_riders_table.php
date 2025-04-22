@@ -17,7 +17,8 @@ return new class extends Migration
             $table->string('document_type');
             $table->string('document_number')->nullable();
             $table->string('document');
-            $table->tinyInteger('is_review')->default(1); // pending, accepted
+            $table->tinyInteger('review_status')->default(1); // pending, accepted, cancel
+            $table->string('remarks')->nullable(); // if cancel with the reason the request
             $table->softDeletes();
             $table->timestamps();
         });

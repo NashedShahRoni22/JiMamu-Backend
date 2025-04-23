@@ -47,7 +47,7 @@ Route::middleware(['json.response'])->prefix('/v1')->group(function() {
         });
         Route::prefix('/rider')->group(function () {
             Route::prefix('/profile')->group(function () {
-                Route::get('/', [ProfileUpdateController::class, 'UserProfileShow']); // Get user profile
+                Route::get('/', [ProfileUpdateController::class, 'UserRiderProfileShow']); // Get user profile
                 Route::put('/update', [ProfileUpdateController::class, 'riderProfileUpdate']); // Update user profile
             });
             Route::post('/location/update', [RiderLocationController::class, 'locationUpdate']);

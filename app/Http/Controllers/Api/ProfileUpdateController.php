@@ -65,6 +65,25 @@ class ProfileUpdateController extends Controller
         }
 
     }
+    public function UserRiderProfileShow()
+    {
+        try {
+            $user = Auth::user();
+            if ($user->hasRole('rider')) {
+                return sendResponse(false, 'You are not authorized for rider', null, 403);
+            }
+            // load relationship data
+            $user->load([
+                'riderBankInformations',
+                'userRiders'
+            ]);
+            $data = new RiderProfileResource($user);
+            return sendResponse(true, 'User profile fetched successfully.', $data, 200);
+        }catch (\Exception $exception){
+            return sendResponse(false, $exception->getMessage(), null, 500);
+        }
+
+    }
     public function riderProfileUpdate(Request $request)
     {
 

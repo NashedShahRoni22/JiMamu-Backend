@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('rider_id');
+            $table->string('order_unique_id');
+            $table->foreignId('rider_id')->nullable();
             $table->foreignId('customer_id');
             $table->foreignId('package_id');
             $table->string('pickup_latitude');
@@ -21,7 +22,7 @@ return new class extends Migration
             $table->string('drop_latitude');
             $table->string('drop_longitude');
             $table->float('weight');
-            $table->float('price');
+            $table->float('fare');
             $table->float('pickup_radius')->default(1.0); // in kilometers
             $table->tinyInteger('status')->default(1); // pending, assigned, picked_up, delivered, canceled
             $table->tinyInteger('payment_status')->default(1); // unpaid, paid

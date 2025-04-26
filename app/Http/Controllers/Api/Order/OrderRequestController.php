@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Api\Order;
 
 use App\Http\Controllers\Controller;
-use App\Models\order;
-use App\Models\OrderRequest;
+use App\Http\Resources\MyOrderDetailsResource;
+use App\Http\Resources\MyOrderListResource;
+use App\Models\Order;
 use App\Services\Rider\LocationService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Redis;
 
@@ -16,7 +18,7 @@ class OrderRequestController extends Controller
 
     }
     public function orderRequest(Request $request){
-//        $rider = auth()->id();
+         $rider = auth()->id();
 //       return Redis::geopos('rider_locations', "rider:$rider");
 //        $lat = 23.7611;
 //        $lng = 90.3623;
@@ -35,53 +37,78 @@ class OrderRequestController extends Controller
 //       return $address = $data['display_name'] ?? null;
 
         // Step 1: Get all members from the geo set
-        $members = Redis::zrange('rider_locations', 0, -1);
-
-        $locations = [];
-
-        // Step 2: Loop through and get position of each rider
-        foreach ($members as $member) {
-            $position = Redis::geopos('rider_locations', $member);
-
-            if (!empty($position[0])) {
-                $locations[] = [
-                    'rider_id' => str_replace('rider:', '', $member),
-                    'longitude' => $position[0][0],
-                    'latitude' => $position[0][1],
-                ];
-            }
-        }
-        $nearby = Redis::georadius('rider_locations', 90.3582, 23.7564, 1, 'km');
-        $riderIds = collect($nearby)->map(function ($key) {
-            return str_replace('rider:', '', $key);
-        });
-
-        return $riderIds;
+//        $members = Redis::zrange('rider_locations', 0, -1);
+//
+//        $locations = [];
+//
+//        // Step 2: Loop through and get position of each rider
+//        foreach ($members as $member) {
+//            $position = Redis::geopos('rider_locations', $member);
+//
+//            if (!empty($position[0])) {
+//                $locations[] = [
+//                    'rider_id' => str_replace('rider:', '', $member),
+//                    'longitude' => $position[0][0],
+//                    'latitude' => $position[0][1],
+//                ];
+//            }
+//        }
+//        $nearby = Redis::georadius('rider_locations', 90.3582, 23.7564, 1, 'km');
+//        $riderIds = collect($nearby)->map(function ($key) {
+//            return str_replace('rider:', '', $key);
+//        });
+//
+//        return $riderIds;
         try {
-           $orderRequest = order::create([
-                'user_id' => auth()->id(),
-                'package_id' => $request->package_id,
-                'pickup_latitude' => $request->pickup_latitude,
-                'pickup_longitude' => $request->pickup_longitude,
-                'drop_latitude' => $request->drop_latitude,
-                'drop_longitude' => $request->drop_longitude,
-                'weight' => $request->weight,
-                'price' => $request->price,
-                'pickup_radius' => $request->pickup_radius
-            ]);
-            $nearbyRiders = Redis::command('georadius', [
-                'rider_locations',
-                $request->pickup_longitude,
-                $request->pickup_latitude,
-                $request->pickup_radius,
-                'km',
-            ]);
-            return $nearbyRiders;
-           return $this->locationService->findNearbyRiders($orderRequest);
+            DB::transaction(function () use ($request) {
+                $orderRequest = Order::create([
+                    'customer_id' => auth()->id(),
+                    'order_unique_id' => rand(000000, 999999),
+                    'package_id' => $request->package_id,
+                    'pickup_latitude' => $request->pickup_latitude,
+                    'pickup_longitude' => $request->pickup_longitude,
+                    'drop_latitude' => $request->drop_latitude,
+                    'drop_longitude' => $request->drop_longitude,
+                    'weight' => $request->weight,
+                    'fare' => $request->total_fare,
+                ]);
+                // radius db store locations data
+                $nearbyRiders = Redis::command('georadius', [
+                    'rider_locations',
+                    $request->pickup_longitude,
+                    $request->pickup_latitude,
+                    $request->pickup_radius,
+                    'km',
+                ]);
+                // return $nearbyRiders;
+              return  $this->locationService->findNearbyRiders($orderRequest);
+            });
+
             return sendResponse(success: true, message: 'Successfully send order request');
         }catch (\Exception $exception){
             return sendResponse(success: false, message: 'something went wrong', data: null, status: 422,  error: $exception->getMessage());
         }
+
+    }
+    public function myNewOrderList()
+    {
+        try {
+            $order = Order::where('customer_id', auth()->id())
+                ->where('status', 1)
+                ->latest()
+                ->get(); // fetch all matching orders
+            $data = MyOrderListResource::collection($order);
+            return sendResponse(success: true, message: 'Success My Order List', data: $data);
+        }catch (\Exception $exception){
+            return sendResponse(false, message: 'something went wrong', data: null, status: 422);
+        }
+
+    }
+    public function myOrderDetails($orderUniqueId){
+       $order = Order::where('id', 1)->with('bids.rider')->firstOrFail();
+       $data = new MyOrderDetailsResource($order);
+       return sendResponse(success: true, message: 'Success Order Details', data: $data);
+
 
     }
 }

@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\ProfileUpdateController;
 use App\Http\Controllers\Api\Order\OrderRequestController;
 use App\Http\Controllers\Api\Rider\RiderLocationController;
+use App\Http\Controllers\Api\Rider\BidsController;
 use Laravel\Socialite\Facades\Socialite;
 
 Route::middleware(['json.response'])->prefix('/v1')->group(function() {
@@ -51,11 +52,16 @@ Route::middleware(['json.response'])->prefix('/v1')->group(function() {
                 Route::put('/update', [ProfileUpdateController::class, 'riderProfileUpdate']); // Update user profile
             });
             Route::post('/location/update', [RiderLocationController::class, 'locationUpdate']);
+            Route::get('/order/new/bids/{order_id}', [BidsController::class, 'newBids']); // show
+            Route::post('/order/apply/bids/{order_id}', [BidsController::class, 'applyBids']); // show
         });
-        Route::prefix('/order')->group(function () {
-            Route::prefix('/request')->group(function () {
-                Route::get('/', [OrderRequestController::class, 'orderRequest']); // Get user profile
+        Route::prefix('/orders')->group(function () {
+            Route::prefix('/new/order/request')->group(function () {
+                Route::post('/', [OrderRequestController::class, 'orderRequest']); // Get user profile
+                Route::get('/show/{order_id}', [OrderRequestController::class, 'showOrderRequest']);
             });
+            Route::get('my/new/order/list', [OrderRequestController::class, 'myNewOrderList']);
+            Route::get('my/order/details/{order_id}', [OrderRequestController::class, 'myOrderDetails']);
         });
     });
 

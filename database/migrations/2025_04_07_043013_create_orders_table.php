@@ -15,8 +15,14 @@ return new class extends Migration
             $table->id();
             $table->foreignId('rider_id');
             $table->foreignId('customer_id');
-            $table->foreignId('order_request_id');
-            $table->float('amount');
+            $table->foreignId('package_id');
+            $table->string('pickup_latitude');
+            $table->string('pickup_longitude');
+            $table->string('drop_latitude');
+            $table->string('drop_longitude');
+            $table->float('weight');
+            $table->float('price');
+            $table->float('pickup_radius')->default(1.0); // in kilometers
             $table->tinyInteger('status')->default(1); // pending, assigned, picked_up, delivered, canceled
             $table->tinyInteger('payment_status')->default(1); // unpaid, paid
             $table->string('tracking_code')->nullable();
@@ -25,7 +31,7 @@ return new class extends Migration
 
             $table->foreign('rider_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('customer_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('order_request_id')->references('id')->on('order_requests')->onDelete('cascade');
+            $table->foreign('package_id')->references('id')->on('packages')->onDelete('cascade');
         });
     }
 

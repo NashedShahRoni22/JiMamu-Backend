@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Order;
 
 use App\Http\Controllers\Controller;
+use App\Models\order;
 use App\Models\OrderRequest;
 use App\Services\Rider\LocationService;
 use Illuminate\Http\Request;
@@ -57,7 +58,7 @@ class OrderRequestController extends Controller
 
         return $riderIds;
         try {
-           $orderRequest = OrderRequest::create([
+           $orderRequest = order::create([
                 'user_id' => auth()->id(),
                 'package_id' => $request->package_id,
                 'pickup_latitude' => $request->pickup_latitude,

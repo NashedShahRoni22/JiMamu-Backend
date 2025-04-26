@@ -5,11 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class OrderRequest extends Model
+class Order extends Model
 {
     use SoftDeletes;
     protected $fillable = [
-        'user_id',
+        'rider_id',
+        'customer_id',
         'package_id',
         'pickup_latitude',
         'pickup_longitude',
@@ -17,6 +18,9 @@ class OrderRequest extends Model
         'drop_longitude',
         'weight',
         'price',
+        'pickup_radius',
         'status',
+        'payment_status',
+        'tracking_code',
     ];
 }

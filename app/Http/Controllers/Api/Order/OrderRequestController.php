@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Api\Order;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\MyOrderDetailsResource;
 use App\Http\Resources\MyOrderListResource;
+use App\Models\Bid;
 use App\Models\Order;
 use App\Services\Rider\LocationService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -90,11 +92,13 @@ class OrderRequestController extends Controller
         }
 
     }
+    // only own order request list
     public function myNewOrderList()
     {
         try {
             $order = Order::where('customer_id', auth()->id())
-                ->where('status', 1)
+                ->where('status', Order::$ORDER_STATUS['pending'])
+                ->where('created_at', '>=', Carbon::now()->subMinutes(5))
                 ->latest()
                 ->get(); // fetch all matching orders
             $data = MyOrderListResource::collection($order);
@@ -104,11 +108,45 @@ class OrderRequestController extends Controller
         }
 
     }
+
     public function myOrderDetails($orderUniqueId){
-       $order = Order::where('id', 1)->with('bids.rider')->firstOrFail();
-       $data = new MyOrderDetailsResource($order);
-       return sendResponse(success: true, message: 'Success Order Details', data: $data);
-
-
+       $order = Order::where('order_unique_id', $orderUniqueId)
+           ->where('status', Order::$ORDER_STATUS['pending'])
+           ->where('created_at', '>=', Carbon::now()->subMinutes(5))
+           ->with('bids.user')->firstOrFail();
+        try {
+            $data = new MyOrderDetailsResource($order);
+            return sendResponse(success: true, message: 'My new order list', data: $data);
+        }catch (\Exception $exception){
+            return sendResponse(success: false, message: 'Something went wrong', data: null, status: 422);
+        }
     }
+    public function orderBidAccept($orderUniqueId, $riderId){
+         $order = Order::where('order_unique_id', $orderUniqueId)
+            ->with('bids') // Load bids
+            ->firstOrFail();
+        if (!$order){
+            return sendResponse(success: false, message: 'Order not found', data: null, status: 404);
+        }
+         $bid = $order->bid->where('user_id', $riderId)->firstOrFail();
+        if (!$bid){
+            return sendResponse(success: false, message: 'Apply Rider Bid not found', data: null, status: 404);
+        }
+
+        try {
+            DB::transaction(function () use ($order, $bid, $orderUniqueId, $riderId){
+                $order->update([
+                    'rider_id' => $bid->user_id,
+                    'status' => Order::$ORDER_STATUS['confirmed'],
+                ]);
+                $bid->update([
+                    'status' => Bid::$STATUS['accepted'],
+                ]);
+            });
+            return sendResponse(success: true, message: 'Order has been confirmed');
+        }catch (\Exception $exception){
+            return sendResponse(success: false, message: 'Something went wrong', data: null, status: 422);
+        }
+    }
+
 }

@@ -20,6 +20,8 @@ class MyOrderDetailsResource extends JsonResource
             'pickup_longitude' => $this->pickup_longitude,
             'drop_latitude' => $this->drop_latitude,
             'drop_longitude' => $this->drop_longitude,
+            'fare' => $this->fare,
+            'rider_bids' => ApplyBidResource::collection($this->bids)
         ];
     }
 }

@@ -35,7 +35,7 @@ class Order extends Model
     public function bid(){
         return $this->hasOne(Bid::class, 'order_id', 'id');
     }
-    public function receiver_information(){
+    public function receiverInformation(){
         return $this->hasOne(ReceiverInformation::class, 'order_id', 'id');
     }
 }

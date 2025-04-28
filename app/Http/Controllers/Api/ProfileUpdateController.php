@@ -69,7 +69,7 @@ class ProfileUpdateController extends Controller
     {
         try {
             $user = Auth::user();
-            if ($user->hasRole('rider')) {
+            if (!$user->hasRole('rider')) {
                 return sendResponse(false, 'You are not authorized for rider', null, 403);
             }
             // load relationship data

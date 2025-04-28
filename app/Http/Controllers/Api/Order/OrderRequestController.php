@@ -121,8 +121,11 @@ class OrderRequestController extends Controller
             return sendResponse(success: false, message: 'Something went wrong', data: null, status: 422);
         }
     }
+    // from rider apply bid accepted from customer
     public function orderBidAccept($orderUniqueId, $riderId){
          $order = Order::where('order_unique_id', $orderUniqueId)
+             ->where('status', Order::$ORDER_STATUS['pending'])
+             ->where('created_at', '>=', Carbon::now()->subMinutes(5))
             ->with('bids') // Load bids
             ->firstOrFail();
         if (!$order){
@@ -134,7 +137,7 @@ class OrderRequestController extends Controller
         }
 
         try {
-            DB::transaction(function () use ($order, $bid, $orderUniqueId, $riderId){
+            DB::transaction(function () use ($order, $bid){
                 $order->update([
                     'rider_id' => $bid->user_id,
                     'status' => Order::$ORDER_STATUS['confirmed'],
@@ -147,6 +150,13 @@ class OrderRequestController extends Controller
         }catch (\Exception $exception){
             return sendResponse(success: false, message: 'Something went wrong', data: null, status: 422);
         }
+    }
+    public function orderTracking($orderUniqueId)
+    {
+        return $order = Order::where('order_unique_id', $orderUniqueId)
+            ->where('status', Order::$ORDER_STATUS['confirmed'])
+            ->with('receiverInformation', 'bid.user')
+            ->firstOrFail();
     }
 
 }

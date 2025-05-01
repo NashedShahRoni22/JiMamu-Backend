@@ -22,11 +22,9 @@ return new class extends Migration
             $table->string('drop_latitude');
             $table->string('drop_longitude');
             $table->float('weight');
-            $table->float('fare');
             $table->float('pickup_radius')->default(1.0); // in kilometers
             $table->tinyInteger('status')->default(1); // pending, confirmed, picked_up, delivered, canceled
             $table->tinyInteger('payment_status')->default(1); // unpaid, paid
-            $table->string('tracking_code')->nullable();
             $table->timestamps();
             $table->softDeletes();
 

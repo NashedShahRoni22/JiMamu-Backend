@@ -61,7 +61,6 @@ class User extends Authenticatable
         return Attribute::make(
             get: fn($value) => $value ? asset('storage/').'/'.$value : null
             );
-
     }
     public function userRiders(){
         return $this->hasMany(UserRider::class, 'user_id', 'id');

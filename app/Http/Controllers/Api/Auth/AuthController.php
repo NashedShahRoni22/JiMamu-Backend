@@ -61,7 +61,6 @@ class AuthController extends Controller
         $exitsUser = User::where('email', $request->email)->first();
         if(!$exitsUser){
             $user = User::create([
-                'name' => 'test',
                 'email' => $request->email,
                 'status' => 1,
             ]);

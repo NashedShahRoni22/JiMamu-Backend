@@ -11,14 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('payments', function (Blueprint $table) {
+        Schema::create('fare_settings', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('order_id');
-            $table->foreignId('order_attempt_id');
-            $table->float('amount');
-            $table->tinyInteger('payment_method'); // paypal, stripe, ...
-            $table->tinyInteger('status'); // pending, completed, failed
+            $table->float('minimum_fare');
+            $table->float('distance_rete');
+            $table->float('platform_charge');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -27,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('payments');
+        Schema::dropIfExists('fare_settings');
     }
 };

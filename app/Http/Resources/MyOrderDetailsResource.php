@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -20,8 +21,8 @@ class MyOrderDetailsResource extends JsonResource
             'pickup_longitude' => $this->pickup_longitude,
             'drop_latitude' => $this->drop_latitude,
             'drop_longitude' => $this->drop_longitude,
-            'fare' => $this->fare,
-            'rider_bids' => ApplyBidResource::collection($this->bids)
+            'status' => Order::$ORDER_STATUS_NAME[$this->status],
+            'order_attempts' => OrderAttemptsResource::collection($this->orderAttempts) ,
         ];
     }
 }

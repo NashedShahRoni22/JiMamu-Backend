@@ -10,7 +10,8 @@ class Order extends Model
     //only using storing data, because from fronted give name
     static $ORDER_STATUS  = ['pending' => 1, 'confirmed' => 2, 'picked' => 3, 'shipping' => 4, 'delivered' => 5, 'cancelled' => 6];
 
-    static $ORDER_STATUS_NAME  = [1 => 'pending', 'confirmed' => 2, 'picked' => 3, 'shipping' => 4, 'delivered' => 5, 'cancelled' => 6];
+    static $ORDER_STATUS_NAME  = [1 => 'pending', 2 => 'confirmed', 3 => 'picked', 4 => 'shipping', 5 => 'delivered', 6 => 'cancelled'];
+
     use SoftDeletes;
     protected $fillable = [
         'order_unique_id',
@@ -22,12 +23,12 @@ class Order extends Model
         'drop_latitude',
         'drop_longitude',
         'weight',
-        'fare',
         'pickup_radius',
         'status',
-        'payment_status',
-        'tracking_code',
     ];
+    public function orderAttempts(){
+        return $this->hasMany(OrderAttempt::class, 'order_id', 'id');
+    }
     public function bids(){
         return $this->hasMany(Bid::class, 'order_id', 'id');
     }
@@ -38,4 +39,9 @@ class Order extends Model
     public function receiverInformation(){
         return $this->hasOne(ReceiverInformation::class, 'order_id', 'id');
     }
+    public function senderInformation()
+    {
+        return $this->hasOne(SenderInformation::class, 'order_id', 'id');
+    }
+
 }

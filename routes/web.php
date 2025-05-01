@@ -29,6 +29,15 @@ Route::get('/migrate/refresh', function () {
         return $e->getMessage();
     }
 });
+Route::get('/storage-link', function () {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('storage:link');
+        return 'Storage link created successfully!';
+    } catch (\Exception $e) {
+        return $e->getMessage();
+    }
+});
+
 
 
 require __DIR__.'/settings.php';

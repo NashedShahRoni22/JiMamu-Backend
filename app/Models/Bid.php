@@ -12,7 +12,7 @@ class Bid extends Model
     static $STATUS = ['pending' => 1, 'accepted' => 2, 'rejected' => 3];
     static $STATUS_NAME = [1 => 'pending', 2 => 'accepted', 3 => 'rejected'];
 
-    protected $fillable = ['order_id', 'user_id', 'bid_amount', 'status'];
+    protected $fillable = ['order_id', 'user_id', 'order_attempt_id', 'bid_amount',  'status'];
 
     public function user()
     {

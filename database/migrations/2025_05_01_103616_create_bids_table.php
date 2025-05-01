@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('bids', function (Blueprint $table) {
             $table->id();
             $table->foreignId('order_id');
+            $table->foreignId('order_attempt_id');
             $table->foreignId('user_id'); // rider id
             $table->float('bid_amount');
             $table->tinyInteger('status')->default(1); // pending, accepted, rejected
@@ -21,6 +22,7 @@ return new class extends Migration
             $table->softDeletes();
 
             $table->foreign('order_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('order_attempt_id')->references('id')->on('order_attempts')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')  ;
         });
     }

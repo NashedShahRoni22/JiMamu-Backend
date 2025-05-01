@@ -7,6 +7,7 @@ use App\Http\Resources\MyOrderDetailsResource;
 use App\Http\Resources\MyOrderListResource;
 use App\Models\Bid;
 use App\Models\Order;
+use App\Models\OrderAttempt;
 use App\Services\Rider\LocationService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -61,6 +62,15 @@ class OrderRequestController extends Controller
 //        });
 //
 //        return $riderIds;
+        $senderName = $request->input('sender_information.name');
+        Order::where('user_id', auth()->id())
+            -where('package_id', $request->package_id)
+            ->where('pickup_latitude', $request->pickup_latitude)
+            ->where('pickup_longitude', $request->pickup_longitude)
+            ->where('drop_latitude', $request->drop_latitude)
+            ->where('drop_longitude', $request->drop_longitude)
+            ->first();
+
         try {
             DB::transaction(function () use ($request) {
                 $orderRequest = Order::create([
@@ -72,8 +82,41 @@ class OrderRequestController extends Controller
                     'drop_latitude' => $request->drop_latitude,
                     'drop_longitude' => $request->drop_longitude,
                     'weight' => $request->weight,
-                    'fare' => $request->total_fare,
                 ]);
+                OrderAttempt::create([
+                    'order_id' => $orderRequest->id,
+                    'fare' => $request->total_fare,
+                    'order_tracking_number' => rand(000000, 999999),
+                ]);
+                // customer sender informations
+                if ($request->has('sender_information')) {
+                    $senderName = $request->input('sender_information.name');
+                    $senderPhone = $request->input('sender_information.phone_number');
+                    $senderRemarks = $request->input('sender_information.remarks');
+
+                    // Check if matching user exists
+                    $userExists = auth()->user()->where('name', $senderName)
+                        ->where('phone_number', $senderPhone)
+                        ->first();
+
+                    // If no matching user, then store as sender information
+                    if (!$userExists) {
+                        $orderRequest->senderInformation()->create([
+                            'sender_name' => $senderName,
+                            'sender_phone' => $senderPhone,
+                            'remarks' => $senderRemarks,
+                        ]);
+                    }
+                }
+                // Store Receiver Info
+                if ($request->has('receiver_information')) {
+                    $orderRequest->receiverInformation()->create([
+                        'receiver_name' => $request->input('receiver_information.name'),
+                        'receiver_phone' => $request->input('receiver_information.phone_number'),
+                        'remarks' => $request->input('receiver_information.remarks'),
+                    ]);
+                }
+
                 // radius db store locations data
                 $nearbyRiders = Redis::command('georadius', [
                     'rider_locations',
@@ -83,7 +126,7 @@ class OrderRequestController extends Controller
                     'km',
                 ]);
                 // return $nearbyRiders;
-              return  $this->locationService->findNearbyRiders($orderRequest);
+              $findNearByRiders =  $this->locationService->findNearbyRiders($orderRequest);
             });
 
             return sendResponse(success: true, message: 'Successfully send order request');
@@ -109,11 +152,15 @@ class OrderRequestController extends Controller
 
     }
 
+    /*
+     * orderAttempts.bids means all bids rider will get when order pending.
+     * orderAttempts.bid means only one bid get when order confirmed from customer.
+     */
     public function myOrderDetails($orderUniqueId){
        $order = Order::where('order_unique_id', $orderUniqueId)
-           ->where('status', Order::$ORDER_STATUS['pending'])
-           ->where('created_at', '>=', Carbon::now()->subMinutes(5))
-           ->with('bids.user')->firstOrFail();
+           ->whereIn('status', [Order::$ORDER_STATUS['pending'],  Order::$ORDER_STATUS['confirmed']])
+           //->where('created_at', '>=', Carbon::now()->subMinutes(5))
+           ->with('orderAttempts.bids', 'orderAttempts.bid')->firstOrFail();
         try {
             $data = new MyOrderDetailsResource($order);
             return sendResponse(success: true, message: 'My new order list', data: $data);

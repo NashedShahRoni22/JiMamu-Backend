@@ -151,6 +151,24 @@ class OrderRequestController extends Controller
         }
 
     }
+    /*
+     * orderAttempts.bids means all bids rider will get when order pending.
+     * orderAttempts.bid means only one bid get when order confirmed from customer.
+     * 1 =  pending, 2 = confirmed, 3 = picked, 4 = shipping
+     */
+    public function showOrderRequest($orderUniqueId)
+    {
+        $order = Order::where('order_unique_id', $orderUniqueId)
+            ->whereIn('status', [1,2,3,4])
+            //->where('created_at', '>=', Carbon::now()->subMinutes(5))
+            ->with('orderAttempts.bids', 'orderAttempts.bid')->firstOrFail();
+        try {
+            $data = new MyOrderDetailsResource($order);
+            return sendResponse(success: true, message: 'My new order list', data: $data);
+        }catch (\Exception $exception){
+            return sendResponse(success: false, message: 'Something went wrong', data: null, status: 422);
+        }
+    }
 
     /*
      * orderAttempts.bids means all bids rider will get when order pending.
@@ -158,7 +176,7 @@ class OrderRequestController extends Controller
      */
     public function myOrderDetails($orderUniqueId){
        $order = Order::where('order_unique_id', $orderUniqueId)
-           ->whereIn('status', [Order::$ORDER_STATUS['pending'],  Order::$ORDER_STATUS['confirmed']])
+           ->whereIn('status', [Order::$ORDER_STATUS['delivered']])
            //->where('created_at', '>=', Carbon::now()->subMinutes(5))
            ->with('orderAttempts.bids', 'orderAttempts.bid')->firstOrFail();
         try {
@@ -169,12 +187,16 @@ class OrderRequestController extends Controller
         }
     }
     // from rider apply bid accepted from customer
-    public function orderBidAccept($orderUniqueId, $riderId){
-         $order = Order::where('order_unique_id', $orderUniqueId)
-             ->where('status', Order::$ORDER_STATUS['pending'])
-             ->where('created_at', '>=', Carbon::now()->subMinutes(5))
-            ->with('bids') // Load bids
+    public function orderBidAccept($orderUniqueId, $orderAttemptId, $riderId){
+        $order =OrderAttempt::where('order_tracking_number', $orderAttemptId)
+           // ->where('created_at', '>=', Carbon::now()->subMinutes(5))
+            ->with('order')
             ->firstOrFail();
+//         $order = Order::where('order_unique_id', $orderUniqueId)
+//             ->where('status', Order::$ORDER_STATUS['pending'])
+//             ->where('created_at', '>=', Carbon::now()->subMinutes(5))
+//            ->with('bids') // Load bids
+//            ->firstOrFail();
         if (!$order){
             return sendResponse(success: false, message: 'Order not found', data: null, status: 404);
         }
@@ -185,9 +207,12 @@ class OrderRequestController extends Controller
 
         try {
             DB::transaction(function () use ($order, $bid){
-                $order->update([
+                $order->order()->update([
                     'rider_id' => $bid->user_id,
                     'status' => Order::$ORDER_STATUS['confirmed'],
+                ]);
+                $order->update([
+                    'status' => OrderAttempt::$ORDER_STATUS['confirmed'],
                 ]);
                 $bid->update([
                     'status' => Bid::$STATUS['accepted'],
@@ -200,7 +225,7 @@ class OrderRequestController extends Controller
     }
     public function orderTracking($orderUniqueId)
     {
-        return $order = Order::where('order_unique_id', $orderUniqueId)
+         $order = Order::where('order_unique_id', $orderUniqueId)
             ->where('status', Order::$ORDER_STATUS['confirmed'])
             ->with('receiverInformation', 'bid.user')
             ->firstOrFail();

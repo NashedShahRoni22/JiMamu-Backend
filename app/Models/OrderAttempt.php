@@ -17,6 +17,9 @@ class OrderAttempt extends Model
         return $this->hasMany(Bid::class, 'order_attempt_id', 'id');
     }
     public function bid(){
-        return $this->hasOne(Bid::class, 'order_attempt_id', 'id')->where('status', 2);
+        return $this->hasOne(Bid::class, 'order_attempt_id', 'id');
+    }
+    public function order(){
+        return $this->belongsTo(Order::class, 'order_id', 'id');
     }
 }

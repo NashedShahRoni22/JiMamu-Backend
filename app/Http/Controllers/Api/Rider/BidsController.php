@@ -24,9 +24,9 @@ class BidsController extends Controller
        return sendResponse(true, 'Successfully get data.', $data);
     }
     public function applyBids(Request $request, $order_id){
-        $order =  Order::where('order_unique_id', $order_id)->firstOrFail();
-        $maxBidPrice = $order->fare + $order->fare * 30 / 100;
-        $minBidPrice = $order->fare - $order->fare * 20 / 100;
+        $order =  Order::where('order_unique_id', $order_id)->with('orderAttempt')->firstOrFail();
+        $maxBidPrice = $order->orderAttempt?->fare + $order->orderAttempt?->fare * 30 / 100;
+        $minBidPrice = $order->orderAttempt?->fare - $order->orderAttempt?->fare * 20 / 100;
         // check maximum
         if($maxBidPrice < $request->bid_amount){
             return sendResponse(false, 'Your bid amount to much high', ['max_bid' => $maxBidPrice], 422);
@@ -42,6 +42,7 @@ class BidsController extends Controller
         try {
             Bid::create([
                 'order_id' => $order->id,
+                'order_attempt_id' => $order->orderAttempt->order_attempt_id,
                 'user_id' => auth()->id(),
                 'bid_amount' => $request->bid_amount
             ]);

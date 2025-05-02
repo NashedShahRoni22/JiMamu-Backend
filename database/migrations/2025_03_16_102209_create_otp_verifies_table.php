@@ -18,7 +18,8 @@ return new class extends Migration
             $table->string('otp_code');
             $table->dateTime('otp_expires_at');
             $table->dateTime('verified_at')->nullable();
-            $table->enum('otp_type', ['phone_number', 'email']);
+            $table->enum('sender_type', ['phone_number', 'email']);
+            $table->tinyInteger('otp_type'); // account verify, order verify(picked, delivered)
             $table->timestamps();
         });
     }

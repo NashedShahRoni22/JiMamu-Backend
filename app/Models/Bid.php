@@ -14,6 +14,11 @@ class Bid extends Model
 
     protected $fillable = ['order_id', 'user_id', 'order_attempt_id', 'bid_amount',  'status'];
 
+    // scope accepted query
+    public function scopeAcceptedBid($query){
+        return $query->where('status', Bid::$STATUS['accepted']);
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'id');

@@ -6,5 +6,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class OtpVerify extends Model
 {
-    protected $fillable = ['email', 'phone_number', 'otp_code', 'otp_expires_at', 'verified_at', 'otp_type'];
+    protected $fillable = ['email', 'phone_number', 'sender_type', 'otp_code', 'otp_expires_at', 'verified_at', 'otp_type'];
 }

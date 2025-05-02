@@ -29,6 +29,9 @@ class Order extends Model
     public function orderAttempts(){
         return $this->hasMany(OrderAttempt::class, 'order_id', 'id');
     }
+    public function orderAttempt(){
+        return $this->hasOne(OrderAttempt::class, 'order_id', 'id');
+    }
     public function bids(){
         return $this->hasMany(Bid::class, 'order_id', 'id');
     }
@@ -42,6 +45,9 @@ class Order extends Model
     public function senderInformation()
     {
         return $this->hasOne(SenderInformation::class, 'order_id', 'id');
+    }
+    public function customer(){
+        return $this->belongsTo(User::class,  'customer_id', 'id');
     }
 
 }

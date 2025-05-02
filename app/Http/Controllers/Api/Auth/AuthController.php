@@ -33,7 +33,8 @@ class AuthController extends Controller
                 'email' => $request->email,
                 'otp_code' => rand(1000, 9999),
                 'otp_expires_at' => now()->addMinutes(3),
-                'otp_type' => "phone_number",
+                'sender_type' => 'email',
+                'otp_type' => 'account_verification',
             ]);
            // event(new OtpGenerated(1251)); // Dispatch event
             Mail::to($request->email)->send(new OtpMail($otp->otp_code));

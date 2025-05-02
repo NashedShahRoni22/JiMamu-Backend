@@ -2,17 +2,22 @@
 
 namespace App\Http\Controllers\Api\Order;
 
+use App\Exceptions\CustomException;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\MyOrderDetailsResource;
 use App\Http\Resources\MyOrderListResource;
+use App\Mail\OtpMail;
 use App\Models\Bid;
 use App\Models\Order;
 use App\Models\OrderAttempt;
+use App\Models\OtpVerify;
+use App\Models\User;
 use App\Services\Rider\LocationService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Redis;
 
 class OrderRequestController extends Controller
@@ -229,6 +234,70 @@ class OrderRequestController extends Controller
             ->where('status', Order::$ORDER_STATUS['confirmed'])
             ->with('receiverInformation', 'bid.user')
             ->firstOrFail();
+    }
+    public function riderOrderSendOtp($orderUniqueId, $otpType){
+
+        $order = Order::where('order_unique_id', $orderUniqueId)
+            ->with([
+                'customer:id,email',
+                'orderAttempt.acceptedBid'
+            ])
+            ->firstOrFail();
+        try {
+            $otp = OtpVerify::create([
+                'email' => $order?->customer->email,
+                'otp_code' => rand(1000, 9999),
+                'otp_expires_at' => now()->addMinutes(3),
+                'sender_type' => 'email',
+                'otp_type' => $otpType,
+            ]);
+            // event(new OtpGenerated(1251)); // Dispatch event
+            Mail::to($order?->customer->email)->send(new OtpMail($otp->otp_code));
+
+            return sendResponse(true, 'OTP picked send successfully.');
+        }catch (CustomException $e){
+            return $e->getMessage();
+        }
+    }
+    public function riderOrderOtpVerify($orderUniqueId, $otpType, $otpCode)
+    {
+        $order = Order::where('order_unique_id', $orderUniqueId)
+            ->with([
+                'customer:id,email',
+                'orderAttempt.acceptedBid'
+            ])
+            ->firstOrFail();
+        // rider check
+
+        if($order->orderAttempt->acceptedBid->user_id != auth()->id()){
+            return sendResponse(success: false, message: 'Rider not valid', data: null, status: 422);
+        }
+        if($otpType == 'confirmed' && $order->status !== Order::$ORDER_STATUS['picked']){
+            return sendResponse(false, false, 'Otp is Invalid!.');
+        }
+        $otpCode = OtpVerify::where('email', $order->customer->email)->where('otp_code', $otpCode)->first();
+
+        if (!$otpCode || $otpCode->otp_code !== $otpCode || Carbon::now()->gt($otpCode->otp_expires_at)) {
+            return sendResponse(false, 'Invalid or expired OTP.', null,401);
+        }
+
+        try {
+            DB::transaction(function () use ($order, $otpType, $otpCode){
+                // email check
+                $orderAttempt = $order->orderAttempt->updaate([
+                    'status' =>$order->status == Order::$ORDER_STATUS['confirmed'] ? Order::$ORDER_STATUS['confirmed'] : Order::$ORDER_STATUS['delivered']
+                ]);
+                $orderUpdate = $order->update([
+                    'status' => $order->status == Order::$ORDER_STATUS['confirmed'] ? Order::$ORDER_STATUS['confirmed'] : Order::$ORDER_STATUS['delivered']
+                ]);
+                // clear otp
+                $otpCode->delete();
+            });
+            return sendResponse(success: true, message: "OTP {$otpType} send successfully.");
+        }catch (\Exception $e){
+            return sendResponse(false, "Something went wrong", null, 422);
+        }
+
     }
 
 }

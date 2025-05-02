@@ -54,6 +54,11 @@ Route::middleware(['json.response'])->prefix('/v1')->group(function() {
             Route::post('/location/update', [RiderLocationController::class, 'locationUpdate']);
             Route::get('/order/new/bids/{order_id}', [BidsController::class, 'newBids']); // show
             Route::post('/order/apply/bids/{order_id}', [BidsController::class, 'applyBids']); // show
+
+            // order otp verify
+            Route::get('order/send/otp/{order_id}/{otp_type}', [OrderRequestController::class, 'riderOrderSendOtp']);
+            Route::get('order/verify/{order_id}/{otp_type}/{otp_code}', [OrderRequestController::class, 'riderOrderOtpVerify']);
+
         });
         Route::prefix('/orders')->group(function () {
             Route::prefix('/new/order/request')->group(function () {

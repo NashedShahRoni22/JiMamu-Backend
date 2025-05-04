@@ -127,7 +127,7 @@ class ProfileUpdateController extends Controller
                             'name' => $request->name[$key],
                             'account_number' => $request->card_number[$key],
                             'cvc_code' => $request->cvc_code[$key],
-                            'expire_date' => $request->expire_date[$key],
+                            'expiry_date' => $request->expire_date[$key],
                             'type' => RiderBankInformation::$type['card'],
                             'is_default_payment' => $item === 'true',
                         ]

@@ -26,7 +26,7 @@ class User extends Authenticatable
         'verification_code',
         'profile_image',
         'phone_number',
-        'dod',
+        'dob',
         'gender',
         'user_type',
         'status',

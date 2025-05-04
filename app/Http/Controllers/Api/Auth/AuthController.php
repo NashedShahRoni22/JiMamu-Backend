@@ -81,7 +81,7 @@ class AuthController extends Controller
             $request->validate([
                 'email' => 'required|string|email|unique:users,email',
                 'user_type' => 'required|string|in:user,rider',
-                'dod' => 'required|string',
+                'dob' => 'required|string',
                 'gender' => 'required|string',
                 'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg',
             ]);
@@ -97,7 +97,7 @@ class AuthController extends Controller
                     'name' => $request->name,
                     'email' => $request->email,
                     'profile_image' => $fileName,
-                    'dod' => $request->dod,
+                    'dob' => $request->dod,
                     'gender' => $request->gender,
                     'user_type' => User::$userType[$request?->user_type],
                     'status' => User::$status['active'],

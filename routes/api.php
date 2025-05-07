@@ -58,6 +58,7 @@ Route::middleware(['json.response'])->prefix('/v1')->group(function() {
             Route::post('/order/apply/bids/{order_id}', [BidsController::class, 'applyBids']); // show
 
 
+            Route::get('/my/new/order/request', [MyDeliveryController::class, 'myNewOrderRequest']); // show
             Route::get('/my/completed/order', [MyDeliveryController::class, 'myCompletedOrderList']); // show
 
             // order otp verify

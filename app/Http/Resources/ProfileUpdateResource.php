@@ -20,7 +20,7 @@ class ProfileUpdateResource extends JsonResource
             'email' => $this->email,
             'phone_number' => $this?->phone_number,
             'profile_image' => $this?->profile_image,
-            'dob' => $this->dod,
+            'dob' => $this->dob,
             'gender' => $this->gender,
             'status' => array_search($this->status, User::$status) ?? 'unknown', // Convert integer to string
             'role' => $this->getRoleNames()->toArray(),

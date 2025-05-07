@@ -9,8 +9,25 @@ use Illuminate\Http\Request;
 
 class MyDeliveryController extends Controller
 {
+    public function myNewOrderRequest()
+    {
+        if(!auth()->user()->hasRole('rider')){
+            return sendResponse(false, 'Your are not rider', null, 403);
+        }
+        try {
+            $order = Order::where('status', Order::$ORDER_STATUS['pending'])
+                ->with('orderAttempts.bids', 'orderAttempts.bid')->get();
+            $data = MyOrderDetailsResource::collection($order);
+            return sendResponse(success: true, message: 'Successfully Get Data', data: $data);
+        } catch (\Exception $exception) {
+            return sendResponse(false, message: 'something went wrong', data: null, status: 422);
+        }
+    }
     public function myCompletedOrderList()
     {
+        if(!auth()->user()->hasRole('rider')){
+            return sendResponse(false, 'Your are not rider', null, 403);
+        }
         try {
             $order = Order::where('customer_id', auth()->id())
                 ->where('status', Order::$ORDER_STATUS['delivered'])
@@ -21,4 +38,5 @@ class MyDeliveryController extends Controller
             return sendResponse(false, message: 'something went wrong', data: null, status: 422);
         }
     }
+
 }

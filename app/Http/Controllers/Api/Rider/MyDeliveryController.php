@@ -35,7 +35,7 @@ class MyDeliveryController extends Controller
             ->with('orderAttempts.bids', 'orderAttempts.bid')->firstOrFail();
         try {
             $data = new MyOrderDetailsResource($order);
-            return sendResponse(success: true, message: 'My new order list', data: $data);
+            return sendResponse(success: true, message: 'Successfully get data', data: $data);
         }catch (\Exception $exception){
             return sendResponse(success: false, message: 'Something went wrong', data: null, status: 422);
         }
@@ -47,7 +47,7 @@ class MyDeliveryController extends Controller
         }
         try {
             $order = Order::where('status', Order::$ORDER_STATUS['pending'])
-                ->where('rider_id', auth()->id())
+                //->where('rider_id', auth()->id())
                 ->with('orderAttempts.bids', 'orderAttempts.bid')->get();
             $data = MyOrderDetailsResource::collection($order);
             return sendResponse(success: true, message: 'Successfully Get Data', data: $data);

@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\Order\OrderRequestController;
 use App\Http\Controllers\Api\Rider\RiderLocationController;
 use App\Http\Controllers\Api\Rider\BidsController;
 use Laravel\Socialite\Facades\Socialite;
+use App\Http\Controllers\Api\Rider\MyDeliveryController;
 
 Route::middleware(['json.response'])->prefix('/v1')->group(function() {
     Route::post('/send/email/otp', [AuthController::class, 'sendEmailOtp']);
@@ -52,8 +53,12 @@ Route::middleware(['json.response'])->prefix('/v1')->group(function() {
                 Route::put('/update', [ProfileUpdateController::class, 'riderProfileUpdate']); // Update user profile
             });
             Route::post('/location/update', [RiderLocationController::class, 'locationUpdate']);
+            Route::get('/order/new/order/bid/list', [BidsController::class, 'newBidList']); // show
             Route::get('/order/new/bids/{order_id}', [BidsController::class, 'newBids']); // show
             Route::post('/order/apply/bids/{order_id}', [BidsController::class, 'applyBids']); // show
+
+
+            Route::get('/my/completed/order', [MyDeliveryController::class, 'myCompletedOrderList']); // show
 
             // order otp verify
             Route::get('order/send/otp/{order_id}/{otp_type}', [OrderRequestController::class, 'riderOrderSendOtp']);
@@ -63,9 +68,10 @@ Route::middleware(['json.response'])->prefix('/v1')->group(function() {
         Route::prefix('/orders')->group(function () {
             Route::prefix('/new/order/request')->group(function () {
                 Route::post('/', [OrderRequestController::class, 'orderRequest']); // Get user profile
+                Route::get('/ongoing/list', [OrderRequestController::class, 'onGoingOrderList']); // Get user profile
                 Route::get('/show/{order_id}', [OrderRequestController::class, 'showOrderRequest']);
             });
-            Route::get('my/new/order/list', [OrderRequestController::class, 'myNewOrderList']);
+            Route::get('/my/completed/order/list', [OrderRequestController::class, 'myCompletedOrderList']);
             Route::get('my/order/details/{order_id}', [OrderRequestController::class, 'myOrderDetails']);
             Route::get('confirmed/order/{order_id}/{sub_order_id}/{rider_id}', [OrderRequestController::class, 'orderBidAccept']);
             Route::get('tracking/order/{order_id}', [OrderRequestController::class, 'orderTracking']);

@@ -20,6 +20,7 @@ class MyOrderListResource extends JsonResource
             'pickup_longitude' => $this->pickup_longitude,
             'drop_latitude' => $this->drop_latitude,
             'drop_longitude' => $this->drop_longitude,
+            'date' => $this->created_at->format('d-m-Y'),
         ];
     }
 }

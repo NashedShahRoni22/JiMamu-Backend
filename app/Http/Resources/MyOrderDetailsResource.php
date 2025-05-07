@@ -22,7 +22,12 @@ class MyOrderDetailsResource extends JsonResource
             'drop_latitude' => $this->drop_latitude,
             'drop_longitude' => $this->drop_longitude,
             'status' => Order::$ORDER_STATUS_NAME[$this->status],
-            'order_attempts' => OrderAttemptsResource::collection($this->orderAttempts) ,
+            'date' => $this->created_at->format('d-m-Y'),
+            'order_attempts' => OrderAttemptsResource::collection($this->orderAttempts),
+            'receiver_information' => $this->when(
+                $this->receiverInformation,
+                new ReceiverInformationResource($this->receiverInformation)
+            ),
         ];
     }
 }

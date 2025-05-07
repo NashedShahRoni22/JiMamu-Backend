@@ -68,13 +68,13 @@ class OrderRequestController extends Controller
 //
 //        return $riderIds;
         $senderName = $request->input('sender_information.name');
-        Order::where('user_id', auth()->id())
-            -where('package_id', $request->package_id)
-            ->where('pickup_latitude', $request->pickup_latitude)
-            ->where('pickup_longitude', $request->pickup_longitude)
-            ->where('drop_latitude', $request->drop_latitude)
-            ->where('drop_longitude', $request->drop_longitude)
-            ->first();
+//        Order::where('user_id', auth()->id())
+//            ->where('package_id', $request->package_id)
+//            ->where('pickup_latitude', $request->pickup_latitude)
+//            ->where('pickup_longitude', $request->pickup_longitude)
+//            ->where('drop_latitude', $request->drop_latitude)
+//            ->where('drop_longitude', $request->drop_longitude)
+//            ->first();
 
         try {
             DB::transaction(function () use ($request) {
@@ -123,15 +123,15 @@ class OrderRequestController extends Controller
                 }
 
                 // radius db store locations data
-                $nearbyRiders = Redis::command('georadius', [
-                    'rider_locations',
-                    $request->pickup_longitude,
-                    $request->pickup_latitude,
-                    $request->pickup_radius,
-                    'km',
-                ]);
+//                $nearbyRiders = Redis::command('georadius', [
+//                    'rider_locations',
+//                    $request->pickup_longitude,
+//                    $request->pickup_latitude,
+//                    $request->pickup_radius,
+//                    'km',
+//                ]);
                 // return $nearbyRiders;
-              $findNearByRiders =  $this->locationService->findNearbyRiders($orderRequest);
+              //$findNearByRiders =  $this->locationService->findNearbyRiders($orderRequest);
             });
 
             return sendResponse(success: true, message: 'Successfully send order request');
@@ -140,17 +140,29 @@ class OrderRequestController extends Controller
         }
 
     }
-    // only own order request list
-    public function myNewOrderList()
+    public function onGoingOrderList()
     {
         try {
             $order = Order::where('customer_id', auth()->id())
-                ->where('status', Order::$ORDER_STATUS['pending'])
+                ->whereIn('status', [Order::$ORDER_STATUS['pending'], Order::$ORDER_STATUS['confirmed']])
                 ->where('created_at', '>=', Carbon::now()->subMinutes(5))
                 ->latest()
                 ->get(); // fetch all matching orders
             $data = MyOrderListResource::collection($order);
             return sendResponse(success: true, message: 'Success My Order List', data: $data);
+        }catch (\Exception $exception){
+            return sendResponse(false, message: 'something went wrong', data: null, status: 422);
+        }
+    }
+    // only own order request list
+    public function myCompletedOrderList()
+    {
+        try {
+            $order = Order::where('customer_id', auth()->id())
+                ->where('status', Order::$ORDER_STATUS['delivered'])
+                ->with('orderAttempts.bids', 'orderAttempts.bid')->get();
+            $data = MyOrderDetailsResource::collection($order);
+            return sendResponse(success: true, message: 'Successfully Get Data', data: $data);
         }catch (\Exception $exception){
             return sendResponse(false, message: 'something went wrong', data: null, status: 422);
         }
@@ -230,10 +242,17 @@ class OrderRequestController extends Controller
     }
     public function orderTracking($orderUniqueId)
     {
-         $order = Order::where('order_unique_id', $orderUniqueId)
-            ->where('status', Order::$ORDER_STATUS['confirmed'])
-            ->with('receiverInformation', 'bid.user')
-            ->firstOrFail();
+        try {
+            $order = Order::where('order_unique_id', $orderUniqueId)
+                ->whereIn('status', [Order::$ORDER_STATUS['confirmed'], Order::$ORDER_STATUS['picked'] , ORder::$ORDER_STATUS['delivered']])
+                ->with('receiverInformation', 'bid.user')
+                ->firstOrFail();
+            $data = new MyOrderDetailsResource($order);
+            return sendResponse(success: true, message: 'Order tracking data', data: $data);
+        }catch (\Exception $exception){
+            return sendResponse(success: false, message: 'Something went wrong', data: null, status: 422);
+        }
+
     }
     public function riderOrderSendOtp($orderUniqueId, $otpType){
 

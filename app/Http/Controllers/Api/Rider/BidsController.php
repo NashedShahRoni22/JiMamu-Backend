@@ -9,9 +9,15 @@ use Illuminate\Http\Request;
 
 class BidsController extends Controller
 {
+    public function newBidList()
+    {
+        $orderBids = Order::get();
+        return sendResponse(true, 'Successfully get data.', $orderBids);
+
+    }
     // show new one bids
     public function newBids($order_id){
-       $order =  Order::where('order_unique_id', $order_id)->firstOrFail();
+       $order =  Order::where('order_unique_id', $order_id)->with('orderAttempt')->firstOrFail();
        $data  = [
            'order_id' => $order->order_unique_id,
            'pickup_latitude' => $order->pickup_latitude,
@@ -19,7 +25,7 @@ class BidsController extends Controller
            'drop_latitude' => $order->drop_latitude,
            'drop_longitude' => $order->drop_longitude,
            'date' => $order->created_at->format('Y-m-d'),
-           'fare' => $order->fare,
+           'fare' => $order->orderAttempt->fare,
        ];
        return sendResponse(true, 'Successfully get data.', $data);
     }
@@ -35,6 +41,11 @@ class BidsController extends Controller
             return sendResponse(false, 'Your bid amount to much low.', ['min_bid' => $minBidPrice], 422);
         }
         // check exist under a order
+       if(!auth()->user()->hasRole('rider')){
+           return sendResponse(false, 'You are not eligible for rider.', null, 404);
+
+       }
+
         $findBid = Bid::where('order_id', $order->id)->where('user_id', auth()->id())->first();
         if($findBid){
             return sendResponse(false, 'You are already applied.', null, 409);
@@ -42,7 +53,7 @@ class BidsController extends Controller
         try {
             Bid::create([
                 'order_id' => $order->id,
-                'order_attempt_id' => $order->orderAttempt->order_attempt_id,
+                'order_attempt_id' => $order?->orderAttempt?->id,
                 'user_id' => auth()->id(),
                 'bid_amount' => $request->bid_amount
             ]);

@@ -52,7 +52,7 @@ class ProfileUpdateController extends Controller
                 'name' => $request->name,
                 'phone_number' => $request->phone_number,
                 'profile_image' => $this->fileName,
-                'dod' => $request->dob,
+                'dob' => $request->dob,
                 'gender' => $request->gender,
                 'status' => User::$status['active'],
             ]);

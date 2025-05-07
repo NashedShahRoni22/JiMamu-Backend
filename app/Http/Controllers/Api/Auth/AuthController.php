@@ -97,7 +97,7 @@ class AuthController extends Controller
                     'name' => $request->name,
                     'email' => $request->email,
                     'profile_image' => $fileName,
-                    'dob' => $request->dod,
+                    'dob' => $request->dob,
                     'gender' => $request->gender,
                     'user_type' => User::$userType[$request?->user_type],
                     'status' => User::$status['active'],

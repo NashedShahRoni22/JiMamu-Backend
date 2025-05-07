@@ -9,6 +9,37 @@ use Illuminate\Http\Request;
 
 class MyDeliveryController extends Controller
 {
+    public function myOngoingOrder()
+    {
+        if(!auth()->user()->hasRole('rider')){
+            return sendResponse(false, 'Your are not rider', null, 403);
+        }
+        try {
+            $order = Order::whereIn('status', [Order::$ORDER_STATUS['confirmed'], Order::$ORDER_STATUS['picked'], Order::$ORDER_STATUS['shipping']])
+                ->where('rider_id', auth()->id())
+                ->with('orderAttempts.bids', 'orderAttempts.bid')->first();
+            $data = new MyOrderDetailsResource($order);
+            return sendResponse(success: true, message: 'Successfully Get Data', data: $data);
+        } catch (\Exception $exception) {
+            return sendResponse(false, message: 'something went wrong', data: null, status: 422);
+        }
+    }
+    public function myOngoingOrderDetails($orderUniqueId){
+        if(!auth()->user()->hasRole('rider')){
+            return sendResponse(false, 'Your are not rider', null, 403);
+        }
+        $order = Order::where('order_unique_id', $orderUniqueId)
+            ->whereIn('status', [Order::$ORDER_STATUS['confirmed'], Order::$ORDER_STATUS['picked'], Order::$ORDER_STATUS['shipping']])
+            ->where('rider_id', auth()->id())
+            //->where('created_at', '>=', Carbon::now()->subMinutes(5))
+            ->with('orderAttempts.bids', 'orderAttempts.bid')->firstOrFail();
+        try {
+            $data = new MyOrderDetailsResource($order);
+            return sendResponse(success: true, message: 'My new order list', data: $data);
+        }catch (\Exception $exception){
+            return sendResponse(success: false, message: 'Something went wrong', data: null, status: 422);
+        }
+    }
     public function myNewOrderRequest()
     {
         if(!auth()->user()->hasRole('rider')){
@@ -16,6 +47,7 @@ class MyDeliveryController extends Controller
         }
         try {
             $order = Order::where('status', Order::$ORDER_STATUS['pending'])
+                ->where('rider_id', auth()->id())
                 ->with('orderAttempts.bids', 'orderAttempts.bid')->get();
             $data = MyOrderDetailsResource::collection($order);
             return sendResponse(success: true, message: 'Successfully Get Data', data: $data);
@@ -30,6 +62,7 @@ class MyDeliveryController extends Controller
         }
         try {
             $order = Order::where('customer_id', auth()->id())
+                ->where('rider_id', auth()->id())
                 ->where('status', Order::$ORDER_STATUS['delivered'])
                 ->with('orderAttempts.bids', 'orderAttempts.bid')->get();
             $data = MyOrderDetailsResource::collection($order);

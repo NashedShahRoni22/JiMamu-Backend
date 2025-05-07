@@ -60,6 +60,9 @@ Route::middleware(['json.response'])->prefix('/v1')->group(function() {
 
             Route::get('/my/new/order/request', [MyDeliveryController::class, 'myNewOrderRequest']); // show
             Route::get('/my/completed/order', [MyDeliveryController::class, 'myCompletedOrderList']); // show
+            // ongoin order
+            Route::get('/my/ongoing/order', [MyDeliveryController::class, 'myOngoingOrder']); // show
+            Route::get('/my/ongoing/order/details/{order_id}', [MyDeliveryController::class, 'myOngoingOrderDetails']); // show
 
             // order otp verify
             Route::get('order/send/otp/{order_id}/{otp_type}', [OrderRequestController::class, 'riderOrderSendOtp']);

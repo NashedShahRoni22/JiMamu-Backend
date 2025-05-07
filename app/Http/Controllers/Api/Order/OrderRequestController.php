@@ -145,7 +145,7 @@ class OrderRequestController extends Controller
         try {
             $order = Order::where('customer_id', auth()->id())
                 ->whereIn('status', [Order::$ORDER_STATUS['pending'], Order::$ORDER_STATUS['confirmed']])
-                ->where('created_at', '>=', Carbon::now()->subMinutes(5))
+                //->where('created_at', '>=', Carbon::now()->subMinutes(5))
                 ->latest()
                 ->get(); // fetch all matching orders
             $data = MyOrderListResource::collection($order);

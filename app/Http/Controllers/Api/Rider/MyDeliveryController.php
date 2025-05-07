@@ -14,10 +14,11 @@ class MyDeliveryController extends Controller
         if(!auth()->user()->hasRole('rider')){
             return sendResponse(false, 'Your are not rider', null, 403);
         }
+        $order = Order::whereIn('status', [Order::$ORDER_STATUS['confirmed'], Order::$ORDER_STATUS['picked'], Order::$ORDER_STATUS['shipping']])
+            ->where('rider_id', auth()->id())
+            ->with('orderAttempts.bids', 'orderAttempts.bid')->firstOrFail();
         try {
-            $order = Order::whereIn('status', [Order::$ORDER_STATUS['confirmed'], Order::$ORDER_STATUS['picked'], Order::$ORDER_STATUS['shipping']])
-                ->where('rider_id', auth()->id())
-                ->with('orderAttempts.bids', 'orderAttempts.bid')->first();
+
             $data = new MyOrderDetailsResource($order);
             return sendResponse(success: true, message: 'Successfully Get Data', data: $data);
         } catch (\Exception $exception) {

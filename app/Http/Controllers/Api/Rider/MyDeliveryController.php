@@ -33,9 +33,12 @@ class MyDeliveryController extends Controller
             ->whereIn('status', [Order::$ORDER_STATUS['confirmed'], Order::$ORDER_STATUS['picked'], Order::$ORDER_STATUS['shipping']])
             ->where('rider_id', auth()->id())
             //->where('created_at', '>=', Carbon::now()->subMinutes(5))
-            ->with('orderAttempts.bids', 'orderAttempts.bid')->firstOrFail();
+            ->with('orderAttempts.bids', 'orderAttempts.bid')->get();
+        if(!$order){
+            return sendResponse(false, 'Order Not Found', data: null, status: 404);
+        }
         try {
-            $data = new MyOrderDetailsResource($order);
+            $data =  MyOrderDetailsResource::collection($order);
             return sendResponse(success: true, message: 'Successfully get data', data: $data);
         }catch (\Exception $exception){
             return sendResponse(success: false, message: 'Something went wrong', data: null, status: 422);

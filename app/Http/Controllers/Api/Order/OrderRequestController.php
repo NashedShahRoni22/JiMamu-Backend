@@ -178,9 +178,12 @@ class OrderRequestController extends Controller
         $order = Order::where('order_unique_id', $orderUniqueId)
             ->whereIn('status', [1,2,3,4])
             //->where('created_at', '>=', Carbon::now()->subMinutes(5))
-            ->with('orderAttempts.bids', 'orderAttempts.bid')->firstOrFail();
+            ->with('orderAttempts.bids', 'orderAttempts.bid')->get();
+        if(!$order){
+            return sendResponse(false, 'Order Not Found', data: null, status: 404);
+        }
         try {
-            $data = new MyOrderDetailsResource($order);
+            $data =  MyOrderDetailsResource::collection($order);
             return sendResponse(success: true, message: 'My new order list', data: $data);
         }catch (\Exception $exception){
             return sendResponse(success: false, message: 'Something went wrong', data: null, status: 422);
@@ -195,9 +198,12 @@ class OrderRequestController extends Controller
        $order = Order::where('order_unique_id', $orderUniqueId)
            ->whereIn('status', [Order::$ORDER_STATUS['delivered']])
            //->where('created_at', '>=', Carbon::now()->subMinutes(5))
-           ->with('orderAttempts.bids', 'orderAttempts.bid')->firstOrFail();
+           ->with('orderAttempts.bids', 'orderAttempts.bid')->get();
+       if(!$order){
+           return sendResponse(false, 'Order Not Found', data: null, status: 404);
+       }
         try {
-            $data = new MyOrderDetailsResource($order);
+            $data =  MyOrderDetailsResource::collection($order);
             return sendResponse(success: true, message: 'My new order list', data: $data);
         }catch (\Exception $exception){
             return sendResponse(success: false, message: 'Something went wrong', data: null, status: 422);
@@ -268,7 +274,7 @@ class OrderRequestController extends Controller
                 'otp_code' => rand(1000, 9999),
                 'otp_expires_at' => now()->addMinutes(3),
                 'sender_type' => 'email',
-                'otp_type' => $otpType,
+                'otp_type' => OtpVerify::$OTP_TYPE[$otpType],
             ]);
             // event(new OtpGenerated(1251)); // Dispatch event
             Mail::to($order?->customer->email)->send(new OtpMail($otp->otp_code));
@@ -288,33 +294,29 @@ class OrderRequestController extends Controller
             ->firstOrFail();
         // rider check
 
-        if($order->orderAttempt->acceptedBid->user_id != auth()->id()){
+        if($order->orderAttempt?->acceptedBid?->user_id != auth()->id()){
             return sendResponse(success: false, message: 'Rider not valid', data: null, status: 422);
         }
-        if($otpType == 'confirmed' && $order->status !== Order::$ORDER_STATUS['picked']){
-            return sendResponse(false, false, 'Otp is Invalid!.');
-        }
-        $otpCode = OtpVerify::where('email', $order->customer->email)->where('otp_code', $otpCode)->first();
+        $getOTP = OtpVerify::where('email', $order->customer->email)->where('otp_code', $otpCode)->first();
 
-        if (!$otpCode || $otpCode->otp_code !== $otpCode || Carbon::now()->gt($otpCode->otp_expires_at)) {
+        if ($getOTP->otp_code !== $otpCode || Carbon::now()->gt($getOTP->otp_expires_at)) {
             return sendResponse(false, 'Invalid or expired OTP.', null,401);
         }
-
         try {
-            DB::transaction(function () use ($order, $otpType, $otpCode){
+            DB::transaction(function () use ($order, $getOTP, $otpCode){
                 // email check
-                $orderAttempt = $order->orderAttempt->updaate([
+                $orderAttempt = $order->orderAttempt->update([
                     'status' =>$order->status == Order::$ORDER_STATUS['confirmed'] ? Order::$ORDER_STATUS['confirmed'] : Order::$ORDER_STATUS['delivered']
                 ]);
                 $orderUpdate = $order->update([
                     'status' => $order->status == Order::$ORDER_STATUS['confirmed'] ? Order::$ORDER_STATUS['confirmed'] : Order::$ORDER_STATUS['delivered']
                 ]);
                 // clear otp
-                $otpCode->delete();
+                $getOTP->delete();
             });
             return sendResponse(success: true, message: "OTP {$otpType} send successfully.");
         }catch (\Exception $e){
-            return sendResponse(false, "Something went wrong", null, 422);
+            return sendResponse(false, "Something went wrong", null, 422, $e->getMessage());
         }
 
     }

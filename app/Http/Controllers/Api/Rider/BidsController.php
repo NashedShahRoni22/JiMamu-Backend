@@ -31,6 +31,10 @@ class BidsController extends Controller
     }
     public function applyBids(Request $request, $order_id){
         $order =  Order::where('order_unique_id', $order_id)->with('orderAttempt')->firstOrFail();
+        // user can not apply their own orders
+        if ($order->customer_id === auth()->id()){
+            return sendResponse(false, 'You cannot apply your bids.');
+        }
         $maxBidPrice = $order->orderAttempt?->fare + $order->orderAttempt?->fare * 30 / 100;
         $minBidPrice = $order->orderAttempt?->fare - $order->orderAttempt?->fare * 20 / 100;
         // check maximum

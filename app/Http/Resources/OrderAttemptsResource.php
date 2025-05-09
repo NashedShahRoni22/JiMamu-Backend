@@ -21,7 +21,7 @@ class OrderAttemptsResource extends JsonResource
             'payment_status' => $this->payment_status,
             'fare' => $this->fare,
             'order_date' => $this->created_at->format('F j, Y, h:i:s A'),
-            'rider_bids' => $this->status == 1 ? ApplyBidResource::collection($this->bids) :  new ApplyBidResource($this->bid),
+            'rider_bids' => ApplyBidResource::collection($this->bids)
         ];
     }
 }

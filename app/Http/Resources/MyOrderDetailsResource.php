@@ -22,7 +22,7 @@ class MyOrderDetailsResource extends JsonResource
             'drop_latitude' => $this->drop_latitude,
             'drop_longitude' => $this->drop_longitude,
             'status' => Order::$ORDER_STATUS_NAME[$this->status],
-            'date' => $this->created_at->format('d-m-Y'),
+            'date' => $this->created_at->format('d-m-Y  h:i:s A'),
             'order_attempts' => OrderAttemptsResource::collection($this->orderAttempts),
             'receiver_information' => $this->when(
                 $this->receiverInformation,

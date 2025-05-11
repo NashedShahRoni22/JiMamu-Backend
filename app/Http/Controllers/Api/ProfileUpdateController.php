@@ -33,7 +33,7 @@ class ProfileUpdateController extends Controller
             'name' => 'required',
             'gender' => 'required',
             'dob' => 'required',
-            'phone_number' => 'required|unique:users,phone_number',
+            'phone_number' => 'required|phone_number',
         ]);
         try {
              $user = Auth::user();

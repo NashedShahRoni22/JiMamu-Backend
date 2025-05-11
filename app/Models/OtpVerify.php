@@ -6,6 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class OtpVerify extends Model
 {
-    static $OTP_TYPE = ['account_verify' => 1, 'picked' => 2, 'confirmed' => 3];
+    static $OTP_TYPE = ['account_verify' => 1, 'picked' => 2, 'delivered' => 3];
     protected $fillable = ['email', 'phone_number', 'sender_type', 'otp_code', 'otp_expires_at', 'verified_at', 'otp_type'];
 }

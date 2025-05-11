@@ -16,10 +16,10 @@ class MyDeliveryController extends Controller
         }
         $order = Order::whereIn('status', [Order::$ORDER_STATUS['confirmed'], Order::$ORDER_STATUS['picked'], Order::$ORDER_STATUS['shipping']])
             ->where('rider_id', auth()->id())
-            ->with('orderAttempts.bids', 'orderAttempts.bid')->firstOrFail();
+            ->with('orderAttempts.bids', 'orderAttempts.bid')->get();
         try {
 
-            $data = new MyOrderDetailsResource($order);
+            $data = MyOrderDetailsResource::collection($order);
             return sendResponse(success: true, message: 'Successfully Get Data', data: $data);
         } catch (\Exception $exception) {
             return sendResponse(false, message: 'something went wrong', data: null, status: 422);
@@ -51,7 +51,8 @@ class MyDeliveryController extends Controller
         }
         try {
             $order = Order::where('status', Order::$ORDER_STATUS['pending'])
-                //->where('rider_id', auth()->id())
+                //->whereNot('rider_id', auth()->id())
+                ->whereNot('customer_id', auth()->id())
                 ->with('orderAttempts.bids', 'orderAttempts.bid')->get();
             $data = MyOrderDetailsResource::collection($order);
             return sendResponse(success: true, message: 'Successfully Get Data', data: $data);
@@ -65,8 +66,7 @@ class MyDeliveryController extends Controller
             return sendResponse(false, 'Your are not rider', null, 403);
         }
         try {
-            $order = Order::where('customer_id', auth()->id())
-                ->where('rider_id', auth()->id())
+            $order = Order::where('rider_id', auth()->id())
                 ->where('status', Order::$ORDER_STATUS['delivered'])
                 ->with('orderAttempts.bids', 'orderAttempts.bid')->get();
             $data = MyOrderDetailsResource::collection($order);

@@ -143,8 +143,8 @@ class OrderRequestController extends Controller
     public function onGoingOrderList()
     {
         try {
-            $order = Order::where('customer_id', auth()->id())
-                ->whereIn('status', [Order::$ORDER_STATUS['pending'], Order::$ORDER_STATUS['confirmed']])
+            $order = Order::whereNot('customer_id', auth()->id())
+                ->whereIn('status', [Order::$ORDER_STATUS['pending'], Order::$ORDER_STATUS['confirmed'], Order::$ORDER_STATUS['picked']])
                 //->where('created_at', '>=', Carbon::now()->subMinutes(5))
                 ->latest()
                 ->get(); // fetch all matching orders
@@ -292,24 +292,27 @@ class OrderRequestController extends Controller
                 'orderAttempt.acceptedBid'
             ])
             ->firstOrFail();
+        // otp type check and allow picked and delivered
+        if (!in_array($otpType, ['picked', 'delivered'])) {
+            return sendResponse(false, 'OTP type allow only picked or delivered', data: null, status: 404);
+        }
         // rider check
-
         if($order->orderAttempt?->acceptedBid?->user_id != auth()->id()){
             return sendResponse(success: false, message: 'Rider not valid', data: null, status: 422);
         }
         $getOTP = OtpVerify::where('email', $order->customer->email)->where('otp_code', $otpCode)->first();
 
-        if ($getOTP->otp_code !== $otpCode || Carbon::now()->gt($getOTP->otp_expires_at)) {
+        if (empty($getOTP) ||  $getOTP->otp_code !== $otpCode || Carbon::now()->gt($getOTP->otp_expires_at)) {
             return sendResponse(false, 'Invalid or expired OTP.', null,401);
         }
         try {
-            DB::transaction(function () use ($order, $getOTP, $otpCode){
+            DB::transaction(function () use ($order, $getOTP, $otpCode, $otpType){
                 // email check
-                $orderAttempt = $order->orderAttempt->update([
-                    'status' =>$order->status == Order::$ORDER_STATUS['confirmed'] ? Order::$ORDER_STATUS['confirmed'] : Order::$ORDER_STATUS['delivered']
+                $order->orderAttempt->update([
+                    'status' =>  Order::$ORDER_STATUS[$otpType]
                 ]);
-                $orderUpdate = $order->update([
-                    'status' => $order->status == Order::$ORDER_STATUS['confirmed'] ? Order::$ORDER_STATUS['confirmed'] : Order::$ORDER_STATUS['delivered']
+                $order->update([
+                    'status' => Order::$ORDER_STATUS[$otpType]
                 ]);
                 // clear otp
                 $getOTP->delete();

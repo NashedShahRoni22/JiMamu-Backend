@@ -29,11 +29,12 @@ class ProfileUpdateController extends Controller
         return sendResponse(true, 'User profile fetched successfully.', $data, 200);
     }
     public function userProfileUpdate(Request $request){
-        request()->validate([
+
+        $request->validate([
             'name' => 'required',
             'gender' => 'required',
             'dob' => 'required',
-            'phone_number' => 'required|phone_number',
+            'phone_number' => 'required',
         ]);
         try {
              $user = Auth::user();

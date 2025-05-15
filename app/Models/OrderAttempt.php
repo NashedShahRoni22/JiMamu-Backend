@@ -10,7 +10,7 @@ class OrderAttempt extends Model
 
     static $ORDER_STATUS_NAME  = [1 => 'pending', 2 => 'confirmed', 3 => 'picked', 4 => 'shipping', 5 => 'delivered', 6 => 'cancelled'];
 
-    protected $fillable = ['order_id', 'fare', 'order_tracking_number', 'payment_status', 'status'];
+    protected $fillable = ['order_id', 'fare', 'parcel_estimate_price', 'order_tracking_number', 'payment_status', 'status'];
 
     // all bids get under a order attempts
     public function bids(){

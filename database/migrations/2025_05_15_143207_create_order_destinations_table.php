@@ -11,16 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('order_attempts', function (Blueprint $table) {
+        Schema::create('order_destinations', function (Blueprint $table) {
             $table->id();
             $table->foreignId('order_id');
-            $table->tinyInteger('status')->default(1); // pending, confirmed, picked_up, delivered, canceled
-            $table->string('order_tracking_number');
-            $table->float('fare');
-            $table->float('parcel_estimate_price'); // parcel estimate price
-            $table->tinyInteger('payment_status')->default(1); // unpaid, paid, cancel
+            $table->string('country');
+            $table->string('state');
+            $table->string('city');
+            $table->string('area')->nullable();
+            $table->string('address');
             $table->timestamps();
             $table->softDeletes();
+
+            $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
         });
     }
 
@@ -29,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('order_attempts');
+        Schema::dropIfExists('order_destinations');
     }
 };

@@ -17,6 +17,7 @@ class MyOrderDetailsResource extends JsonResource
     {
         return [
             'order_id' => $this->order_unique_id,
+            'order_type' => $this->order_type == 1? 'national': 'international',
             'pickup_latitude' => $this->pickup_latitude,
             'pickup_longitude' => $this->pickup_longitude,
             'drop_latitude' => $this->drop_latitude,
@@ -28,6 +29,13 @@ class MyOrderDetailsResource extends JsonResource
                 $this->receiverInformation,
                 new ReceiverInformationResource($this->receiverInformation)
             ),
+            'sender_information' => $this->when(
+                $this->senderInformation,
+                new SenderInformationResource($this->senderInformation)
+            ),
+            'order_destination' => new OrderDestinationResource($this?->orderDestination)
+
+
         ];
     }
 }

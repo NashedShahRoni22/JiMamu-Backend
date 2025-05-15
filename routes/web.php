@@ -8,7 +8,7 @@ Route::get('/test', function () {
     return 'test';
 });
 
-Route::get('/admin', function () {
+Route::get('/', function () {
 
     return Inertia::render('welcome');
 })->name('home');

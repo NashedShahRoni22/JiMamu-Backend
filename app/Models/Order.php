@@ -11,6 +11,7 @@ class Order extends Model
     static $ORDER_STATUS  = ['pending' => 1, 'confirmed' => 2, 'picked' => 3, 'shipping' => 4, 'delivered' => 5, 'cancelled' => 6];
 
     static $ORDER_STATUS_NAME  = [1 => 'pending', 2 => 'confirmed', 3 => 'picked', 4 => 'shipping', 5 => 'delivered', 6 => 'cancelled'];
+    static $ORDER_TYPE = ['national' => 1, 'international' => 2];
 
     use SoftDeletes;
     protected $fillable = [
@@ -18,6 +19,7 @@ class Order extends Model
         'rider_id',
         'customer_id',
         'package_id',
+        'order_type',
         'pickup_latitude',
         'pickup_longitude',
         'drop_latitude',
@@ -48,6 +50,9 @@ class Order extends Model
     }
     public function customer(){
         return $this->belongsTo(User::class,  'customer_id', 'id');
+    }
+    public function orderDestination(){
+       return $this->hasOne(OrderDestination::class, 'order_id', 'id');
     }
 
 }

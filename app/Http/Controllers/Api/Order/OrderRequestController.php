@@ -10,6 +10,7 @@ use App\Mail\OtpMail;
 use App\Models\Bid;
 use App\Models\Order;
 use App\Models\OrderAttempt;
+use App\Models\OrderDestination;
 use App\Models\OtpVerify;
 use App\Models\User;
 use App\Services\Rider\LocationService;
@@ -75,13 +76,14 @@ class OrderRequestController extends Controller
 //            ->where('drop_latitude', $request->drop_latitude)
 //            ->where('drop_longitude', $request->drop_longitude)
 //            ->first();
-
+      // return $request->order_type == 'national' ? Order::$ORDER_TYPE['national'] : Order::$ORDER_TYPE['international'];
         try {
             DB::transaction(function () use ($request) {
                 $orderRequest = Order::create([
                     'customer_id' => auth()->id(),
                     'order_unique_id' => rand(000000, 999999),
                     'package_id' => $request->package_id,
+                    'order_type' => $request->order_type == 'national' ? Order::$ORDER_TYPE['national'] : Order::$ORDER_TYPE['international'],
                     'pickup_latitude' => $request->pickup_latitude,
                     'pickup_longitude' => $request->pickup_longitude,
                     'drop_latitude' => $request->drop_latitude,
@@ -91,8 +93,21 @@ class OrderRequestController extends Controller
                 OrderAttempt::create([
                     'order_id' => $orderRequest->id,
                     'fare' => $request->total_fare,
+                    'parcel_estimate_price' => $request->parcel_estimate_price,
                     'order_tracking_number' => rand(000000, 999999),
                 ]);
+                // when order request will have international
+               if($request->order_type == 'international' && $request->has('order_destination')){
+                   OrderDestination::create([
+                       'order_id' => $orderRequest->id,
+                       'country' => $request->input('order_destination.country'),
+                       'state' => $request->input('order_destination.state'),
+                       'city' =>  $request->input('order_destination.city'),
+                       'area' => $request->input('order_destination.area'),
+                       'address' => $request->input('order_destination.address'),
+
+                   ]);
+               }
                 // customer sender informations
                 if ($request->has('sender_information')) {
                     $senderName = $request->input('sender_information.name');
@@ -178,7 +193,7 @@ class OrderRequestController extends Controller
         $order = Order::where('order_unique_id', $orderUniqueId)
             ->whereIn('status', [1,2,3,4])
             //->where('created_at', '>=', Carbon::now()->subMinutes(5))
-            ->with('orderAttempts.bids', 'orderAttempts.bid')->get();
+            ->with('orderAttempts.bids', 'orderAttempts.bid', 'receiverInformation', 'senderInformation', 'orderDestination')->get();
         if(!$order){
             return sendResponse(false, 'Order Not Found', data: null, status: 404);
         }

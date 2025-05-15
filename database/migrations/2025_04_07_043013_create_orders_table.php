@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('rider_id')->nullable();
             $table->foreignId('customer_id');
             $table->foreignId('package_id');
+            $table->tinyInteger('order_type')->default(1); // order types are national, international
             $table->string('pickup_latitude');
             $table->string('pickup_longitude');
             $table->string('drop_latitude');

@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Package;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -125,5 +126,13 @@ class UserSeeder extends Seeder
         Redis::geoadd('rider_locations', 23.7566, 90.3741, "rider:{$rider8->id}");
         Redis::geoadd('rider_locations', 23.7460, 23.7460, "rider:{$rider9->id}");
         Redis::geoadd('rider_locations', 23.7460, 23.7460, "rider:{$rider10->id}");
+
+        // create pacakges
+        Package::create([
+            'name' => 'phone',
+        ]);
+        Package::create([
+            'name' => 'laptop',
+        ]);
     }
 }

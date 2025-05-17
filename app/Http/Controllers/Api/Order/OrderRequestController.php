@@ -6,12 +6,14 @@ use App\Exceptions\CustomException;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\MyOrderDetailsResource;
 use App\Http\Resources\MyOrderListResource;
+use App\Http\Resources\PackageResource;
 use App\Mail\OtpMail;
 use App\Models\Bid;
 use App\Models\Order;
 use App\Models\OrderAttempt;
 use App\Models\OrderDestination;
 use App\Models\OtpVerify;
+use App\Models\Package;
 use App\Models\User;
 use App\Services\Rider\LocationService;
 use Carbon\Carbon;
@@ -335,6 +337,17 @@ class OrderRequestController extends Controller
             return sendResponse(success: true, message: "OTP {$otpType} send successfully.");
         }catch (\Exception $e){
             return sendResponse(false, "Something went wrong", null, 422, $e->getMessage());
+        }
+
+    }
+    public function packages()
+    {
+        try {
+            $packages = Package::where('status', 1)->get();
+            $data = PackageResource::collection($packages);
+            return sendResponse(success: true, message: 'Packages', data: $data);
+        }catch (\Exception $e){
+
         }
 
     }

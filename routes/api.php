@@ -79,6 +79,7 @@ Route::middleware(['json.response'])->prefix('/v1')->group(function() {
             Route::get('my/order/details/{order_id}', [OrderRequestController::class, 'myOrderDetails']);
             Route::get('confirmed/order/{order_id}/{sub_order_id}/{rider_id}', [OrderRequestController::class, 'orderBidAccept']);
             Route::get('tracking/order/{order_id}', [OrderRequestController::class, 'orderTracking']);
+            Route::get('packages', [OrderRequestController::class, 'packages']);
 
         });
     });

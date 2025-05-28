@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\Rider\RiderLocationController;
 use App\Http\Controllers\Api\Rider\BidsController;
 use Laravel\Socialite\Facades\Socialite;
 use App\Http\Controllers\Api\Rider\MyDeliveryController;
+use App\Http\Controllers\Api\StripePaymentController;
 
 Route::middleware(['json.response'])->prefix('/v1')->group(function() {
     Route::post('/send/email/otp', [AuthController::class, 'sendEmailOtp']);
@@ -72,7 +73,7 @@ Route::middleware(['json.response'])->prefix('/v1')->group(function() {
         Route::prefix('/orders')->group(function () {
             Route::prefix('/new/order/request')->group(function () {
                 Route::post('/', [OrderRequestController::class, 'orderRequest']); // Get user profile
-                Route::get('/ongoing/list', [OrderRequestController::class, 'onGoingOrderList']); // Get user profile
+                Route::get('/ongoing/list/{orderType}', [OrderRequestController::class, 'onGoingOrderList']); // Get user profile
                 Route::get('/show/{order_id}', [OrderRequestController::class, 'showOrderRequest']);
             });
             Route::get('/my/completed/order/list', [OrderRequestController::class, 'myCompletedOrderList']);
@@ -81,6 +82,10 @@ Route::middleware(['json.response'])->prefix('/v1')->group(function() {
             Route::get('tracking/order/{order_id}', [OrderRequestController::class, 'orderTracking']);
             Route::get('packages', [OrderRequestController::class, 'packages']);
 
+        });
+        // payment
+        Route::prefix('/orders')->group(function () {
+            Route::get('stripe/payment/process', [StripePaymentController::class, 'stripePayment']);
         });
     });
 

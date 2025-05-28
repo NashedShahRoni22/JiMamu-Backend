@@ -37,7 +37,7 @@ class AuthController extends Controller
                 'otp_type' => OtpVerify::$OTP_TYPE['account_verify'],
             ]);
            // event(new OtpGenerated(1251)); // Dispatch event
-            Mail::to($request->email)->send(new OtpMail($otp->otp_code));
+            Mail::to('akazad914@gmail.com')->send(new OtpMail($otp->otp_code));
 
             return sendResponse(true, 'OTP Send successfully.');
         }catch (CustomException $e){

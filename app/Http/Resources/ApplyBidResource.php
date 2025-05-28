@@ -17,6 +17,7 @@ class ApplyBidResource extends JsonResource
         return [
             'rider_id' => $this->user?->id,
             'name' => $this->user?->name,
+            'phone_number' => $this->user?->phone_number,
             'profile_image' => $this->profile_image,
             'bid_amount' => $this->bid_amount,
 

@@ -35,7 +35,6 @@ class MyOrderDetailsResource extends JsonResource
             ),
             'order_destination' => new OrderDestinationResource($this?->orderDestination)
 
-
         ];
     }
 }

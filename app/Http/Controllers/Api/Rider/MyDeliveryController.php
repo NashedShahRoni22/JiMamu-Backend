@@ -9,12 +9,13 @@ use Illuminate\Http\Request;
 
 class MyDeliveryController extends Controller
 {
-    public function myOngoingOrder()
+    public function myOngoingOrder($orderType = 'national')
     {
         if(!auth()->user()->hasRole('rider')){
             return sendResponse(false, 'Your are not rider', null, 403);
         }
         $order = Order::whereIn('status', [Order::$ORDER_STATUS['confirmed'], Order::$ORDER_STATUS['picked'], Order::$ORDER_STATUS['shipping']])
+            ->where('order_type', Order::$ORDER_TYPE[$orderType])
             ->where('rider_id', auth()->id())
             ->with('orderAttempts.bids', 'orderAttempts.bid')->get();
         try {
@@ -44,7 +45,7 @@ class MyDeliveryController extends Controller
             return sendResponse(success: false, message: 'Something went wrong', data: null, status: 422);
         }
     }
-    public function myNewOrderRequest()
+    public function myNewOrderRequest($orderType = 'national')
     {
         if(!auth()->user()->hasRole('rider')){
             return sendResponse(false, 'Your are not rider', null, 403);
@@ -52,6 +53,7 @@ class MyDeliveryController extends Controller
         try {
             $order = Order::where('status', Order::$ORDER_STATUS['pending'])
                 //->whereNot('rider_id', auth()->id())
+                ->where('order_type', Order::$ORDER_TYPE[$orderType])
                 ->whereNot('customer_id', auth()->id())
                 ->with('orderAttempts.bids', 'orderAttempts.bid')->get();
             $data = MyOrderDetailsResource::collection($order);

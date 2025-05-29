@@ -59,10 +59,10 @@ Route::middleware(['json.response'])->prefix('/v1')->group(function() {
             Route::post('/order/apply/bids/{order_id}', [BidsController::class, 'applyBids']); // show
 
 
-            Route::get('/my/new/order/request', [MyDeliveryController::class, 'myNewOrderRequest']); // show
+            Route::get('/my/new/order/request/{order_type}', [MyDeliveryController::class, 'myNewOrderRequest']); // show
             Route::get('/my/completed/order', [MyDeliveryController::class, 'myCompletedOrderList']); // show
-            // ongoin order
-            Route::get('/my/ongoing/order', [MyDeliveryController::class, 'myOngoingOrder']); // show
+            // ongoing order
+            Route::get('/my/ongoing/order/{order_type}', [MyDeliveryController::class, 'myOngoingOrder']); // show
             Route::get('/my/ongoing/order/details/{order_id}', [MyDeliveryController::class, 'myOngoingOrderDetails']); // show
 
             // order otp verify

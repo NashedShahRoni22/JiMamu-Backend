@@ -83,10 +83,14 @@ Route::middleware(['json.response'])->prefix('/v1')->group(function() {
             Route::get('packages', [OrderRequestController::class, 'packages']);
 
         });
-        // payment
-        Route::prefix('/orders')->group(function () {
-            Route::get('stripe/payment/process', [StripePaymentController::class, 'stripePayment']);
+
+        // payments
+        Route::prefix('/payments')->group(function () {
+            Route::get('stripe/payment/process/{order_id}', [StripePaymentController::class, 'stripePaymentProcess']);
+            Route::get('stripe/payment/success', [StripePaymentController::class, 'stripePaymentSuccess']);
         });
+        Route::post('/webhook/stripe', [StripePaymentController::class, 'handleStripeWebhook']);
+
     });
 
 

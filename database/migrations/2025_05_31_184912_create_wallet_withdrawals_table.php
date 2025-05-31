@@ -11,14 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('wallets', function (Blueprint $table) {
+        Schema::create('wallet_withdrawals', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('wallet_id');
             $table->foreignId('user_id');
-            $table->decimal('balance', 15, 2)->default(0);
+            $table->decimal('amount', 15, 2);
+            $table->tinyInteger('status')->default(1); // pending, processing, approved, cancelled
             $table->timestamps();
-            $table->softDeletes();
-
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 
@@ -27,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('wallets');
+        Schema::dropIfExists('wallet_withdrawals');
     }
 };

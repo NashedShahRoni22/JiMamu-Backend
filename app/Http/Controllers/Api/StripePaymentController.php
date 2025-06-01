@@ -42,7 +42,7 @@ class StripePaymentController extends Controller
 
             'cancel_url' => config('app.url') . '/api/payment/cancel',
         ]);
-        $this->handleStripeWebhook($session);
+      //  $this->handleStripeWebhook($session);
 
         return sendResponse(true, 'Payment successful', $session->url, 200);
 
@@ -78,16 +78,17 @@ class StripePaymentController extends Controller
     }
     public function stripePaymentSuccess(Request $request)
     {
+
         Stripe::setApiKey(env('STRIPE_SECRET'));
         $sessionId = $request->get('session_id');
-        $orderId = $request->get('order_id');
+        $orderId = $request->get('orderId');
 
         $order = Order::where('id', $orderId)->with('orderAttempt')->first();
         if(!$order){
             return sendResponse('false', 'payment has failed');
         }
         try {
-            DB::transaction(function () use ($order, $sessionId) {
+        //    DB::transaction(function () use ($order, $sessionId) {
                 // Fetch the session details from Stripe
                 $session = Session::retrieve($sessionId);
                 if ($session->payment_status === 'paid') {
@@ -102,22 +103,22 @@ class StripePaymentController extends Controller
                     ]);
                     // store into wallet and wallet history
                     $wallet = Wallet::where('user_id', auth()->id())->first();
-                    if ($wallet) {
-                        $amount = $wallet->balance + $paymentIntent->amount / 100;
-                        $wallet = Wallet::createOrUpdate([
-                            'user_id' => $order->user_id,
-                            'balance' => $amount,
-                        ]);
+                   // if ($wallet) {
+                        $amount = $wallet?->balance + $paymentIntent->amount / 100;
+                        $wallet = Wallet::updateOrCreate(
+                            ['user_id' => auth()->id()], // Match by this
+                            ['balance' => 50.00]         // Set this
+                        );
                         WalletHistory::create([
                             'wallet_id' => $wallet->id,
-                            'user_id' => $order->user_id,
+                            'user_id' => auth()->id(),
                             'order_id' => $order->id,
                             'amount' => $amount,
-                            'transaction_type' => WalletHistory::$STATUS['credit']
+                            'transaction_type' => WalletHistory::$TRANSACTION_TYPE['credit']
                         ]);
                     }
-                }
-            });
+              //  }
+          //  });
 
             return sendResponse(true, 'Payment has been successful');
 

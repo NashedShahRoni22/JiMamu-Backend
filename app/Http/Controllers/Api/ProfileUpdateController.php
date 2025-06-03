@@ -117,28 +117,27 @@ class ProfileUpdateController extends Controller
                 $user->assignRole('rider');
             }
             // rider bank information saving..
-            if (!empty($request->is_default_payment)) {
-                foreach ($request->is_default_payment as $key => $item) {
-                    $user->riderBankInformations()->updateOrCreate(
-                        [
-                            'user_id' => $user->id,
-                            'account_number' => $request->card_number[$key], // Uniquely identify by account number
-                        ],
-                        [
-                            'name' => $request->name[$key],
-                            'account_number' => $request->card_number[$key],
-                            'cvc_code' => $request->cvc_code[$key],
-                            'expiry_date' => $request->expire_date[$key],
-                            'type' => RiderBankInformation::$type['card'],
-                            'is_default_payment' => $item === 'true',
-                        ]
-                    );
-                }
-            }
+//            if (!empty($request->is_default_payment)) {
+//                foreach ($request->is_default_payment as $key => $item) {
+//                    $user->riderBankInformations()->updateOrCreate(
+//                        [
+//                            'user_id' => $user->id,
+//                            'account_number' => $request->card_number[$key], // Uniquely identify by account number
+//                        ],
+//                        [
+//                            'name' => $request->name[$key],
+//                            'account_number' => $request->card_number[$key],
+//                            'cvc_code' => $request->cvc_code[$key],
+//                            'expiry_date' => $request->expire_date[$key],
+//                            'type' => RiderBankInformation::$type['card'],
+//                            'is_default_payment' => $item === 'true',
+//                        ]
+//                    );
+//                }
+//            }
 
             // load relationship data
             $user->load([
-                'riderBankInformations',
                 'userRiders'
             ]);
             $data = new RiderProfileResource($user);

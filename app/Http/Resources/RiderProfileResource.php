@@ -19,7 +19,7 @@ class RiderProfileResource extends JsonResource
             'status' => array_search($this->status, User::$status) ?? 'unknown', // Convert integer to string
             'role' => $this->getRoleNames()->toArray(),
             'rider_document' => RiderDocumentResource::collection($this->userRiders),
-            'rider_bank_information' => RiderBankInformationResource::collection($this->riderBankInformations),
+            //'rider_bank_information' => RiderBankInformationResource::collection($this->riderBankInformations),
         ];
     }
 }

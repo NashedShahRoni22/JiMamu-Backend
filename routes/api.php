@@ -74,7 +74,7 @@ Route::middleware(['json.response'])->prefix('/v1')->group(function() {
         Route::prefix('/orders')->group(function () {
             Route::prefix('/new/order/request')->group(function () {
                 Route::post('/', [OrderRequestController::class, 'orderRequest']); // Get user profile
-                Route::get('/ongoing/list/{orderType}', [OrderRequestController::class, 'onGoingOrderList']); // Get user profile
+                Route::get('/ongoing/list/?{orderType}', [OrderRequestController::class, 'onGoingOrderList']); // Get user profile
                 Route::get('/show/{order_id}', [OrderRequestController::class, 'showOrderRequest']);
             });
             Route::get('/my/completed/order/list', [OrderRequestController::class, 'myCompletedOrderList']);

@@ -161,7 +161,9 @@ class OrderRequestController extends Controller
     {
         try {
             $order = Order::where('customer_id', auth()->id())
-                ->where('order_type', Order::$ORDER_TYPE[$orderType])
+                ->when(!empty($orderType), function ($query) use ($orderType) {
+                    return $query->where('order_type', $orderType);
+                })
                 ->whereIn('status', [Order::$ORDER_STATUS['pending'], Order::$ORDER_STATUS['confirmed'], Order::$ORDER_STATUS['picked']])
                 //->where('created_at', '>=', Carbon::now()->subMinutes(5))
                 ->latest()

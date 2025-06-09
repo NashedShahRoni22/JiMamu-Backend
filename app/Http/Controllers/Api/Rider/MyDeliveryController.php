@@ -53,7 +53,9 @@ class MyDeliveryController extends Controller
         try {
             $order = Order::where('status', Order::$ORDER_STATUS['pending'])
                 //->whereNot('rider_id', auth()->id())
-                ->where('order_type', Order::$ORDER_TYPE[$orderType])
+                ->when(!empty($orderType), function ($query) use ($orderType) {
+                    return $query->where('order_type', $orderType);
+                })
                 ->whereNot('customer_id', auth()->id())
                 ->with('orderAttempts.bids', 'orderAttempts.bid')->get();
             $data = MyOrderDetailsResource::collection($order);

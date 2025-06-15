@@ -157,13 +157,13 @@ class OrderRequestController extends Controller
         }
 
     }
-    public function onGoingOrderList($orderType = 'national')
+    public function onGoingOrderList()
     {
         try {
             $order = Order::where('customer_id', auth()->id())
-                ->when(!empty($orderType), function ($query) use ($orderType) {
-                    return $query->where('order_type', $orderType);
-                })
+//                ->when(!empty($orderType), function ($query) use ($orderType) {
+//                    return $query->where('order_type', $orderType);
+//                })
                 ->whereIn('status', [Order::$ORDER_STATUS['pending'], Order::$ORDER_STATUS['confirmed'], Order::$ORDER_STATUS['picked']])
                 //->where('created_at', '>=', Carbon::now()->subMinutes(5))
                 ->latest()
@@ -180,7 +180,9 @@ class OrderRequestController extends Controller
         try {
             $order = Order::where('customer_id', auth()->id())
                 ->where('status', Order::$ORDER_STATUS['delivered'])
-                ->with('orderAttempts.bids', 'orderAttempts.bid')->get();
+                ->with('orderAttempts.bids', 'orderAttempts.bid')
+                ->latest()
+                ->get();
             $data = MyOrderDetailsResource::collection($order);
             return sendResponse(success: true, message: 'Successfully Get Data', data: $data);
         }catch (\Exception $exception){
@@ -196,7 +198,7 @@ class OrderRequestController extends Controller
     public function showOrderRequest($orderUniqueId)
     {
         $order = Order::where('order_unique_id', $orderUniqueId)
-            ->whereIn('status', [1,2,3,4])
+            ->whereIn('status', [1,2,3,4,5])
             //->where('created_at', '>=', Carbon::now()->subMinutes(5))
             ->with('orderAttempts.bids', 'orderAttempts.bid', 'receiverInformation', 'senderInformation', 'orderDestination')->get();
         if(!$order){
@@ -243,7 +245,7 @@ class OrderRequestController extends Controller
         if (!$order){
             return sendResponse(success: false, message: 'Order not found', data: null, status: 404);
         }
-         $bid = $order->bid->where('user_id', $riderId)->firstOrFail();
+         $bid = $order->bid->where('user_id', $riderId)->first();
         if (!$bid){
             return sendResponse(success: false, message: 'Apply Rider Bid not found', data: null, status: 404);
         }
@@ -306,12 +308,14 @@ class OrderRequestController extends Controller
     }
     public function riderOrderOtpVerify($orderUniqueId, $otpType, $otpCode)
     {
+
         $order = Order::where('order_unique_id', $orderUniqueId)
             ->with([
                 'customer:id,email',
                 'orderAttempt.acceptedBid'
             ])
             ->firstOrFail();
+
         // otp type check and allow picked and delivered
         if (!in_array($otpType, ['picked', 'delivered'])) {
             return sendResponse(false, 'OTP type allow only picked or delivered', data: null, status: 404);

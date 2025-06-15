@@ -9,15 +9,16 @@ use Illuminate\Http\Request;
 
 class MyDeliveryController extends Controller
 {
-    public function myOngoingOrder($orderType = 'national')
+    public function myOngoingOrder($orderType)
     {
         if(!auth()->user()->hasRole('rider')){
             return sendResponse(false, 'Your are not rider', null, 403);
         }
         $order = Order::whereIn('status', [Order::$ORDER_STATUS['confirmed'], Order::$ORDER_STATUS['picked'], Order::$ORDER_STATUS['shipping']])
-            ->where('order_type', Order::$ORDER_TYPE[$orderType])
             ->where('rider_id', auth()->id())
-            ->with('orderAttempts.bids', 'orderAttempts.bid')->get();
+            ->with('orderAttempts.bids', 'orderAttempts.bid')
+            ->latest()
+            ->get();
         try {
 
             $data = MyOrderDetailsResource::collection($order);
@@ -45,7 +46,7 @@ class MyDeliveryController extends Controller
             return sendResponse(success: false, message: 'Something went wrong', data: null, status: 422);
         }
     }
-    public function myNewOrderRequest($orderType = 'national')
+    public function myNewOrderRequest()
     {
         if(!auth()->user()->hasRole('rider')){
             return sendResponse(false, 'Your are not rider', null, 403);
@@ -53,11 +54,13 @@ class MyDeliveryController extends Controller
         try {
             $order = Order::where('status', Order::$ORDER_STATUS['pending'])
                 //->whereNot('rider_id', auth()->id())
-                ->when(!empty($orderType), function ($query) use ($orderType) {
-                    return $query->where('order_type', $orderType);
-                })
+//                ->when(!empty($orderType), function ($query) use ($orderType) {
+//                    return $query->where('order_type', $orderType);
+//                })
                 ->whereNot('customer_id', auth()->id())
-                ->with('orderAttempts.bids', 'orderAttempts.bid')->get();
+                ->with('orderAttempts.bids', 'orderAttempts.bid')
+                ->latest()
+                ->get();
             $data = MyOrderDetailsResource::collection($order);
             return sendResponse(success: true, message: 'Successfully Get Data', data: $data);
         } catch (\Exception $exception) {
@@ -72,7 +75,9 @@ class MyDeliveryController extends Controller
         try {
             $order = Order::where('rider_id', auth()->id())
                 ->where('status', Order::$ORDER_STATUS['delivered'])
-                ->with('orderAttempts.bids', 'orderAttempts.bid')->get();
+                ->with('orderAttempts.bids', 'orderAttempts.bid')
+                ->latest()
+                ->get();
             $data = MyOrderDetailsResource::collection($order);
             return sendResponse(success: true, message: 'Successfully Get Data', data: $data);
         } catch (\Exception $exception) {

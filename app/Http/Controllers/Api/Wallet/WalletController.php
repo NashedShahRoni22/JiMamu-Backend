@@ -21,7 +21,7 @@ class WalletController extends Controller
     public function walletHistory()
     {
         try {
-            $wallet  = Wallet::select('id', 'user_id', 'balance')->where('user_id', auth()->id())->with('walletHistory')->first();
+            $wallet  = Wallet::where('user_id', auth()->id())->with('walletHistory')->firstOrFail();
             $data = new WalletResource($wallet);
             return sendResponse(true, 'success', $data);
         }catch (\Exception $exception){

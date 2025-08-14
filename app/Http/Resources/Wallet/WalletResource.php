@@ -16,7 +16,7 @@ class WalletResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'balance' => $this->balance,
+            'balance' => $this?->balance,
             'walletHistory' => WalletHistoryResource::collection($this->whenLoaded('walletHistory')),
         ];
     }

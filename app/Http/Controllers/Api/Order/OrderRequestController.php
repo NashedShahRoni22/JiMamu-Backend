@@ -117,18 +117,18 @@ class OrderRequestController extends Controller
                     $senderRemarks = $request->input('sender_information.remarks');
 
                     // Check if matching user exists
-                    $userExists = auth()->user()->where('name', $senderName)
-                        ->where('phone_number', $senderPhone)
-                        ->first();
+//                    $userExists = auth()->user()->where('name', $senderName)
+//                        ->where('phone_number', $senderPhone)
+//                        ->first();
 
                     // If no matching user, then store as sender information
-                    if (!$userExists) {
+                 //   if (!$userExists) {
                         $orderRequest->senderInformation()->create([
                             'sender_name' => $senderName,
                             'sender_phone' => $senderPhone,
                             'remarks' => $senderRemarks,
                         ]);
-                    }
+                   // }
                 }
                 // Store Receiver Info
                 if ($request->has('receiver_information')) {

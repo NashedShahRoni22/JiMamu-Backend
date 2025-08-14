@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 
 class MyDeliveryController extends Controller
 {
-    public function myOngoingOrder($orderType)
+    public function myOngoingOrder()
     {
         if(!auth()->user()->hasRole('rider')){
             return sendResponse(false, 'Your are not rider', null, 403);
@@ -20,7 +20,6 @@ class MyDeliveryController extends Controller
             ->latest()
             ->get();
         try {
-
             $data = MyOrderDetailsResource::collection($order);
             return sendResponse(success: true, message: 'Successfully Get Data', data: $data);
         } catch (\Exception $exception) {

@@ -17,7 +17,9 @@ return new class extends Migration
             $table->foreignId('user_id');
             $table->decimal('amount', 15, 2);
             $table->tinyInteger('status')->default(1); // pending, processing, approved, cancelled
+            $table->softDeletes();
             $table->timestamps();
+
         });
     }
 

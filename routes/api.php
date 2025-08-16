@@ -11,6 +11,7 @@ use Laravel\Socialite\Facades\Socialite;
 use App\Http\Controllers\Api\Rider\MyDeliveryController;
 use App\Http\Controllers\Api\StripePaymentController;
 use App\Http\Controllers\Api\Wallet\WalletController;
+use App\Http\Controllers\Api\Order\OrderCancelController;
 
 Route::middleware(['json.response'])->prefix('/v1')->group(function() {
     Route::post('/send/email/otp', [AuthController::class, 'sendEmailOtp']);
@@ -69,6 +70,8 @@ Route::middleware(['json.response'])->prefix('/v1')->group(function() {
             // order otp verify
             Route::get('order/send/otp/{order_id}/{otp_type}', [OrderRequestController::class, 'riderOrderSendOtp']);
             Route::get('order/verify/{order_id}/{otp_type}/{otp_code}', [OrderRequestController::class, 'riderOrderOtpVerify']);
+            // cancel order
+            Route::post('order/cancel/{order_id}', [OrderCancelController::class, 'riderOrderCancel']);
 
         });
         Route::prefix('/orders')->group(function () {
@@ -82,6 +85,8 @@ Route::middleware(['json.response'])->prefix('/v1')->group(function() {
             Route::get('confirmed/order/{order_id}/{sub_order_id}/{rider_id}', [OrderRequestController::class, 'orderBidAccept']);
             Route::get('tracking/order/{order_id}', [OrderRequestController::class, 'orderTracking']);
             Route::get('packages', [OrderRequestController::class, 'packages']);
+
+            Route::post('order/cancel/{order_id}', [OrderCancelController::class, 'cancelOrder']);
 
         });
 

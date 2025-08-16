@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('stripe_product');
             $table->string('stripe_price');
             $table->integer('quantity')->nullable();
+            $table->softDeletes();
             $table->timestamps();
 
             $table->index(['subscription_id', 'stripe_price']);

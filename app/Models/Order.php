@@ -54,5 +54,12 @@ class Order extends Model
     public function orderDestination(){
        return $this->hasOne(OrderDestination::class, 'order_id', 'id');
     }
+    public function rider(){
+        return $this->belongsTo(User::class, 'rider_id', 'id');
+    }
+    public function package()
+    {
+        return $this->belongsTo(Package::class, 'package_id', 'id');
+    }
 
 }

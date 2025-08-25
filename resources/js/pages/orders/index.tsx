@@ -1,6 +1,6 @@
 // resources/js/Pages/Orders/Index.tsx
 import AppLayout from "@/layouts/app-layout";
-import { Head, usePage } from "@inertiajs/react";
+import { Head, usePage, Link } from "@inertiajs/react";
 import React from "react";
 import { DataTable } from "@/components/ui/datatable";
 import { ColumnDef } from "@tanstack/react-table";
@@ -18,6 +18,7 @@ export default function Index() {
         customer_image: string;
         payment_status: string;
         weight: number;
+        action: string;
     };
 
     const columns: ColumnDef<Order>[] = [
@@ -43,6 +44,18 @@ export default function Index() {
         },
         { accessorKey: "payment_status", header: "Payment Status" },
         { accessorKey: "weight", header: "Weight" },
+        {
+            accessorKey: "action",
+            header: "Action",
+            cell: ({ row }) => (
+                <Link
+                    href={`/orders/show/${row.original.id}`} // your URL
+                    className="text-blue-500 hover:underline"
+                >
+                    View
+                </Link>
+            ),
+        },
     ];
 
     return (

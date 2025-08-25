@@ -18,6 +18,39 @@ const mainNavItems: NavItem[] = [
         href: '/orders',
         icon: LayoutGrid,
     },
+    {
+        title: 'Cancel Orders',
+        href: '/cancel/orders',
+        icon: LayoutGrid,
+    },
+    {
+        title: 'Customer',
+        icon: LayoutGrid,
+        children: [
+            { title: 'Pending Orders', href: '/rider/pending' },
+            { title: 'Completed Orders', href: '/rider/completed' },
+            { title: 'Cancelled Orders', href: '/rider/cancelled' },
+        ],
+    },
+    {
+        title: 'Rider',
+        icon: LayoutGrid,
+        children: [
+            { title: 'Pending Orders', href: '/rider/pending' },
+            { title: 'Completed Orders', href: '/rider/completed' },
+            { title: 'Cancelled Orders', href: '/rider/cancelled' },
+        ],
+    },
+    {
+        title: 'Users',
+        icon: LayoutGrid,
+        children: [
+            { title: 'Pending Orders', href: '/rider/pending' },
+            { title: 'Completed Orders', href: '/rider/completed' },
+            { title: 'Cancelled Orders', href: '/rider/cancelled' },
+        ],
+    },
+
 ];
 
 const footerNavItems: NavItem[] = [

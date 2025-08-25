@@ -27,4 +27,43 @@ class OrderController extends Controller
             'orders' => $orders
         ]);
     }
+    public function show(Order $order)
+    {
+        $order->load('customer', 'rider', 'bid', 'receiverInformation', 'senderInformation', 'orderDestination', 'package');
+
+        // Get pickup and drop addresses
+        $pickupAddress = $this->getAddressFromCoords($order->pickup_latitude, $order->pickup_longitude);
+        $dropAddress   = $this->getAddressFromCoords($order->drop_latitude, $order->drop_longitude);
+
+        // Add addresses to order object
+        $order->pickup_address = $pickupAddress;
+        $order->drop_address   = $dropAddress;
+
+        return Inertia::render('orders/order-details', [
+            'order' => $order
+        ]);
+    }
+
+    private function getAddressFromCoords($lat, $lng)
+    {
+        // Nominatim requires a User-Agent header
+        $opts = [
+            "http" => [
+                "header" => "User-Agent: MyLaravelApp/1.0\r\n"
+            ]
+        ];
+        $context = stream_context_create($opts);
+
+        $url = "https://nominatim.openstreetmap.org/reverse?format=json&lat={$lat}&lon={$lng}";
+        $response = file_get_contents($url, false, $context);
+
+        if (!$response) {
+            return 'Address not found';
+        }
+
+        $data = json_decode($response, true);
+
+        return $data['display_name'] ?? 'Address not found';
+    }
+
 }

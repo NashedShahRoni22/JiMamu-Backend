@@ -21,6 +21,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // order
     Route::prefix('orders')->group(function () {
         Route::get('/', [OrderController::class, 'index'])->name('orders.index');
+        Route::get('/show/{order}', [OrderController::class, 'show'])->name('orders.show');
     });
 });
 

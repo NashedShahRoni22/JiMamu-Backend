@@ -9,24 +9,48 @@ use Inertia\Inertia;
 
 class OrderController extends Controller
 {
-    public function index(){
-        $orders = Order::with('customer')->get()->map(function ($order) {
-            return [
-                'id' => $order->id,
-                'order_unique_id' => $order->order_unique_id,
-                'status' => $order->status,
-                'customer_name' => $order->customer->name ?? 'N/A',
-                'customer_email' => $order->customer->email ?? '',
-                'customer_image' => $order->customer->profile_image ?? '',
-                'payment_status' => $order->payment_status,
-                'weight' => $order->weight,
-            ];
-        });
+    public function index()
+    {
+        $orderId = request('order_id');
+        $customerEmail = request('customer_email');
+        $status = request('status');
+
+        $orders = Order::with('customer')
+            ->when($orderId, function ($query, $orderId) {
+                $query->where('order_unique_id', 'like', "%{$orderId}%");
+            })
+            ->when($customerEmail, function ($query, $customerEmail) {
+                $query->whereHas('customer', function ($q) use ($customerEmail) {
+                    $q->where('email', 'like', "%{$customerEmail}%");
+                });
+            })
+            ->when($status, function ($query, $status) {
+                $query->where('status', Order::$ORDER_STATUS_NAME[$status]);
+            })
+            ->get()
+            ->map(function ($order) {
+                return [
+                    'id' => $order->id,
+                    'order_unique_id' => $order->order_unique_id,
+                    'status' => Order::$ORDER_STATUS_NAME[$order->status],
+                    'customer_name' => $order->customer->name ?? 'N/A',
+                    'customer_email' => $order->customer->email ?? '',
+                    'customer_image' => $order->customer->profile_image ?? '',
+                    'payment_status' => $order->payment_status,
+                    'weight' => $order->weight,
+                ];
+            });
 
         return Inertia::render('orders/index', [
-            'orders' => $orders
+            'orders' => $orders,
+            'filters' => [
+                'order_id' => $orderId,
+                'customer_email' => $customerEmail,
+                'status' => $status
+            ]
         ]);
     }
+
     public function show(Order $order)
     {
         $order->load('customer', 'rider', 'bid', 'receiverInformation', 'senderInformation', 'orderDestination', 'package');

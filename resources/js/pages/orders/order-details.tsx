@@ -92,7 +92,7 @@ export default function Show() {
                         <h2 className="text-lg font-semibold mb-2">Pickup Address</h2>
                         {order.pickup_address ? (
                             <>
-                                <p><strong>Address Name:</strong> {order.pickup_address}</p>
+                                <p>{order.pickup_address}</p>
                             </>
                         ) : (
                             <p>N/A</p>
@@ -104,7 +104,7 @@ export default function Show() {
                         <h2 className="text-lg font-semibold mb-2">Drop Address</h2>
                         {order.drop_address ? (
                             <>
-                                <p><strong>Address Name:</strong> {order.drop_address}</p>
+                                <p>{order.drop_address}</p>
                             </>
                         ) : (
                             <p>N/A</p>

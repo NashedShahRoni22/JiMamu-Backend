@@ -36,15 +36,7 @@ const mainNavItems: NavItem[] = [
         title: 'Rider',
         icon: LayoutGrid,
         children: [
-            { title: 'Pending Orders', href: '/rider/pending' },
-            { title: 'Completed Orders', href: '/rider/completed' },
-            { title: 'Cancelled Orders', href: '/rider/cancelled' },
-        ],
-    },
-    {
-        title: 'Users',
-        icon: LayoutGrid,
-        children: [
+            { title: 'Account Approve Request', href: '/riders/rider/account/review' },
             { title: 'Pending Orders', href: '/rider/pending' },
             { title: 'Completed Orders', href: '/rider/completed' },
             { title: 'Cancelled Orders', href: '/rider/cancelled' },

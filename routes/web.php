@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\Admin\RiderAccountReviewController;
 
 Route::get('/test', function () {
 
@@ -22,6 +23,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('orders')->group(function () {
         Route::get('/', [OrderController::class, 'index'])->name('orders.index');
         Route::get('/show/{order}', [OrderController::class, 'show'])->name('orders.show');
+    });
+    Route::prefix('riders')->name('riders.')->group(function () {
+        Route::get('/rider/account/review', [RiderAccountReviewController::class, 'accountCreateRequest'])->name('account.review.request');
+        Route::get('/rider/account/review/details/{order}', [RiderAccountReviewController::class, 'accountReviewDetails'])->name('rider.account.review.details');
     });
 });
 

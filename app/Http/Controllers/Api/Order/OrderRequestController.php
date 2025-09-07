@@ -321,7 +321,7 @@ class OrderRequestController extends Controller
             return sendResponse(false, 'OTP type allow only picked or delivered', data: null, status: 404);
         }
         // rider check
-        if($order->orderAttempt?->acceptedBid?->user_id != auth()->id()){
+        if($order->rider_id != auth()->id()){
             return sendResponse(success: false, message: 'Rider not valid', data: null, status: 422);
         }
         $getOTP = OtpVerify::where('email', $order->customer->email)->where('otp_code', $otpCode)->first();

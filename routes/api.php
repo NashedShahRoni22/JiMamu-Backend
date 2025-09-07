@@ -9,7 +9,8 @@ use App\Http\Controllers\Api\Rider\RiderLocationController;
 use App\Http\Controllers\Api\Rider\BidsController;
 use Laravel\Socialite\Facades\Socialite;
 use App\Http\Controllers\Api\Rider\MyDeliveryController;
-use App\Http\Controllers\Api\StripePaymentController;
+use App\Http\Controllers\Api\Payment\StripePaymentController;
+use App\Http\Controllers\Api\Payment\StripeWebhookController;
 use App\Http\Controllers\Api\Wallet\WalletController;
 use App\Http\Controllers\Api\Order\OrderCancelController;
 
@@ -92,10 +93,9 @@ Route::middleware(['json.response'])->prefix('/v1')->group(function() {
 
         // payments
         Route::prefix('/payments')->group(function () {
-            Route::get('stripe/payment/process/{order_id}', [StripePaymentController::class, 'stripePaymentProcess']);
-            Route::get('stripe/payment/success', [StripePaymentController::class, 'stripePaymentSuccess']);
+            Route::post('/create/payment-intent', [StripePaymentController::class, 'createPaymentIntent']);
         });
-        Route::post('/webhook/stripe', [StripePaymentController::class, 'handleStripeWebhook']);
+        Route::post('/webhook/stripe', [StripeWebhookController::class, 'handleWebhook']);
         // wallets
         Route::prefix('wallets')->group(function () {
             Route::get('/', [WalletController::class, 'wallet']);

@@ -18,7 +18,10 @@ use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
-    public function __construct(public MakeVerificationCodeService $makeVerificationCodeService, protected FileService $fileService)
+    public function __construct(
+        public MakeVerificationCodeService $makeVerificationCodeService,
+        protected FileService $fileService,
+      )
     {
 
     }
@@ -38,6 +41,9 @@ class AuthController extends Controller
             ]);
            // event(new OtpGenerated(1251)); // Dispatch event
             Mail::to($otp->email)->send(new OtpMail($otp->otp_code));
+
+
+
 
             return sendResponse(true, 'OTP Send successfully.');
         }catch (CustomException $e){

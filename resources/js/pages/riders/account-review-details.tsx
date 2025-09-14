@@ -1,6 +1,7 @@
 import AppLayout from "@/layouts/app-layout";
 import { Head, usePage, Link } from "@inertiajs/react";
-import React from "react";
+import React, {useEffect} from "react";
+import toast from "react-hot-toast";
 
 type RiderDocument = {
     id: number;
@@ -34,14 +35,21 @@ interface Props {
 }
 
 export default function Show() {
-    const { rider } = usePage<Props>().props;
+    const { rider, toastMessage } = usePage<Props>().props;
+
 
     const reviewStatusMap: Record<number, string> = {
-        0: "Pending",
-        1: "Approved",
-        2: "Rejected"
+        1: "Pending",
+        2: "Approved",
+        3: "Rejected"
     };
 
+
+    useEffect(() => {
+        if (toastMessage) {
+            toast.success(toastMessage);
+        }
+    }, [toastMessage]);
     return (
         <AppLayout>
             <Head title={`Rider Review - ${rider.name}`} />
@@ -109,12 +117,12 @@ export default function Show() {
 
                 {/* Actions */}
                 <div className="mt-6 flex gap-4">
-                    <button className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+                    <Link href={route('riders.rider.account.approve', {user_id: rider.id, status_type: 2})}  className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
                         Approve
-                    </button>
-                    <button className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
+                    </Link>
+                    <Link href={route('riders.rider.account.approve', {user_id: rider.id, status_type: 3})} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
                         Reject
-                    </button>
+                    </Link>
                 </div>
             </div>
         </AppLayout>

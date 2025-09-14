@@ -27,6 +27,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('riders')->name('riders.')->group(function () {
         Route::get('/rider/account/review', [RiderAccountReviewController::class, 'accountCreateRequest'])->name('account.review.request');
         Route::get('/rider/account/review/details/{order}', [RiderAccountReviewController::class, 'accountReviewDetails'])->name('rider.account.review.details');
+        Route::get('rider/account/approve/{user_id}/{status_type}', [RiderAccountReviewController::class, 'accountApprove'])->name('rider.account.approve');
     });
 });
 

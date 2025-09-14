@@ -45,5 +45,25 @@ class RiderAccountReviewController extends Controller
             'rider' => $rider
         ]);
     }
+    // rider account review approved or rejected
+    public function accountApprove($userId, $statusType)
+    {
+        $rider = User::with('userRiders')->findOrFail($userId);
+
+        foreach ($rider->userRiders as $userRider) {
+            $userRider->review_status = $statusType; // approved or rejected
+            $userRider->save();
+        }
+
+        return Inertia::render('riders/account-review-details', [
+            'rider' => $rider,
+            // Pass message as normal prop
+            'toastMessage' => $statusType == 2
+                ? 'Rider approved successfully!'
+                : 'Rider rejected!',
+        ]);
+    }
+
+
 
 }

@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
            PackageSeeder::class,
            WeightRuleSeeder::class,
            DistanceZoneSeeder::class,
+           OrderCancelReasonSeeder::class,
        ]);
     }
 }

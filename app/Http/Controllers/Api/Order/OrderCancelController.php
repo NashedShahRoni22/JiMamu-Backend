@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Api\Order;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderCancel;
+use App\Models\OrderCancelReason;
 use App\Models\Wallet;
 use App\Models\WalletHistory;
 use App\Models\RiderCancelFlag;
+use App\Models\RiderCancelReason;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -104,6 +106,19 @@ class OrderCancelController extends Controller
             return sendResponse(true, 'Successfully Order Has Cancelled.');
         }catch (\Exception $exception){
             return sendResponse(false, 'Something Went Wrong', null, 422);
+        }
+    }
+
+    public function orderCancelReason(){
+        try {
+            $reasons = OrderCancelReason::query()
+                ->active()
+                ->orderBy('name')
+                ->get(['id', 'name']);
+
+            return sendResponse(true, 'Rider cancel reasons fetched successfully.', $reasons);
+        } catch (\Exception $e) {
+            return sendResponse(false, 'Failed to fetch rider cancel reasons.', null, 500);
         }
     }
 }

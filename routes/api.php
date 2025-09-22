@@ -91,6 +91,8 @@ Route::middleware(['json.response'])->prefix('/v1')->group(function() {
             Route::get('packages', [OrderRequestController::class, 'packages']);
 
             Route::post('order/cancel/{order_id}', [OrderCancelController::class, 'cancelOrder']);
+            Route::get('order/cancel/reason/list', [OrderCancelController::class, 'orderCancelReason']);;
+
 
             // international order request
             Route::post('international/order/request', [InternationalOrderController::class, 'internationalOrderRequest']);

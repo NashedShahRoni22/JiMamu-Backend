@@ -72,4 +72,7 @@ class User extends Authenticatable
     public function userBankInformations(){
         return $this->hasMany(UserBankInformation::class, 'user_id', 'id');
     }
+    public function riderCancelFlags(){
+        return $this->hasMany(RiderCancelFlag::class, 'rider_id', 'id');
+    }
 }

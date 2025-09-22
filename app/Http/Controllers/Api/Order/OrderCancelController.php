@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\OrderCancel;
 use App\Models\Wallet;
 use App\Models\WalletHistory;
+use App\Models\RiderCancelFlag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -75,11 +76,21 @@ class OrderCancelController extends Controller
         if($order->rider_id != auth()->id()){
             return sendResponse(false, 'Rider not found.', null, 404);
         }
-
-
         try {
+            // Enforce maximum of 3 rider cancellations (red flags)
+            $flagsCount = RiderCancelFlag::where('rider_id', auth()->id())->count();
+            if ($flagsCount >= 3) {
+                return sendResponse(false, 'You have reached the maximum number of cancellations (3).', null, 403);
+            }
+
             if($order->status === Order::$ORDER_STATUS['confirmed']){
                 DB::transaction(function() use($order, $orderCancel, $request){
+                    // Record rider cancellation flag (one per order per rider)
+                    RiderCancelFlag::firstOrCreate(
+                        ['rider_id' => auth()->id(), 'order_id' => $order->id],
+                        ['reason' => $request->reason]
+                    );
+
                     OrderCancel::create([
                         'order_id' => $order->id,
                         'customer_id' => auth()->id(),

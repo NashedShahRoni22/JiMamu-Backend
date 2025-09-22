@@ -9,12 +9,14 @@ use App\Http\Resources\MyOrderListResource;
 use App\Http\Resources\PackageResource;
 use App\Mail\OtpMail;
 use App\Models\Bid;
+use App\Models\DistanceZone;
 use App\Models\Order;
 use App\Models\OrderAttempt;
 use App\Models\OrderDestination;
 use App\Models\OtpVerify;
 use App\Models\Package;
 use App\Models\User;
+use App\Models\WeightRule;
 use App\Services\Rider\LocationService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -357,6 +359,15 @@ class OrderRequestController extends Controller
 
         }
 
+    }
+    public function zoneList(){
+        $distances = DistanceZone::get();
+        return sendResponse(success: true, message: 'Successfully get distance data', data: $distances);
+
+    }
+    public function weightList(){
+       $parcelWeights = WeightRule::get();
+        return sendResponse(success: true, message: 'Successfully get weight data', data: $parcelWeights);
     }
 
 }

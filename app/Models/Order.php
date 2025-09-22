@@ -61,5 +61,8 @@ class Order extends Model
     {
         return $this->belongsTo(Package::class, 'package_id', 'id');
     }
+    public function riderCancelFlags(){
+        return $this->hasMany(RiderCancelFlag::class, 'order_id', 'id');
+    }
 
 }

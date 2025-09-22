@@ -77,6 +77,8 @@ Route::middleware(['json.response'])->prefix('/v1')->group(function() {
 
         });
         Route::prefix('/orders')->group(function () {
+            Route::get('/zone/list', [OrderRequestController::class, 'zoneList']);
+            Route::get('/parcel/weight/list', [OrderRequestController::class, 'weightList']);;
             Route::prefix('/new/order/request')->group(function () {
                 Route::post('/', [OrderRequestController::class, 'orderRequest']); // Get user profile
                 Route::get('/ongoing/list/', [OrderRequestController::class, 'onGoingOrderList']); // Get user profile
@@ -92,8 +94,7 @@ Route::middleware(['json.response'])->prefix('/v1')->group(function() {
 
             // international order request
             Route::post('international/order/request', [InternationalOrderController::class, 'internationalOrderRequest']);
-
-
+            Route::get('international/ongoing/order/list', [InternationalOrderController::class, 'internationalOngoingOrderList']);
         });
 
         // payments

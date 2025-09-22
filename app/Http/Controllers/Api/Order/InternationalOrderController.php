@@ -3,20 +3,25 @@
 namespace App\Http\Controllers\Api\Order;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\MyOrderListResource;
 use App\Models\Order;
 use App\Models\OrderAttempt;
 use App\Models\OrderDestination;
+use App\Services\Order\FareCalculatorService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class InternationalOrderController extends Controller
 {
+    public function __construct(public FareCalculatorService $fareCalculatorService){
+
+    }
     public function internationalOrderRequest(Request $request)
     {
+//        $fare = $this->fareCalculatorService->calculateFare($request->distance, $request->weight);
+//        return $fare;
         try {
             DB::transaction(function () use ($request) {
-                $fare = 0;
-
 
                 $orderRequest = Order::create([
                     'customer_id' => auth()->id(),
@@ -93,5 +98,20 @@ class InternationalOrderController extends Controller
             return sendResponse(success: false, message: 'something went wrong', data: null, status: 422,  error: $exception->getMessage());
         }
 
+    }
+
+    public function internationalOngoingOrderList(){
+        try {
+            $order = Order::where('customer_id', auth()->id())
+                ->where('order_type', Order::$ORDER_TYPE['international'])
+                ->whereIn('status', [Order::$ORDER_STATUS['pending'], Order::$ORDER_STATUS['confirmed'], Order::$ORDER_STATUS['picked']])
+                //->where('created_at', '>=', Carbon::now()->subMinutes(5))
+                ->latest()
+                ->get(); // fetch all matching orders
+            $data = MyOrderListResource::collection($order);
+            return sendResponse(success: true, message: 'Success My Order List', data: $data);
+        }catch (\Exception $exception){
+            return sendResponse(false, message: 'something went wrong', data: null, status: 422);
+        }
     }
 }

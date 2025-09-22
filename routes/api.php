@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\Payment\StripePaymentController;
 use App\Http\Controllers\Api\Payment\StripeWebhookController;
 use App\Http\Controllers\Api\Wallet\WalletController;
 use App\Http\Controllers\Api\Order\OrderCancelController;
+use App\Http\Controllers\Api\Order\InternationalOrderController;
 
 Route::middleware(['json.response'])->prefix('/v1')->group(function() {
     Route::post('/send/email/otp', [AuthController::class, 'sendEmailOtp']);
@@ -88,6 +89,10 @@ Route::middleware(['json.response'])->prefix('/v1')->group(function() {
             Route::get('packages', [OrderRequestController::class, 'packages']);
 
             Route::post('order/cancel/{order_id}', [OrderCancelController::class, 'cancelOrder']);
+
+            // international order request
+            Route::post('international/order/request', [InternationalOrderController::class, 'internationalOrderRequest']);
+
 
         });
 

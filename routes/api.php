@@ -62,6 +62,7 @@ Route::middleware(['json.response'])->prefix('/v1')->group(function() {
             Route::get('/order/new/order/bid/list', [BidsController::class, 'newBidList']); // show
             Route::get('/order/new/bids/{order_id}', [BidsController::class, 'newBids']); // show
             Route::post('/order/apply/bids/{order_id}', [BidsController::class, 'applyBids']); // show
+            route::get('/my/order/applied/bids/{order_type}', [BidsController::class, 'myOrderAppliedBids']);
 
 
             Route::get('/my/new/order/request', [MyDeliveryController::class, 'myNewOrderRequest']); // show

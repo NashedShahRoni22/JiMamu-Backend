@@ -35,15 +35,15 @@ class BidsController extends Controller
         if ($order->customer_id === auth()->id()){
             return sendResponse(false, 'You cannot apply your bids.');
         }
-        $maxBidPrice = $order->orderAttempt?->fare + $order->orderAttempt?->fare * 30 / 100;
-        $minBidPrice = $order->orderAttempt?->fare - $order->orderAttempt?->fare * 20 / 100;
-        // check maximum
-        if($maxBidPrice < $request->bid_amount){
-            return sendResponse(false, 'Your bid amount to much high', ['max_bid' => $maxBidPrice], 422);
-        }
-        if($minBidPrice > $request->bid_amount){
-            return sendResponse(false, 'Your bid amount to much low.', ['min_bid' => $minBidPrice], 422);
-        }
+//        $maxBidPrice = $order->orderAttempt?->fare + $order->orderAttempt?->fare * 30 / 100;
+//        $minBidPrice = $order->orderAttempt?->fare - $order->orderAttempt?->fare * 20 / 100;
+//        // check maximum
+//        if($maxBidPrice < $request->bid_amount){
+//            return sendResponse(false, 'Your bid amount to much high', ['max_bid' => $maxBidPrice], 422);
+//        }
+//        if($minBidPrice > $request->bid_amount){
+//            return sendResponse(false, 'Your bid amount to much low.', ['min_bid' => $minBidPrice], 422);
+//        }
         // check exist under a order
        if(!auth()->user()->hasRole('rider')){
            return sendResponse(false, 'You are not eligible for rider.', null, 404);
@@ -66,4 +66,27 @@ class BidsController extends Controller
             return sendResponse(false, 'Something went wrong!', null,422, $exception->getMessage());
         }
     }
+    public function myOrderAppliedBids($order_type = 'national')
+    {
+        try {
+            $orders = Order::where('order_type', Order::$ORDER_TYPE[$order_type])
+                ->whereHas('orderAttempts.bids', function ($q) {
+                    $q->where('user_id', auth()->id());
+                })
+                ->with('package:id,name')
+                ->with(['orderAttempt' => function ($query) {
+                    $query->with(['bid' => function ($q) {
+                        $q->where('user_id', auth()->id());
+                    }]);
+                }])
+                ->latest()
+                ->get();
+
+            return sendResponse(true, 'Successfully get data.', $orders);
+        } catch (\Exception $e) {
+            return sendResponse(false, 'Something went wrong!', null, 422, $e->getMessage());
+        }
+    }
+
+
 }

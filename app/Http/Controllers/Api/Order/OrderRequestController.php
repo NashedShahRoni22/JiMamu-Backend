@@ -101,17 +101,17 @@ class OrderRequestController extends Controller
                     'order_tracking_number' => rand(000000, 999999),
                 ]);
                 // when order request will have international
-               if($request->order_type == 'international' && $request->has('order_destination')){
-                   OrderDestination::create([
-                       'order_id' => $orderRequest->id,
-                       'country' => $request->input('order_destination.country'),
-                       'state' => $request->input('order_destination.state'),
-                       'city' =>  $request->input('order_destination.city'),
-                       'area' => $request->input('order_destination.area'),
-                       'address' => $request->input('order_destination.address'),
-
-                   ]);
-               }
+//               if($request->order_type == 'international' && $request->has('order_destination')){
+//                   OrderDestination::create([
+//                       'order_id' => $orderRequest->id,
+//                       'country' => $request->input('order_destination.country'),
+//                       'state' => $request->input('order_destination.state'),
+//                       'city' =>  $request->input('order_destination.city'),
+//                       'area' => $request->input('order_destination.area'),
+//                       'address' => $request->input('order_destination.address'),
+//
+//                   ]);
+//               }
                 // customer sender informations
                 if ($request->has('sender_information')) {
                     $senderName = $request->input('sender_information.name');
@@ -356,7 +356,7 @@ class OrderRequestController extends Controller
             $data = PackageResource::collection($packages);
             return sendResponse(success: true, message: 'Packages', data: $data);
         }catch (\Exception $e){
-
+            return sendResponse(success: false, message: 'Something went wrong', data: null, status: 422);
         }
 
     }

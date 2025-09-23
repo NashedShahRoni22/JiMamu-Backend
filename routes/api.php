@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\Payment\StripeWebhookController;
 use App\Http\Controllers\Api\Wallet\WalletController;
 use App\Http\Controllers\Api\Order\OrderCancelController;
 use App\Http\Controllers\Api\Order\InternationalOrderController;
+use App\Http\Controllers\Api\Order\OrderManageController;
 
 Route::middleware(['json.response'])->prefix('/v1')->group(function() {
     Route::post('/send/email/otp', [AuthController::class, 'sendEmailOtp']);
@@ -91,13 +92,22 @@ Route::middleware(['json.response'])->prefix('/v1')->group(function() {
             Route::get('packages', [OrderRequestController::class, 'packages']);
 
             Route::post('order/cancel/{order_id}', [OrderCancelController::class, 'cancelOrder']);
-            Route::get('order/cancel/reason/list', [OrderCancelController::class, 'orderCancelReason']);;
+            Route::get('order/cancel/reason/list', [OrderCancelController::class, 'orderCancelReason']);
 
 
             // international order request
             Route::post('international/order/request', [InternationalOrderController::class, 'internationalOrderRequest']);
             Route::get('international/ongoing/order/list', [InternationalOrderController::class, 'internationalOngoingOrderList']);
+
+            // ***** national and internation both order *****
+            // order bid accepted cancel
+
+
         });
+
+        // customer and rider
+
+        Route::get('/cancel/order/accepted/bid/{order_id}', [OrderManageController::class, 'acceptedBidCancel']); // only order bid accepted cancel
 
         // payments
         Route::prefix('/payments')->group(function () {
@@ -108,7 +118,8 @@ Route::middleware(['json.response'])->prefix('/v1')->group(function() {
         Route::prefix('wallets')->group(function () {
             Route::get('/', [WalletController::class, 'wallet']);
             Route::get('history', [WalletController::class, 'walletHistory']);
-            Route::get('withdraw', [WalletController::class, 'walletWithdraw']);
+            Route::post('withdrawal', [WalletController::class, 'walletWithdrawal']);
+            Route::get('/processing', [WalletController::class, 'walletProcessing']);
         });
 
     });

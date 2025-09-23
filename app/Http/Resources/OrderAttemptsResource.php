@@ -20,6 +20,7 @@ class OrderAttemptsResource extends JsonResource
             'order_tracking_number' => $this->order_tracking_number,
             'payment_status' => $this->payment_status,
             'fare' => $this->fare,
+            'parcel_estimate_price' => $this->parcel_estimate_price,
             'order_date' => $this->created_at->format('F j, Y, h:i:s A'),
             'rider_bids' => ApplyBidResource::collection($this->bids)
         ];

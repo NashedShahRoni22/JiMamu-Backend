@@ -11,15 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('rider_locations', function (Blueprint $table) {
+        Schema::create('pricing_rates', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id');
-            $table->decimal('latitude', 10, 7)->nullable();
-            $table->decimal('longitude', 10, 7)->nullable();
+            $table->decimal('base_fare', 10, 2);
+            $table->decimal('platform_charge', 10, 2);
             $table->timestamps();
             $table->softDeletes();
-
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 
@@ -28,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('rider_locations');
+        Schema::dropIfExists('pricing_rates');
     }
 };

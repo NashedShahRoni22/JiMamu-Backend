@@ -76,7 +76,7 @@ class AuthController extends Controller
         }
         $token = $exitsUser->createToken('auth_token')->plainTextToken;
 
-        return sendResponse(true, 'OTP Verified successfully.', ["token" => $token, "status" => User::$statusName[$exitsUser?->status], 'role' => $exitsUser->getRoleNames()->toArray()]);
+        return sendResponse(true, 'OTP Verified successfully.', ["token" => $token, "status" => User::$statusName[$exitsUser?->status], 'user_id'=> $exitsUser->id, 'role' => $exitsUser->getRoleNames()->toArray()]);
     }
     public function socialLogin(Request $request)
     {

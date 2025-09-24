@@ -14,8 +14,10 @@ return new class extends Migration
             $table->foreignId('order_id')->constrained('orders')->cascadeOnDelete();
             $table->string('reason')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->unique(['rider_id', 'order_id']);
+
         });
     }
 

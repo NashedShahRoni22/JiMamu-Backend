@@ -18,6 +18,7 @@ return new class extends Migration
             $table->decimal('cost_per_kg', 10, 2)->default(0); // e.g., 10, 8, 6
             $table->boolean('is_base_price')->default(false); // true = just base price, no per kg
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

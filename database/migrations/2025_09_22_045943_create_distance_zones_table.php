@@ -19,6 +19,7 @@ return new class extends Migration
             $table->decimal('platform_charge', 10, 2)->default(0);
             $table->decimal('per_km_rate', 10, 2)->default(0);      // rate per km (optional)
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

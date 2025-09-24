@@ -19,6 +19,7 @@ return new class extends Migration
             $table->tinyInteger('payment_method'); // paypal, stripe, ...
             $table->tinyInteger('status'); // pending, completed, failed
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

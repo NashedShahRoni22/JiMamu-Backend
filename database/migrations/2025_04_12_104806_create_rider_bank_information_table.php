@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('remarks')->nullable(); // if cancel with the reason the request
 
             $table->timestamps();
+            $table->softDeletes();
 
             $table->softDeletes();
 

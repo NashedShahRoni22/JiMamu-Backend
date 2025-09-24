@@ -202,6 +202,7 @@ class OrderRequestController extends Controller
         $order = Order::where('order_unique_id', $orderUniqueId)
             ->whereIn('status', [1,2,3,4,5])
             //->where('created_at', '>=', Carbon::now()->subMinutes(5))
+            ->with('package:id,name')
             ->with('orderAttempts.bids', 'orderAttempts.bid', 'receiverInformation', 'senderInformation', 'orderDestination')->get();
         if(!$order){
             return sendResponse(false, 'Order Not Found', data: null, status: 404);
@@ -222,6 +223,7 @@ class OrderRequestController extends Controller
        $order = Order::where('order_unique_id', $orderUniqueId)
            ->whereIn('status', [Order::$ORDER_STATUS['delivered']])
            //->where('created_at', '>=', Carbon::now()->subMinutes(5))
+           ->with('package:id,name')
            ->with('orderAttempts.bids', 'orderAttempts.bid')->get();
        if(!$order){
            return sendResponse(false, 'Order Not Found', data: null, status: 404);

@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('cvc_code'); // Store securely! (See note below)
             $table->boolean('is_default_payment')->default(false);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

@@ -21,6 +21,7 @@ return new class extends Migration
             $table->enum('sender_type', ['phone_number', 'email']);
             $table->tinyInteger('otp_type'); // account verify, order verify(picked, delivered)
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

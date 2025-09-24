@@ -34,6 +34,7 @@ class MyDeliveryController extends Controller
             ->whereIn('status', [Order::$ORDER_STATUS['confirmed'], Order::$ORDER_STATUS['picked'], Order::$ORDER_STATUS['shipping']])
             ->where('rider_id', auth()->id())
             //->where('created_at', '>=', Carbon::now()->subMinutes(5))
+            ->with('package:id,name')
             ->with('orderAttempts.bids', 'orderAttempts.bid')->get();
         if(!$order){
             return sendResponse(false, 'Order Not Found', data: null, status: 404);
@@ -56,9 +57,9 @@ class MyDeliveryController extends Controller
 //                ->when(!empty($orderType), function ($query) use ($orderType) {
 //                    return $query->where('order_type', $orderType);
 //                })
-                ->whereDoesntHave('orderAttempts.bids', function ($q) {
-                    $q->where('user_id', auth()->id());
-                })
+//                ->whereDoesntHave('orderAttempts.bids', function ($q) {
+//                    $q->where('user_id', auth()->id());
+//                })
                 ->whereNot('customer_id', auth()->id())
                 ->with('orderAttempts.bids', 'orderAttempts.bid')
                 ->latest()

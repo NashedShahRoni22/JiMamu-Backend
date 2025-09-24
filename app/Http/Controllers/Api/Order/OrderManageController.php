@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Order;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Models\PricingRate;
 use Illuminate\Http\Request;
 
 class OrderManageController extends Controller
@@ -35,12 +36,16 @@ class OrderManageController extends Controller
             ])
                 ->first();
 
-            return sendResponse(true, 'Order Bid cancelled successfully.', $stats, 200);
+            return sendResponse(true, 'Order Bid cancelled successfully.', $stats);
 
         }catch (\Exception $e){
             return sendResponse(false, 'Something went wrong. Please try again.');
         }
 
+    }
+    public function orderPricingRate(){
+        $data = PricingRate::first();
+        return sendResponse(true, 'Pricing Rate', $data);
     }
 
 }

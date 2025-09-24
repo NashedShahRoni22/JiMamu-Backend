@@ -56,6 +56,9 @@ class MyDeliveryController extends Controller
 //                ->when(!empty($orderType), function ($query) use ($orderType) {
 //                    return $query->where('order_type', $orderType);
 //                })
+                ->whereDoesntHave('orderAttempts.bids', function ($q) {
+                    $q->where('user_id', auth()->id());
+                })
                 ->whereNot('customer_id', auth()->id())
                 ->with('orderAttempts.bids', 'orderAttempts.bid')
                 ->latest()

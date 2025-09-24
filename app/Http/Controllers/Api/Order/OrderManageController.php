@@ -21,4 +21,26 @@ class OrderManageController extends Controller
             return sendResponse(false, 'Something went wrong. Please try again.');
         }
     }
+    public function orderOverview()
+    {
+        try {
+            $stats = Order::selectRaw("
+            SUM(CASE WHEN customer_id = ? AND status = ? THEN 1 ELSE 0 END) as totalCompletedMyOrders,
+            SUM(CASE WHEN rider_id = ? AND status = ? THEN 1 ELSE 0 END) as totalCompletedMyDeliveries
+        ", [
+                auth()->id(),
+                Order::$ORDER_STATUS['delivered'],
+                auth()->id(),
+                Order::$ORDER_STATUS['delivered']
+            ])
+                ->first();
+
+            return sendResponse(true, 'Order Bid cancelled successfully.', $stats, 200);
+
+        }catch (\Exception $e){
+            return sendResponse(false, 'Something went wrong. Please try again.');
+        }
+
+    }
+
 }

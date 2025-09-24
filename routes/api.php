@@ -52,6 +52,7 @@ Route::middleware(['json.response'])->prefix('/v1')->group(function() {
                 Route::get('/', [ProfileUpdateController::class, 'UserProfileShow']); // Get user profile
                 Route::put('/update', [ProfileUpdateController::class, 'userProfileUpdate']); // Update user profile
             });
+
         });
         Route::prefix('/rider')->group(function () {
             Route::prefix('/profile')->group(function () {
@@ -109,6 +110,8 @@ Route::middleware(['json.response'])->prefix('/v1')->group(function() {
         // customer and rider
 
         Route::get('/cancel/order/accepted/bid/{order_id}', [OrderManageController::class, 'acceptedBidCancel']); // only order bid accepted cancel
+
+        Route::get('/order/overview', [OrderManageController::class, 'orderOverview']);
 
         // payments
         Route::prefix('/payments')->group(function () {

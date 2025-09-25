@@ -50,7 +50,7 @@ class OrderManageController extends Controller
             'national' => $pricingData[1],
             'international' => $pricingData[2],
         ];
-        return sendResponse(true, 'Pricing Rate', $data);
+        return sendResponse(true, 'Pricing Rate data get successfully', $data);
     }
 
 }

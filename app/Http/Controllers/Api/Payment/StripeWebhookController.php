@@ -7,13 +7,15 @@ use App\Models\Wallet;
 use Illuminate\Http\Request;
 use Stripe\Webhook;
 use App\Models\Order;
+use Illuminate\Support\Facades\Log;
+
 
 class StripeWebhookController extends Controller
 {
     public function handleWebhook(Request $request)
     {
-        $payload = @file_get_contents('php://input');
-        $sig_header = $_SERVER['HTTP_STRIPE_SIGNATURE'] ?? '';
+        $payload = $request->getContent();
+        $sig_header = $request->header('Stripe-Signature', '');
         $endpoint_secret = config('services.stripe.webhook_secret');
 
         try {
@@ -23,21 +25,48 @@ class StripeWebhookController extends Controller
                 $endpoint_secret
             );
         } catch (\Exception $e) {
+            Log::error('Stripe Webhook signature verification failed', [
+                'error' => $e->getMessage(),
+                'payload' => $payload,
+                'headers' => $request->headers->all(),
+            ]);
+
             return response()->json(['error' => $e->getMessage()], 400);
         }
 
-        if ($event->type === 'payment_intent.succeeded') {
-            $paymentIntent = $event->data->object;
-            $orderId = $paymentIntent->metadata->order_id;
+        try {
+            if ($event->type === 'payment_intent.succeeded') {
+                $paymentIntent = $event->data->object;
+                $orderId = $paymentIntent->metadata->order_id ?? null;
 
-            $order = Order::find($orderId);
-            if ($order) {
-                $order->status = Order::$ORDER_STATUS['confirmed'];
-                $order->save();
+                if ($orderId) {
+                    $order = Order::where('order_unique_id', $orderId)->first();
+
+                    if ($order) {
+                        $order->status = Order::$ORDER_STATUS['confirmed'];
+                        $order->save();
+                    } else {
+                        Log::warning('Stripe Webhook: Order not found', [
+                            'order_unique_id' => $orderId,
+                            'payment_intent_id' => $paymentIntent->id,
+                        ]);
+                    }
+                } else {
+                    Log::warning('Stripe Webhook: Missing order_id in metadata', [
+                        'payment_intent_id' => $paymentIntent->id,
+                    ]);
+                }
             }
-           // Wallet::find($order->user_id)->increment('balance', $order->amount);
+        } catch (\Exception $e) {
+            Log::error('Stripe Webhook processing error', [
+                'error' => $e->getMessage(),
+                'event' => $event,
+            ]);
+
+            return response()->json(['error' => 'Webhook handling failed'], 500);
         }
 
         return response()->json(['status' => 'success']);
     }
+
 }

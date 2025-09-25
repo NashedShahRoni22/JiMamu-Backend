@@ -17,6 +17,7 @@ use App\Models\OtpVerify;
 use App\Models\Package;
 use App\Models\User;
 use App\Models\WeightRule;
+use App\Services\Payment\StripePaymentService;
 use App\Services\Rider\LocationService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -27,7 +28,7 @@ use Illuminate\Support\Facades\Redis;
 
 class OrderRequestController extends Controller
 {
-    public function __construct(public LocationService $locationService){
+    public function __construct(public LocationService $locationService, public StripePaymentService $stripePaymentService){
 
     }
     public function orderRequest(Request $request){
@@ -256,20 +257,21 @@ class OrderRequestController extends Controller
 
         try {
             DB::transaction(function () use ($order, $bid){
-                $order->order()->update([
-                    'rider_id' => $bid->user_id,
-                    'status' => Order::$ORDER_STATUS['confirmed'],
-                ]);
-                $order->update([
-                    'status' => OrderAttempt::$ORDER_STATUS['confirmed'],
-                ]);
+//                $order->order()->update([
+//                    'rider_id' => $bid->user_id,
+//                    'status' => Order::$ORDER_STATUS['confirmed'],
+//                ]);
+//                $order->update([
+//                    'status' => OrderAttempt::$ORDER_STATUS['confirmed'],
+//                ]);
                 $bid->update([
-                    'status' => Bid::$STATUS['accepted'],
+                    'status' => Bid::$STATUS['accepted']
                 ]);
             });
-            return sendResponse(success: true, message: 'Order has been confirmed');
+            $paymentSecretKey = $this->stripePaymentService->createPaymentIntent($orderUniqueId, $orderAttemptId);
+            return sendResponse(success: true, message: 'Order has been confirmed', data: $paymentSecretKey);
         }catch (\Exception $exception){
-            return sendResponse(success: false, message: 'Something went wrong', data: null, status: 422);
+            return sendResponse(success: false, message: 'Something went wrong bid accept', data: null, status: 422);
         }
     }
     public function orderTracking($orderUniqueId)

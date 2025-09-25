@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Payment;
 
 use App\Http\Controllers\Controller;
+use App\Models\OrderAttempt;
 use App\Models\Wallet;
 use Illuminate\Http\Request;
 use Stripe\Webhook;
@@ -40,11 +41,22 @@ class StripeWebhookController extends Controller
                 $orderId = $paymentIntent->metadata->order_id ?? null;
 
                 if ($orderId) {
-                    $order = Order::where('order_unique_id', $orderId)->first();
-
+                    $order = Order::where('order_unique_id', $orderId)->with('user', 'orderAttempt')->first();
+                    Log::info($order);
                     if ($order) {
-                        $order->status = Order::$ORDER_STATUS['confirmed'];
-                        $order->save();
+//                        $order->status = Order::$ORDER_STATUS['confirmed'];
+//                        $order->save();
+                        $order->update([
+                            'status' => Order::$ORDER_STATUS['confirmed'],
+                        ]);
+
+                        $order->orderAttempt->update([
+                            'status' => OrderAttempt::$ORDER_STATUS['confirmed'],
+                        ]);
+
+                       // $wallet = Wallet::where('user_id', $order->user->id)->with('walletHistory')->first();
+
+
                     } else {
                         Log::warning('Stripe Webhook: Order not found', [
                             'order_unique_id' => $orderId,

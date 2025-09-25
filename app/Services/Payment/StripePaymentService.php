@@ -1,21 +1,19 @@
 <?php
+namespace App\Services\Payment;
 
-namespace App\Http\Controllers\Api\Payment;
-
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Stripe\Stripe;
-use Stripe\PaymentIntent;
 use App\Models\Order;
+use Illuminate\Http\Request;
+use Stripe\PaymentIntent;
+use Stripe\Stripe;
 
-class StripePaymentController extends Controller
-{
-    public function createPaymentIntent(Request $request)
+class StripePaymentService{
+
+    public function createPaymentIntent($order_unique_id, $order_tracking_number)
     {
         try {
-            $order = Order::where('order_unique_id', $request->order_id)
-                ->with(['orderAttempt' => function ($query) use ($request) {
-                    $query->where('order_tracking_number', $request->order_tracking_number);
+            $order = Order::where('order_unique_id', $order_unique_id)
+                ->with(['orderAttempt' => function ($query) use ($order_tracking_number) {
+                    $query->where('order_tracking_number', $order_tracking_number);
                 }])
                 ->first();
 
@@ -33,7 +31,7 @@ class StripePaymentController extends Controller
             Stripe::setApiKey(config('services.stripe.secret'));
 
             $paymentIntent = PaymentIntent::create([
-                'amount' => $orderAttempt * 100, // cents (for testing)
+                'amount' => $orderAttempt?->fare * 100, // cents (for testing)
                 'currency' => 'usd',
                 'metadata' => [
                     'order_id' => $order->order_unique_id,
@@ -41,17 +39,18 @@ class StripePaymentController extends Controller
                 ],
             ]);
 
-            $orderData = [
+            return [
                 'order_id' => $order->order_unique_id,
                 'order_tracking_number' => $orderAttempt->order_tracking_number,
                 'client_secret' => $paymentIntent->client_secret,
             ];
 
-            return sendResponse('success', 'Payment secret key created successfully!', $orderData, 201);
+            //return sendResponse('success', 'Payment secret key created successfully!', $orderData, 201);
 
         } catch (\Exception $e) {
             return sendResponse(false, 'Something went wrong order payment ' . $e->getMessage(), null, 500);
         }
     }
+
 
 }

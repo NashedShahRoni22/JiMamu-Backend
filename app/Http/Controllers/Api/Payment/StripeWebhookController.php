@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Payment;
 
 use App\Http\Controllers\Controller;
+use App\Models\Wallet;
 use Illuminate\Http\Request;
 use Stripe\Webhook;
 use App\Models\Order;
@@ -31,10 +32,10 @@ class StripeWebhookController extends Controller
 
             $order = Order::find($orderId);
             if ($order) {
-                $order->status = 'paid';
-                $order->payment_id = $paymentIntent->id;
+                $order->status = Order::$ORDER_STATUS['confirmed'];
                 $order->save();
             }
+           // Wallet::find($order->user_id)->increment('balance', $order->amount);
         }
 
         return response()->json(['status' => 'success']);

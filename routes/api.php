@@ -21,6 +21,9 @@ Route::middleware(['json.response'])->prefix('/v1')->group(function() {
     Route::post('/email/otp/verify', [AuthController::class, 'verifyOtp']);
     Route::post('/social/login', [AuthController::class, 'socialLogin']);
 
+    Route::post('/webhook/stripe', [StripeWebhookController::class, 'handleWebhook']);
+
+
 //    Route::get('/auth/google', function () {
 //        return Socialite::driver('google')->stateless()->redirect();
 //    });
@@ -118,7 +121,6 @@ Route::middleware(['json.response'])->prefix('/v1')->group(function() {
         Route::prefix('/payments')->group(function () {
             Route::post('/create/payment-intent', [StripePaymentController::class, 'createPaymentIntent']);
         });
-        Route::post('/webhook/stripe', [StripeWebhookController::class, 'handleWebhook']);
         // wallets
         Route::prefix('wallets')->group(function () {
             Route::get('/', [WalletController::class, 'wallet']);

@@ -16,6 +16,12 @@ class PricingRateSeeder extends Seeder
         PricingRate::create([
             'base_fare' => '10',
             'platform_charge' => '5',
+            'type' => 1,
+        ]);
+        PricingRate::create([
+            'base_fare' => '25',
+            'platform_charge' => '7',
+            'type' => 2,
         ]);
     }
 }

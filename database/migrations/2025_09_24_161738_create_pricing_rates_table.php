@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->decimal('base_fare', 10, 2);
             $table->decimal('platform_charge', 10, 2);
+            $table->tinyInteger('type');
             $table->timestamps();
             $table->softDeletes();
         });

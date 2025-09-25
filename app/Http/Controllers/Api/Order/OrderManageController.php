@@ -44,7 +44,12 @@ class OrderManageController extends Controller
 
     }
     public function orderPricingRate(){
-        $data = PricingRate::first();
+        $pricingData = PricingRate::whereIn('type', [1, 2])->get()->keyBy('type');
+
+        $data = [
+            'national' => $pricingData[1],
+            'international' => $pricingData[2],
+        ];
         return sendResponse(true, 'Pricing Rate', $data);
     }
 

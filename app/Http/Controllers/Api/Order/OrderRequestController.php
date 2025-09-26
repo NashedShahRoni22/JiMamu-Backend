@@ -16,6 +16,8 @@ use App\Models\OrderDestination;
 use App\Models\OtpVerify;
 use App\Models\Package;
 use App\Models\User;
+use App\Models\Wallet;
+use App\Models\WalletHistory;
 use App\Models\WeightRule;
 use App\Services\Payment\StripePaymentService;
 use App\Services\Rider\LocationService;
@@ -346,6 +348,21 @@ class OrderRequestController extends Controller
                 ]);
                 // clear otp
                 $getOTP->delete();
+                if($otpType == Order::$ORDER_STATUS['delivered'] && $order->status == Order::$ORDER_STATUS['delivered']){
+                   $fare = $order?->orderAttempt?->fare;
+                    $wallet = Wallet::where('user_id', auth()->id())->update([
+                        'balance' => $fare,
+                    ]);
+                    WalletHistory::create([
+                        'wallet_id' => $wallet->id,
+                        'user_id' => auth()->id(),
+                        'order_id' => $order->id,
+                        'amount' => $fare-10, // reduce platform charge of 10
+                        'purpose_of_transaction' => WalletHistory::$PURPOSE_OF_TRANSACTION['order_completed'],
+                        'transaction_type' => WalletHistory::$TRANSACTION_TYPE ['credit'],
+                    ]);
+                }
+
             });
             return sendResponse(success: true, message: "OTP {$otpType} send successfully.");
         }catch (\Exception $e){

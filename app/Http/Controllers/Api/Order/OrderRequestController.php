@@ -98,7 +98,7 @@ class OrderRequestController extends Controller
                     'drop_longitude' => $request->drop_longitude,
                     'weight' => $request->weight,
                 ]);
-                $pricingRate = PricingRate::where('type', PricingRate::$STATUS[$request->order_type])->frist();
+                $pricingRate = PricingRate::where('type', PricingRate::$STATUS[$request->order_type])->first();
                 // cutting system base fare and platform change, rider will show only need fare
                 $netFare = ((float) $orderRequest->total_fare) - ((float) ($pricingRate->base_fare + $pricingRate->platform_charge));
                 OrderAttempt::create([

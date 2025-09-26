@@ -257,10 +257,10 @@ class OrderRequestController extends Controller
 
         try {
             DB::transaction(function () use ($order, $bid){
-//                $order->order()->update([
-//                    'rider_id' => $bid->user_id,
-//                    'status' => Order::$ORDER_STATUS['confirmed'],
-//                ]);
+                $order->order()->update([
+                    'rider_id' => $bid->user_id,
+                   // 'status' => Order::$ORDER_STATUS['confirmed'],
+                ]);
 //                $order->update([
 //                    'status' => OrderAttempt::$ORDER_STATUS['confirmed'],
 //                ]);

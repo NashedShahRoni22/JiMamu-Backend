@@ -7,6 +7,7 @@ use App\Http\Resources\MyOrderListResource;
 use App\Models\Order;
 use App\Models\OrderAttempt;
 use App\Models\OrderDestination;
+use App\Models\PricingRate;
 use App\Services\Order\FareCalculatorService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -34,9 +35,12 @@ class InternationalOrderController extends Controller
                     'drop_longitude' => $request->drop_longitude,
                     'weight' => $request->weight,
                 ]);
+                $pricingRate = PricingRate::where('type', PricingRate::$STATUS[$request->order_type])->frist();
+                // cutting system base fare and platform change, rider will show only need fare
+                $netFare = ((float) $orderRequest->total_fare) - ((float) ($pricingRate->base_fare + $pricingRate->platform_charge));
                 OrderAttempt::create([
                     'order_id' => $orderRequest->id,
-                    'fare' => $request->total_fare,
+                    'fare' => $netFare,
                     'parcel_estimate_price' => $request->parcel_estimate_price,
                     'order_tracking_number' => rand(000000, 999999),
                 ]);

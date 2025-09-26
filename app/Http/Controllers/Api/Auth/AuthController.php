@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Mail\OtpMail;
 use App\Models\OtpVerify;
 use App\Models\User;
+use App\Models\Wallet;
 use App\Services\Auth\MakeVerificationCodeService;
 use App\Services\Files\FileService;
 use Carbon\Carbon;
@@ -71,6 +72,11 @@ class AuthController extends Controller
                 'email' => $request->email,
                 'status' => 1,
             ]);
+            // Create wallet only if it doesn't exist
+            Wallet::firstOrCreate(
+                ['user_id' => $user->id], // condition
+                ['balance' => 0]          // defaults if creating new
+            );
             $exitsUser = $user;
             $user->assignRole('user');
         }

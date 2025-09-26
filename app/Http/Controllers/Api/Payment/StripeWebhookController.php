@@ -41,7 +41,7 @@ class StripeWebhookController extends Controller
                 $orderId = $paymentIntent->metadata->order_id ?? null;
 
                 if ($orderId) {
-                    $order = Order::where('order_unique_id', $orderId)->with('user', 'orderAttempt')->first();
+                    $order = Order::where('order_unique_id', $orderId)->with('orderAttempt')->first();
                     Log::info($order);
                     if ($order) {
 //                        $order->status = Order::$ORDER_STATUS['confirmed'];

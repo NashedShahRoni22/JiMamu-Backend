@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Order;
 
 use App\Http\Controllers\Controller;
+use App\Models\Bid;
 use App\Models\Order;
 use App\Models\PricingRate;
 use Illuminate\Http\Request;
@@ -10,13 +11,19 @@ use Illuminate\Http\Request;
 class OrderManageController extends Controller
 {
     // order woner and accepted rider can cancel accepted bid
-    public function acceptedBidCancel($order_id){
-        $order = Order::where('order_unique_id', $order_id)
-            ->where('customer_id', auth()->id())
-            ->orWhere('rider_id', auth()->id())
+    public function acceptedBidCancel($order_id, $rider_id){
+         $order = Order::where('order_unique_id', $order_id)
+            ->with('bids')
             ->firstOrFail();
+
+
+        $bid = $order->bids->where('status', Bid::$STATUS['accepted'])->first();
+        if ($bid) {
+            return sendResponse(false, 'Bid already accepted, You can not cancel this bid.');
+        }
         try {
-           $order->update(['status' => Order::$ORDER_STATUS['cancelled'], 'rider_id' => null]);
+            $bid = $order->bids->firstWhere('user_id', $rider_id);
+            $bid->forceDelete();
             return sendResponse(true, 'Order Bid cancelled successfully.');
         }catch (\Exception $e){
             return sendResponse(false, 'Something went wrong. Please try again.');
@@ -36,7 +43,7 @@ class OrderManageController extends Controller
             ])
                 ->first();
 
-            return sendResponse(true, 'Order Bid cancelled successfully.', $stats);
+            return sendResponse(true, 'Order overview data get successfully.', $stats);
 
         }catch (\Exception $e){
             return sendResponse(false, 'Something went wrong. Please try again.');

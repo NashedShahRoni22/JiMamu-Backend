@@ -9,8 +9,8 @@ class Bid extends Model
 {
     use SoftDeletes;
 
-    static $STATUS = ['pending' => 1, 'accepted' => 2, 'rejected' => 3];
-    static $STATUS_NAME = [1 => 'pending', 2 => 'accepted', 3 => 'rejected'];
+    static $STATUS = ['pending' => 1, 'accepted' => 2, 'rejected' => 3, 'cancelled' => 4];
+    static $STATUS_NAME = [1 => 'pending', 2 => 'accepted', 3 => 'rejected', 4 => 'cancelled'];
 
     protected $fillable = ['order_id', 'user_id', 'order_attempt_id', 'bid_amount',  'status'];
 

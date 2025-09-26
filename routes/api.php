@@ -112,7 +112,7 @@ Route::middleware(['json.response'])->prefix('/v1')->group(function() {
 
         // customer and rider
 
-        Route::get('/cancel/order/accepted/bid/{order_id}', [OrderManageController::class, 'acceptedBidCancel']); // only order bid accepted cancel
+        Route::get('/cancel/order/accepted/bid/{order_id}/{rider_id}', [OrderManageController::class, 'acceptedBidCancel']); // only order bid accepted cancel
 
         Route::get('/order/pricing/rate', [OrderManageController::class, 'orderPricingRate']);
         Route::get('/order/overview', [OrderManageController::class, 'orderOverview']);

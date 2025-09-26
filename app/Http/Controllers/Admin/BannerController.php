@@ -40,12 +40,8 @@ class BannerController extends Controller
             'image_name' => $path, // e.g. banners/1727438273_myphoto.jpg
         ]);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Banner uploaded successfully!',
-            'path' => $path,
-            'url' => Storage::url($path), // this gives full public URL
-        ]);
+        return redirect()->route('banner.index')->with('success', 'Banner updated successfully.');
+
     }
 
     public function edit($id){

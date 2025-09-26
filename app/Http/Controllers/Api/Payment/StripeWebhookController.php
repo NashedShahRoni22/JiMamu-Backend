@@ -55,15 +55,15 @@ class StripeWebhookController extends Controller
                             'status' => OrderAttempt::$ORDER_STATUS['confirmed'],
                         ]);
 
-                        $wallet = Wallet::where('user_id', $order->rider_id)->with('walletHistory')->first();
-                        $wallet->update([
-                            'balance' => $wallet->balance + $paymentIntent->amount / 100,
-                        ]);
+                        $wallet = Wallet::where('user_id', $order->customer_id)->with('walletHistory')->first();
+//                        $wallet->update([
+//                            'balance' => ($wallet->balance + $paymentIntent->amount / 100),
+//                        ]);
                         $wallet->walletHistory()->create([
                             'wallet_id' => $wallet->id,
                             'user_id' => $order->rider_id,
                             'order_id' => $order->id,
-                            'amount' => ($paymentIntent->amount / 100) - 10,
+                            'amount' => ($paymentIntent->amount / 100),
                             'purpose_of_transaction' => WalletHistory::$PURPOSE_OF_TRANSACTION['customer_order_paid'],
                             'transaction_type' => WalletHistory::$TRANSACTION_TYPE ['credit'],
                             'status' => WalletHistory::$STATUS['approved']

@@ -15,6 +15,7 @@ use App\Models\OrderAttempt;
 use App\Models\OrderDestination;
 use App\Models\OtpVerify;
 use App\Models\Package;
+use App\Models\PricingRate;
 use App\Models\User;
 use App\Models\Wallet;
 use App\Models\WalletHistory;
@@ -97,9 +98,12 @@ class OrderRequestController extends Controller
                     'drop_longitude' => $request->drop_longitude,
                     'weight' => $request->weight,
                 ]);
+                $pricingRate = PricingRate::where('type', PricingRate::$STATUS[$orderRequest->order_type])->frist();
+                // cutting system base fare and platform change, rider will show only need fare
+                $netFare = ((float) $orderRequest->total_fare) - ((float) ($pricingRate->base_fare + $pricingRate->platform_charge));
                 OrderAttempt::create([
                     'order_id' => $orderRequest->id,
-                    'fare' => $request->total_fare,
+                    'fare' =>$netFare,
                     'parcel_estimate_price' => $request->parcel_estimate_price,
                     'order_tracking_number' => rand(000000, 999999),
                 ]);
@@ -351,13 +355,13 @@ class OrderRequestController extends Controller
                 if($otpType == Order::$ORDER_STATUS['delivered'] && $order->status == Order::$ORDER_STATUS['delivered']){
                    $fare = $order?->orderAttempt?->fare;
                     $wallet = Wallet::where('user_id', auth()->id())->update([
-                        'balance' => $fare,
+                        'balance' => $fare - 5,
                     ]);
                     WalletHistory::create([
                         'wallet_id' => $wallet->id,
                         'user_id' => auth()->id(),
                         'order_id' => $order->id,
-                        'amount' => $fare-10, // reduce platform charge of 10
+                        'amount' => $fare - 5, // reduce platform charge of 10
                         'purpose_of_transaction' => WalletHistory::$PURPOSE_OF_TRANSACTION['order_completed'],
                         'transaction_type' => WalletHistory::$TRANSACTION_TYPE ['credit'],
                     ]);

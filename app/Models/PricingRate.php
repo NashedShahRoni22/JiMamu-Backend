@@ -7,4 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 class PricingRate extends Model
 {
     protected $fillable = ['base_fare', 'platform_charge', 'type'];
+
+    static $STATUS = ['national' => 1, 'international' => 2];
 }

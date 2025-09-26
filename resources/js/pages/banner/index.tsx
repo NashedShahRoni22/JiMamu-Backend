@@ -1,4 +1,3 @@
-
 import AppLayout from "@/layouts/app-layout";
 import { Head, usePage, Link } from "@inertiajs/react";
 import React, { useState } from "react";
@@ -72,7 +71,17 @@ export default function Index() {
         <AppLayout>
             <div className="p-4">
                 <Head title="Banners" />
-                <h1 className="text-2xl font-bold mb-4">Banners</h1>
+
+                {/* Header + Add Button */}
+                <div className="flex justify-between items-center mb-4">
+                    <h1 className="text-2xl font-bold">Banners</h1>
+                    <Link
+                        href={route("banner.create")}
+                        className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                    >
+                        Add Banner
+                    </Link>
+                </div>
 
                 {/* Filter Inputs */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">

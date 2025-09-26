@@ -22,5 +22,11 @@ class PackageSeeder extends Seeder
         Package::create([
             'name' => 'Laptop',
         ]);
+        Package::create([
+            'name' => 'Electronics',
+        ]);
+        Package::create([
+            'name' => 'Shoes',
+        ]);
     }
 }

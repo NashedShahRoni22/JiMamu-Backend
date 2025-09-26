@@ -27,6 +27,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('weight_roles');
+        Schema::dropIfExists('weight_rules'); // ✔ correct table name
     }
+
 };

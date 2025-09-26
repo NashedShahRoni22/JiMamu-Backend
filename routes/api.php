@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\Wallet\WalletController;
 use App\Http\Controllers\Api\Order\OrderCancelController;
 use App\Http\Controllers\Api\Order\InternationalOrderController;
 use App\Http\Controllers\Api\Order\OrderManageController;
+use App\Http\Controllers\Admin\BannerController;
 
 Route::middleware(['json.response'])->prefix('/v1')->group(function() {
     Route::post('/send/email/otp', [AuthController::class, 'sendEmailOtp']);
@@ -129,6 +130,8 @@ Route::middleware(['json.response'])->prefix('/v1')->group(function() {
             Route::get('/processing', [WalletController::class, 'walletProcessing']);
         });
 
+        // get all banner
+        Route::get('/banners', [BannerController::class, 'getAllBanner']);
     });
 
 

@@ -262,7 +262,7 @@ class OrderRequestController extends Controller
         }
 
         try {
-            DB::transaction(function () use ($order, $bid){
+            DB::transaction(function () use ($order, $bid, $riderId){
                 $order->order()->update([
                     'rider_id' => $bid->user_id,
                    // 'status' => Order::$ORDER_STATUS['confirmed'],
@@ -270,6 +270,10 @@ class OrderRequestController extends Controller
 //                $order->update([
 //                    'status' => OrderAttempt::$ORDER_STATUS['confirmed'],
 //                ]);
+                $bid = Bid::where('order_id', $order->order_id)->where('user_id', $riderId)->first();
+                $order->update([
+                    'total_fare' => $bid->bid_amount,
+                ]);
                 $bid->update([
                     'status' => Bid::$STATUS['accepted']
                 ]);

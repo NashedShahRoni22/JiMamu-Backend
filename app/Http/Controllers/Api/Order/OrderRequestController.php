@@ -100,7 +100,7 @@ class OrderRequestController extends Controller
                 ]);
                 $pricingRate = PricingRate::where('type', PricingRate::$STATUS[$request->order_type])->first();
                 // cutting system base fare and platform change, rider will show only need fare
-                $netFare = abs((float)($pricingRate->base_fare + $pricingRate->platform_charge) + (float)$orderRequest->total_fare);
+                $netFare = abs((float)($pricingRate->base_fare + $pricingRate->platform_charge) + (float)$request->total_fare);
                 OrderAttempt::create([
                     'order_id' => $orderRequest->id,
                     'fare' =>$netFare,
@@ -278,8 +278,9 @@ class OrderRequestController extends Controller
                     'status' => Bid::$STATUS['accepted']
                 ]);
             });
-            $paymentSecretKey = $this->stripePaymentService->createPaymentIntent($orderUniqueId, $orderAttemptId);
-            return sendResponse(success: true, message: 'Order has been confirmed', data: $paymentSecretKey);
+            //$paymentSecretKey = $this->stripePaymentService->createPaymentIntent($orderUniqueId, $orderAttemptId);
+            //return sendResponse(success: true, message: 'Order has been confirmed', data: $paymentSecretKey);
+            return sendResponse(success: true, message: 'Order has been confirmed');
         }catch (\Exception $exception){
             return sendResponse(success: false, message: 'Something went wrong bid accept', data: null, status: 422);
         }

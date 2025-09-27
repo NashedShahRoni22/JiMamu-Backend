@@ -17,7 +17,7 @@ class OrderCancelController extends Controller
 {
     // from customer order cancel
     public function cancelOrder(Request $request, $order_id){
-        $order = Order::where('order_unique_id', $order_id)->where('status', Order::$ORDER_STATUS['confirmed'])->first();
+        $order = Order::where('order_unique_id', $order_id)->first();
         if(empty($order)){
             return sendResponse(false, 'Order not found/confirmed.', null, 404);
         }

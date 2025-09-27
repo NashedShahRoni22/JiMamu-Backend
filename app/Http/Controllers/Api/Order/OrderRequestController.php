@@ -272,15 +272,14 @@ class OrderRequestController extends Controller
 //                ]);
                 $bid = Bid::where('order_id', $order->order_id)->where('user_id', $riderId)->first();
                 $order->update([
-                    'total_fare' => $bid->bid_amount,
+                    'fare' => $bid->bid_amount,
                 ]);
                 $bid->update([
                     'status' => Bid::$STATUS['accepted']
                 ]);
             });
-            //$paymentSecretKey = $this->stripePaymentService->createPaymentIntent($orderUniqueId, $orderAttemptId);
-            //return sendResponse(success: true, message: 'Order has been confirmed', data: $paymentSecretKey);
-            return sendResponse(success: true, message: 'Order has been confirmed');
+            $paymentSecretKey = $this->stripePaymentService->createPaymentIntent($orderUniqueId, $orderAttemptId);
+            return sendResponse(success: true, message: 'Order has been confirmed', data: $paymentSecretKey);
         }catch (\Exception $exception){
             return sendResponse(success: false, message: 'Something went wrong bid accept', data: null, status: 422);
         }

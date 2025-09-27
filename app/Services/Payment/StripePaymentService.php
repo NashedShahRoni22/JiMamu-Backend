@@ -2,6 +2,7 @@
 namespace App\Services\Payment;
 
 use App\Models\Order;
+use App\Models\PricingRate;
 use Illuminate\Http\Request;
 use Stripe\PaymentIntent;
 use Stripe\Stripe;
@@ -16,6 +17,10 @@ class StripePaymentService{
                     $query->where('order_tracking_number', $order_tracking_number);
                 }])
                 ->first();
+            $pricingRate = PricingRate::where('type', $order->order_type)->first();
+
+            // cutting system base fare and platform change, rider will show only need fare
+            $netFare = abs((float)($pricingRate->base_fare + $pricingRate->platform_charge) + (float)$order->fare);
 
             if (!$order) {
                 return sendResponse(false, 'Order not found!', null, 404);
@@ -31,7 +36,7 @@ class StripePaymentService{
             Stripe::setApiKey(config('services.stripe.secret'));
 
             $paymentIntent = PaymentIntent::create([
-                'amount' => $orderAttempt?->fare * 100, // cents (for testing)
+                'amount' => $netFare * 100, // cents (for testing)
                 'currency' => 'usd',
                 'metadata' => [
                     'order_id' => $order->order_unique_id,

@@ -37,7 +37,7 @@ class InternationalOrderController extends Controller
                 ]);
                 $pricingRate = PricingRate::where('type', PricingRate::$STATUS[$request->order_type])->first();
                 // cutting system base fare and platform change, rider will show only need fare
-                $netFare = abs((float)($pricingRate->base_fare + $pricingRate->platform_charge) - (float)$orderRequest->total_fare);
+                $netFare = abs((float)($pricingRate->base_fare + $pricingRate->platform_charge) + (float)$request->total_fare);
                 OrderAttempt::create([
                     'order_id' => $orderRequest->id,
                     'fare' => $netFare,

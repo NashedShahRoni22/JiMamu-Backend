@@ -25,7 +25,7 @@ class WalletController extends Controller
         try {
             $wallet = Wallet::where('user_id', auth()->id())
                 ->with(['walletHistory' => function ($query) {
-                    $query->whereIn('status', [1, 2]); // 1 = pending, 2 = approved
+                    $query->whereIn('status', [1, 2, 3, 4]); // 1 = pending, 2 = approved
                 }])
                 ->firstOrFail();
             $data = new WalletResource($wallet);
@@ -81,7 +81,7 @@ class WalletController extends Controller
         try {
             $wallet = Wallet::where('user_id', auth()->id())
                 ->with(['walletHistory' => function ($query) {
-                    $query->whereIn('status', [3, 4]); // 3 = approved, 4 = cancelled
+                    $query->whereIn('status', [1, 2, 3, 4]); // 3 = approved, 4 = cancelled
                 }])
                 ->firstOrFail();
             $data = new WalletResource($wallet);

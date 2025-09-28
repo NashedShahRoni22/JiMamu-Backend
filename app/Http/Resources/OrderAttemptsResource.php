@@ -20,7 +20,11 @@ class OrderAttemptsResource extends JsonResource
         $order = Order::find($this->order_id);
         $pricingRate = PricingRate::where('type', $order->order_type)->first();
         // cutting system base fare and platform change, rider will show only need fare
-        $netFare = abs((float)($pricingRate->base_fare + $pricingRate->platform_charge) + (float)$this->fare );
+        if($order->status !== Order::$ORDER_STATUS['pending']){
+            $netFare = abs((float)($pricingRate->base_fare + $pricingRate->platform_charge) - (float)$this->fare );
+        }else{
+            $netFare =  (float)$this->fare;
+        }
 
         return [
             'status' => OrderAttempt::$ORDER_STATUS_NAME[$this->status],

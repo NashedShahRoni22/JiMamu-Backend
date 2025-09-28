@@ -53,13 +53,14 @@ class StripeWebhookController extends Controller
 
                         $order->orderAttempt->update([
                             'status' => OrderAttempt::$ORDER_STATUS['confirmed'],
+                            'payment_status' => 2,
                         ]);
 
-                        $wallet = Wallet::where('user_id', $order->customer_id)->with('walletHistory')->first();
+                        $wallet = Wallet::where('user_id', $order->customer_id)->first();
 //                        $wallet->update([
 //                            'balance' => ($wallet->balance + $paymentIntent->amount / 100),
 //                        ]);
-                        $wallet->walletHistory()->create([
+                        WalletHistory::create([
                             'wallet_id' => $wallet->id,
                             'user_id' => $order->rider_id,
                             'order_id' => $order->id,
@@ -68,6 +69,15 @@ class StripeWebhookController extends Controller
                             'transaction_type' => WalletHistory::$TRANSACTION_TYPE ['credit'],
                             'status' => WalletHistory::$STATUS['approved']
                         ]);
+//                        $wallet->walletHistory()->create([
+//                            'wallet_id' => $wallet->id,
+//                            'user_id' => $order->rider_id,
+//                            'order_id' => $order->id,
+//                            'amount' => ($paymentIntent->amount / 100),
+//                            'purpose_of_transaction' => WalletHistory::$PURPOSE_OF_TRANSACTION['customer_order_paid'],
+//                            'transaction_type' => WalletHistory::$TRANSACTION_TYPE ['credit'],
+//                            'status' => WalletHistory::$STATUS['approved']
+//                        ]);
                     } else {
                         Log::warning('Stripe Webhook: Order not found', [
                             'order_unique_id' => $orderId,

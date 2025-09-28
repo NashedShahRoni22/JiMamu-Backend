@@ -346,7 +346,7 @@ class OrderRequestController extends Controller
             return sendResponse(false, 'Invalid or expired OTP.', null,401);
         }
         try {
-            DB::transaction(function () use ($order, $getOTP, $otpCode, $otpType){
+            //DB::transaction(function () use ($order, $getOTP, $otpCode, $otpType){
                 // email check
                 $order->orderAttempt->update([
                     'status' =>  Order::$ORDER_STATUS[$otpType]
@@ -356,22 +356,25 @@ class OrderRequestController extends Controller
                 ]);
                 // clear otp
                 $getOTP->delete();
-                if($otpType == Order::$ORDER_STATUS['delivered'] && $order->status == Order::$ORDER_STATUS['delivered']){
-                   $fare = $order?->orderAttempt?->fare;
-                    $wallet = Wallet::where('user_id', auth()->id())->update([
-                        'balance' => $fare - 5,
-                    ]);
-                    WalletHistory::create([
-                        'wallet_id' => $wallet->id,
-                        'user_id' => auth()->id(),
-                        'order_id' => $order->id,
-                        'amount' => $fare - 5, // reduce platform charge of 10
-                        'purpose_of_transaction' => WalletHistory::$PURPOSE_OF_TRANSACTION['order_completed'],
-                        'transaction_type' => WalletHistory::$TRANSACTION_TYPE ['credit'],
-                    ]);
+
+           // });
+            if($otpType == Order::$ORDER_STATUS['delivered'] && $order->status == Order::$ORDER_STATUS['delivered']){
+                $fare = $order?->orderAttempt?->fare;
+
+                $wallet = Wallet::where('user_id', $order->customer_id)->first();
+                if ($wallet) {
+                    $wallet->increment('balance', $fare);
                 }
 
-            });
+                WalletHistory::create([
+                    'wallet_id' => $wallet->id,
+                    'user_id' => auth()->id(),
+                    'order_id' => $order->id,
+                    'amount' => $fare, // reduce platform charge of 10
+                    'purpose_of_transaction' => WalletHistory::$PURPOSE_OF_TRANSACTION['order_completed'],
+                    'transaction_type' => WalletHistory::$TRANSACTION_TYPE ['credit'],
+                ]);
+            }
             return sendResponse(success: true, message: "OTP {$otpType} send successfully.");
         }catch (\Exception $e){
             return sendResponse(false, "Something went wrong", null, 422, $e->getMessage());

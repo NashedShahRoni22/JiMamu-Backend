@@ -30,18 +30,18 @@ class OrderCancelController extends Controller
             return sendResponse(false, 'Wallet not found.', null, 404);
         }
         try {
-            if($order->status === Order::$ORDER_STATUS['confirmed']){
+           // if($order->status === Order::$ORDER_STATUS['confirmed']){
                 DB::transaction(function() use($order, $wallet, $orderCancel, $request){
-                    $wallet->decrement('balance', 10);
-                    WalletHistory::create([
-                        'wallet_id' => $wallet->id,
-                        'user_id' => auth()->id(),
-                        'order_id' => $order->id,
-                        'amount' => 10,
-                        'purpose_of_transaction' => WalletHistory::$PURPOSE_OF_TRANSACTION['customer_order_cancel'],
-                        'transaction_type' => WalletHistory::$TRANSACTION_TYPE['credit'],
-                        'status' => WalletHistory::$STATUS['approved']
-                    ]);
+                   // $wallet->decrement('balance', 10);
+//                    WalletHistory::create([
+//                        'wallet_id' => $wallet->id,
+//                        'user_id' => auth()->id(),
+//                        'order_id' => $order->id,
+//                        'amount' => 10,
+//                        'purpose_of_transaction' => WalletHistory::$PURPOSE_OF_TRANSACTION['customer_order_cancel'],
+//                        'transaction_type' => WalletHistory::$TRANSACTION_TYPE['credit'],
+//                        'status' => WalletHistory::$STATUS['approved']
+//                    ]);
                     OrderCancel::create([
                         'order_id' => $order->id,
                         'customer_id' => auth()->id(),
@@ -51,7 +51,7 @@ class OrderCancelController extends Controller
                         'status' => Order::$ORDER_STATUS['cancelled'],
                     ]);
                 });
-            }
+           // }
             return sendResponse(true, 'Successfully Order Has Cancelled.');
 
         }catch (\Exception $exception){

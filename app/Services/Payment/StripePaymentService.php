@@ -20,7 +20,7 @@ class StripePaymentService{
             $pricingRate = PricingRate::where('type', $order->order_type)->first();
 
             // cutting system base fare and platform change, rider will show only need fare
-            $netFare = abs((float)($pricingRate->base_fare + $pricingRate->platform_charge) + (float)$order->fare);
+            $netFare = abs((float)($pricingRate->base_fare + $pricingRate->platform_charge) + (float)$order?->orderAttempt?->fare);
 
             if (!$order) {
                 return sendResponse(false, 'Order not found!', null, 404);

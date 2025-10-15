@@ -210,7 +210,7 @@ class OrderRequestController extends Controller
             ->whereIn('status', [1,2,3,4,5])
             //->where('created_at', '>=', Carbon::now()->subMinutes(5))
             ->with('package:id,name')
-            ->with('orderAttempts.bids', 'orderAttempts.bid', 'receiverInformation', 'senderInformation', 'orderDestination')->get();
+            ->with('orderAttempts.bids', 'orderAttempts.bid', 'receiverInformation', 'senderInformation', 'orderDestination', 'package:id,name')->get();
         if(!$order){
             return sendResponse(false, 'Order Not Found', data: null, status: 404);
         }
@@ -262,23 +262,23 @@ class OrderRequestController extends Controller
         }
 
         try {
-            DB::transaction(function () use ($order, $bid, $riderId){
-                $order->order()->update([
-                    'rider_id' => $bid->user_id,
-                   // 'status' => Order::$ORDER_STATUS['confirmed'],
-                ]);
-//                $order->update([
-//                    'status' => OrderAttempt::$ORDER_STATUS['confirmed'],
+//            DB::transaction(function () use ($order, $bid, $riderId){
+//                $order->order()->update([
+//                    'rider_id' => $bid->user_id,
+//                   // 'status' => Order::$ORDER_STATUS['confirmed'],
 //                ]);
-                $bid = Bid::where('order_id', $order->order_id)->where('user_id', $riderId)->first();
-                $order->update([
-                    'fare' => $bid->bid_amount,
-                ]);
-                $bid->update([
-                    'status' => Bid::$STATUS['accepted']
-                ]);
-            });
-            $paymentSecretKey = $this->stripePaymentService->createPaymentIntent($orderUniqueId, $orderAttemptId);
+////                $order->update([
+////                    'status' => OrderAttempt::$ORDER_STATUS['confirmed'],
+////                ]);
+//                $bid = Bid::where('order_id', $order->order_id)->where('user_id', $riderId)->first();
+//                $order->update([
+//                    'fare' => $bid->bid_amount,
+//                ]);
+//                $bid->update([
+//                    'status' => Bid::$STATUS['accepted']
+//                ]);
+//            });
+            $paymentSecretKey = $this->stripePaymentService->createPaymentIntent($orderUniqueId, $orderAttemptId, $riderId);
             return sendResponse(success: true, message: 'Order has been confirmed', data: $paymentSecretKey);
         }catch (\Exception $exception){
             return sendResponse(success: false, message: 'Something went wrong bid accept', data: null, status: 422);

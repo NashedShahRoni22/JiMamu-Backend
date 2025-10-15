@@ -25,6 +25,7 @@ class MyOrderDetailsResource extends JsonResource
             'weight' => $this->weight,
             'status' => Order::$ORDER_STATUS_NAME[$this->status],
             'date' => $this->created_at->format('d-m-Y  h:i:s A'),
+            'package' => $this->package->name,
             'order_attempts' => OrderAttemptsResource::collection($this->orderAttempts),
             'receiver_information' => $this->when(
                 $this->receiverInformation,

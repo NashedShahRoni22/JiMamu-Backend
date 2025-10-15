@@ -9,7 +9,7 @@ use Stripe\Stripe;
 
 class StripePaymentService{
 
-    public function createPaymentIntent($order_unique_id, $order_tracking_number)
+    public function createPaymentIntent($order_unique_id, $order_tracking_number, $rider_id)
     {
         try {
             $order = Order::where('order_unique_id', $order_unique_id)
@@ -39,6 +39,7 @@ class StripePaymentService{
                 'amount' => $netFare * 100, // cents (for testing)
                 'currency' => 'usd',
                 'metadata' => [
+                    'rider_id' => $rider_id,
                     'order_id' => $order->order_unique_id,
                     'order_tracker_number' => $orderAttempt->order_unique_id,
                 ],

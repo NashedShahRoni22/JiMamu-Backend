@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Api\Payment;
 
 use App\Http\Controllers\Controller;
+use App\Models\Bid;
 use App\Models\OrderAttempt;
 use App\Models\Wallet;
 use App\Models\WalletHistory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Stripe\Webhook;
 use App\Models\Order;
 use Illuminate\Support\Facades\Log;
@@ -40,36 +42,49 @@ class StripeWebhookController extends Controller
             if ($event->type === 'payment_intent.succeeded') {
                 $paymentIntent = $event->data->object;
                 $orderId = $paymentIntent->metadata->order_id ?? null;
-
+                $riderId = $paymentIntent->metadata->rider_id ?? null;
                 if ($orderId) {
+
                     $order = Order::where('order_unique_id', $orderId)->with('orderAttempt')->first();
                     Log::info($order);
                     if ($order) {
-//                        $order->status = Order::$ORDER_STATUS['confirmed'];
-//                        $order->save();
-                        $order->update([
-                            'status' => Order::$ORDER_STATUS['confirmed'],
-                        ]);
+                        DB::transaction(function () use ($order, $riderId, $paymentIntent){
+//                $order->update([
+//                    'status' => OrderAttempt::$ORDER_STATUS['confirmed'],
+//                ]);
+                            $bid = Bid::where('order_id', $order->order_id)->where('user_id', $riderId)->first();
 
-                        $order->orderAttempt->update([
-                            'status' => OrderAttempt::$ORDER_STATUS['confirmed'],
-                            'payment_status' => 2,
-                        ]);
+                            $order->update([
+                                'fare' => $bid->bid_amount,
+                                'rider_id' => $bid->user_id,
+                                'status' => Order::$ORDER_STATUS['confirmed'],
+                            ]);
+                            $bid->update([
+                                'status' => Bid::$STATUS['accepted']
+                            ]);
 
-                        $wallet = Wallet::where('user_id', $order->customer_id)->with('walletHistory')->first();
+                            $order->orderAttempt->update([
+                                'status' => OrderAttempt::$ORDER_STATUS['confirmed'],
+                                'payment_status' => 2,
+                            ]);
+
+                            $wallet = Wallet::where('user_id', $order->customer_id)->with('walletHistory')->first();
 //                        $wallet->update([
 //                            'balance' => ($wallet->balance + $paymentIntent->amount / 100),
 //                        ]);
 
-                        $wallet->walletHistory()->create([
-                            'wallet_id' => $wallet->id,
-                            'user_id' => $order->customer_id,
-                            'order_id' => $order->id,
-                            'amount' => ($paymentIntent->amount / 100),
-                            'purpose_of_transaction' => WalletHistory::$PURPOSE_OF_TRANSACTION['customer_order_paid'],
-                            'transaction_type' => WalletHistory::$TRANSACTION_TYPE ['credit'],
-                            'status' => WalletHistory::$STATUS['approved']
-                        ]);
+                            $wallet->walletHistory()->create([
+                                'wallet_id' => $wallet->id,
+                                'user_id' => $order->customer_id,
+                                'order_id' => $order->id,
+                                'amount' => ($paymentIntent->amount / 100),
+                                'purpose_of_transaction' => WalletHistory::$PURPOSE_OF_TRANSACTION['customer_order_paid'],
+                                'transaction_type' => WalletHistory::$TRANSACTION_TYPE ['credit'],
+                                'status' => WalletHistory::$STATUS['approved']
+                            ]);
+
+
+                        });
                     } else {
                         Log::warning('Stripe Webhook: Order not found', [
                             'order_unique_id' => $orderId,

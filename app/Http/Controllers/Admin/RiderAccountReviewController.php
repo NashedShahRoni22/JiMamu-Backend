@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\UserRider;
+use App\Models\Wallet;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -63,6 +64,7 @@ class RiderAccountReviewController extends Controller
                 : 'Rider rejected!',
         ]);
     }
+
 
 
 

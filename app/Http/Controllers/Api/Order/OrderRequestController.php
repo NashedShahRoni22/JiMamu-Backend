@@ -358,7 +358,7 @@ class OrderRequestController extends Controller
                 $getOTP->delete();
 
            // });
-            if($otpType == Order::$ORDER_STATUS['delivered'] && $order->status == Order::$ORDER_STATUS['delivered']){
+            if($otpType == Order::$ORDER_STATUS['delivered']){
                 $fare = $order?->orderAttempt?->fare;
 
                 $wallet = Wallet::where('user_id', $order->customer_id)->first();

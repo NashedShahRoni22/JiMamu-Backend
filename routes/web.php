@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\RiderAccountReviewController;
+use App\Http\Controllers\Admin\UserDashboardController;
 
 Route::get('/test', function () {
 
@@ -37,6 +38,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/rider/account/review', [RiderAccountReviewController::class, 'accountCreateRequest'])->name('account.review.request');
         Route::get('/rider/account/review/details/{order}', [RiderAccountReviewController::class, 'accountReviewDetails'])->name('rider.account.review.details');
         Route::get('rider/account/approve/{user_id}/{status_type}', [RiderAccountReviewController::class, 'accountApprove'])->name('rider.account.approve');
+    });
+    // user dashboard
+    Route::prefix('users')->name('users.')->group(function () {
+        Route::get('/dashboard/{user_id}', [UserDashboardController::class, 'userDashboard'])->name('dashboard');
+        Route::get('/dashboard/orders/{user_id}', [UserDashboardController::class, 'userOrders'])->name('dashboard.user.orders');
+        Route::get('/dashboard/rider/order/{user_id}', [UserDashboardController::class, 'riderOrders'])->name('dashboard.rider.orders');
     });
 });
 

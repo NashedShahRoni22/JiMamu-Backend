@@ -40,12 +40,22 @@ export default function Index() {
             accessorKey: "action",
             header: "Action",
             cell: ({ row }) => (
-                <Link
-                    href={`/riders/rider/account/review/details/${row.original.id}`}
-                    className="text-blue-500 hover:underline"
-                >
-                    Views
-                </Link>
+                <>
+                    <Link
+                        href={`/riders/rider/account/review/details/${row.original.id}`}
+                        className="text-blue-500 hover:underline"
+                    >
+                        Views |
+                    </Link>
+                    <Link
+                        href={`/users/dashboard/${row.original.id}`}
+                        className="text-blue-500 hover:underline"
+                    >
+                        Report
+                    </Link>
+                </>
+
+
             ),
         },
     ];

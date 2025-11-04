@@ -13,14 +13,21 @@ class StripePaymentService{
     {
         try {
             $order = Order::where('order_unique_id', $order_unique_id)
-                ->with(['orderAttempt' => function ($query) use ($order_tracking_number) {
-                    $query->where('order_tracking_number', $order_tracking_number);
-                }])
+                ->with([
+                    'orderAttempt' => function ($query) use ($order_tracking_number) {
+                        $query->where('order_tracking_number', $order_tracking_number);
+                    },
+                    'bid' => function ($query) use ($rider_id) {
+                        $query->where('user_id', $rider_id);
+                    },
+                ])
                 ->first();
+            //return $order;
+
+            $bidAmount = $order?->bid?->bid_amount;
             $pricingRate = PricingRate::where('type', $order->order_type)->first();
 
-            // cutting system base fare and platform change, rider will show only need fare
-            $netFare = abs((float)($pricingRate->base_fare + $pricingRate->platform_charge) + (float)$order?->orderAttempt?->fare);
+            $netFare = abs(($pricingRate->base_fare + $pricingRate->platform_charge) + $bidAmount);
 
             if (!$order) {
                 return sendResponse(false, 'Order not found!', null, 404);

@@ -52,11 +52,11 @@ class StripeWebhookController extends Controller
 //                $order->update([
 //                    'status' => OrderAttempt::$ORDER_STATUS['confirmed'],
 //                ]);
-                            $bid = Bid::where('order_id', $order->order_id)->where('user_id', $riderId)->first();
+                            $bid = Bid::where('order_id', $order->id)->where('user_id', $riderId)->first();
 
                             $order->update([
-                                'fare' => $bid->bid_amount,
-                                'rider_id' => $bid->user_id,
+
+                                'rider_id' => $bid?->user_id,
                                 'status' => Order::$ORDER_STATUS['confirmed'],
                             ]);
                             $bid->update([
@@ -64,6 +64,7 @@ class StripeWebhookController extends Controller
                             ]);
 
                             $order->orderAttempt->update([
+                                'fare' => ($paymentIntent->amount / 100),
                                 'status' => OrderAttempt::$ORDER_STATUS['confirmed'],
                                 'payment_status' => 2,
                             ]);

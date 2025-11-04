@@ -328,9 +328,23 @@ class OrderRequestController extends Controller
         $order = Order::where('order_unique_id', $orderUniqueId)
             ->with([
                 'customer:id,email',
-                'orderAttempt.acceptedBid'
+                'orderAttempt.acceptedBid',
+                'bid' => function ($query) {
+                    $query->where('user_id', auth()->id());
+                },
             ])
-            ->firstOrFail();
+            ->first();
+
+
+//        ->with([
+//        'orderAttempt' => function ($query) use ($order_tracking_number) {
+//            $query->where('order_tracking_number', $order_tracking_number);
+//        },
+//        'bid' => function ($query) use ($rider_id) {
+//            $query->where('user_id', $rider_id);
+//        },
+   // ])
+     //   ->first();
 
         // otp type check and allow picked and delivered
         if (!in_array($otpType, ['picked', 'delivered'])) {
@@ -359,18 +373,20 @@ class OrderRequestController extends Controller
 
            // });
             if($otpType == Order::$ORDER_STATUS['delivered']){
-                $fare = $order?->orderAttempt?->fare;
-
+                $bidAmount = $order?->bid?->bid_amount;
+                $pricingRate = PricingRate::where('type', $order->order_type)->first();
+                $netFare = abs(($pricingRate->base_fare + $bidAmount) - $pricingRate->platform_charge );
                 $wallet = Wallet::where('user_id', $order->customer_id)->first();
+
                 if ($wallet) {
-                    $wallet->increment('balance', $fare);
+                    $wallet->increment('balance', $netFare);
                 }
 
                 WalletHistory::create([
                     'wallet_id' => $wallet->id,
                     'user_id' => auth()->id(),
                     'order_id' => $order->id,
-                    'amount' => $fare, // reduce platform charge of 10
+                    'amount' => $netFare, // reduce platform charge of 10
                     'purpose_of_transaction' => WalletHistory::$PURPOSE_OF_TRANSACTION['order_completed'],
                     'transaction_type' => WalletHistory::$TRANSACTION_TYPE ['credit'],
                 ]);

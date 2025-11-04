@@ -11,4 +11,7 @@ class Wallet extends Model
     public function walletHistory(){
         return $this->hasMany(WalletHistory::class, 'wallet_id', 'id');
     }
+    public function walletHistories(){
+        return $this->hasMany(WalletHistory::class, 'wallet_id', 'id');
+    }
 }

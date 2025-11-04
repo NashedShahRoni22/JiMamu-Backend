@@ -336,6 +336,7 @@ class OrderRequestController extends Controller
             ->first();
 
 
+
 //        ->with([
 //        'orderAttempt' => function ($query) use ($order_tracking_number) {
 //            $query->where('order_tracking_number', $order_tracking_number);
@@ -372,11 +373,11 @@ class OrderRequestController extends Controller
                 $getOTP->delete();
 
            // });
-            if($otpType == Order::$ORDER_STATUS['delivered']){
+            if($otpType == 'delivered'){
                 $bidAmount = $order?->bid?->bid_amount;
                 $pricingRate = PricingRate::where('type', $order->order_type)->first();
                 $netFare = abs(($pricingRate->base_fare + $bidAmount) - $pricingRate->platform_charge );
-                $wallet = Wallet::where('user_id', $order->customer_id)->first();
+                $wallet = Wallet::where('user_id', $order->rider_id)->first();
 
                 if ($wallet) {
                     $wallet->increment('balance', $netFare);

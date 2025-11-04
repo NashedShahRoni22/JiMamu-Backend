@@ -78,12 +78,13 @@ class WalletController extends Controller
     // only show completed transaction cancel or approved
     public function walletHistory()
     {
+
         try {
             $wallet = Wallet::where('user_id', auth()->id())
                 ->with(['walletHistory' => function ($query) {
                     $query->whereIn('status', [1, 2, 3, 4]); // 3 = approved, 4 = cancelled
                 }])
-                ->firstOrFail();
+                ->first();
             $data = new WalletResource($wallet);
             return sendResponse(true, 'success', $data);
         }catch (\Exception $exception){

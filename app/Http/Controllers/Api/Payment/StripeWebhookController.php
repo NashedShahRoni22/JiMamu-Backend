@@ -64,7 +64,8 @@ class StripeWebhookController extends Controller
                             ]);
 
                             $order->orderAttempt->update([
-                                'fare' => ($paymentIntent->amount / 100),
+                                //'fare' => ($paymentIntent->amount / 100),
+                                'fare' => $bid?->bid_amount,
                                 'status' => OrderAttempt::$ORDER_STATUS['confirmed'],
                                 'payment_status' => 2,
                             ]);

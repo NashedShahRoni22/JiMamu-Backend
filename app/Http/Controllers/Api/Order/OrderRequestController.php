@@ -376,7 +376,7 @@ class OrderRequestController extends Controller
             if($otpType == 'delivered'){
                 $bidAmount = $order?->bid?->bid_amount;
                 $pricingRate = PricingRate::where('type', $order->order_type)->first();
-                $netFare = abs($pricingRate->base_fare + $bidAmount);
+                $netFare = abs($bidAmount);
                 $wallet = Wallet::where('user_id', $order->rider_id)->first();
 
                 if ($wallet) {

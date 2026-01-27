@@ -14,6 +14,9 @@ class Order extends Model
     static $ORDER_STATUS_NAME  = [ 1 => 'pending', 2 => 'confirmed', 3 => 'picked', 4 => 'shipping', 5 => 'delivered', 6 => 'cancelled' ];
     static $ORDER_TYPE = ['national' => 1, 'international' => 2];
 
+    // goods weight type
+    static $WEIGHT_TYPE=['kg' => 1, 'lbs' => 2];
+
     //use SoftDeletes;
     protected $fillable = [
         'order_unique_id',
@@ -26,6 +29,7 @@ class Order extends Model
         'drop_latitude',
         'drop_longitude',
         'weight',
+        'weight_type',
         'pickup_radius',
         'status',
     ];

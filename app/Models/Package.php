@@ -6,5 +6,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class Package extends Model
 {
-    protected $fillable = ['name', 'status'];
+    protected $fillable = ['name', 'sort_description', 'icon', 'status'];
 }

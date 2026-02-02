@@ -34,6 +34,7 @@ class InternationalOrderController extends Controller
                     'drop_latitude' => $request->drop_latitude,
                     'drop_longitude' => $request->drop_longitude,
                     'weight' => $request->weight,
+                    'weight_type' => Order::$WEIGHT_TYPE[$request->weight_type],
                 ]);
                 $pricingRate = PricingRate::where('type', PricingRate::$STATUS[$request->order_type])->first();
                 // cutting system base fare and platform change, rider will show only need fare

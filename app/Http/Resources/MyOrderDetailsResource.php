@@ -23,6 +23,7 @@ class MyOrderDetailsResource extends JsonResource
             'drop_latitude' => $this->drop_latitude,
             'drop_longitude' => $this->drop_longitude,
             'weight' => $this->weight,
+            'weight_type' => $this->weight_type == 1 ? 'kg': 'lbs',
             'status' => Order::$ORDER_STATUS_NAME[$this->status],
             'date' => $this->created_at->format('d-m-Y  h:i:s A'),
             'package' => $this->package->name,

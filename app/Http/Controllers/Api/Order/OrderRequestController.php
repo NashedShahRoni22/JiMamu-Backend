@@ -36,6 +36,7 @@ class OrderRequestController extends Controller
     }
     public function orderRequest(Request $request){
          $rider = auth()->id();
+         return $request->all();
 //       return Redis::geopos('rider_locations', "rider:$rider");
 //        $lat = 23.7611;
 //        $lng = 90.3623;

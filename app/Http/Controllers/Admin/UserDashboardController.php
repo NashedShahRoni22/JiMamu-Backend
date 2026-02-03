@@ -19,6 +19,8 @@ class UserDashboardController extends Controller
         // Example: get wallet balance (assuming you have a Wallet model)
         $walletBalance = Wallet::where('user_id', $rider->id)->value('balance') ?? 0;
 
+        //return Order::where('rider_id', $riderId)->get();
+
         return Inertia::render('users/dashboard/Orders', [
             'auth' => [
                 'user' => [

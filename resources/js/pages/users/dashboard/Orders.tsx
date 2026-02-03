@@ -19,6 +19,7 @@ export default function Orders({ orders }: OrdersProps) {
           <RiderDashboardLayout>
               <Head title="Orders" />
               <h2 className="text-2xl font-bold mb-4">Active Orders</h2>
+              <p>Test wallet</p>
               {/*{orders.length ? (*/}
               {/*    <ul className="space-y-3">*/}
               {/*        {orders.map((order) => (*/}

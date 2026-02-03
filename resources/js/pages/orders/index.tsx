@@ -9,22 +9,19 @@ export default function Index() {
 
     type Order = {
         id: number;
+        customer_image: string;
         order_unique_id: string;
         status: string;
         customer_name: string;
         customer_email: string;
-        customer_image: string;
         payment_status: string;
         weight: number;
+        created_at: string;
         action: string;
     };
 
     const columns: ColumnDef<Order>[] = [
         { accessorKey: "id", header: "ID" },
-        { accessorKey: "order_unique_id", header: "Order ID" },
-        { accessorKey: "status", header: "Status" },
-        { accessorKey: "customer_name", header: "Customer Name" },
-        { accessorKey: "customer_email", header: "Customer Email" },
         {
             accessorKey: "customer_image",
             header: "Image",
@@ -39,8 +36,13 @@ export default function Index() {
                     <span>No Image</span>
                 )
         },
+        { accessorKey: "order_unique_id", header: "Order ID" },
+        { accessorKey: "status", header: "Status" },
+        { accessorKey: "customer_name", header: "Customer Name" },
+        { accessorKey: "customer_email", header: "Customer Email" },
         { accessorKey: "payment_status", header: "Payment Status" },
         { accessorKey: "weight", header: "Weight" },
+        {accessorKey: "created_at", header: "Order Date"},
         {
             accessorKey: "action",
             header: "Action",

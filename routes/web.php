@@ -33,6 +33,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('orders')->group(function () {
         Route::get('/', [OrderController::class, 'index'])->name('orders.index');
         Route::get('/show/{order}', [OrderController::class, 'show'])->name('orders.show');
+        Route::get('/status/{order}', [OrderController::class, 'status'])->name('orders.status');
     });
     Route::prefix('riders')->name('riders.')->group(function () {
         Route::get('/rider/account/review', [RiderAccountReviewController::class, 'accountCreateRequest'])->name('account.review.request');

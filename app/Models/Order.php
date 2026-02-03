@@ -16,6 +16,7 @@ class Order extends Model
 
     // goods weight type
     static $WEIGHT_TYPE=['kg' => 1, 'lbs' => 2];
+    static  $WEIGHT_TYPE_NAME = [1 => 'kg', 2 => 'lbs'];
 
     //use SoftDeletes;
     protected $fillable = [

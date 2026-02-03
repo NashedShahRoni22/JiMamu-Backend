@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exceptions\CustomException;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ProfileUpdateResource;
 use App\Http\Resources\RiderProfileResource;
@@ -87,7 +88,10 @@ class ProfileUpdateController extends Controller
     }
     public function riderProfileUpdate(Request $request)
     {
-
+        $existRider = UserRider::where('user_id', \auth()->id())->first();
+        if ($existRider) {
+            throw new CustomException('You have requested profile update', 409);
+        }
         try {
             $user = Auth::user();
             $pathName = [];

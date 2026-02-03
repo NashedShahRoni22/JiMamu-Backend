@@ -9,19 +9,16 @@ export default function Index() {
 
     type riderRequest = {
         id: number;
+        profile_image: string;
         name: string;
         email: string;
         phone_number: string;
-        profile_image: string;
+        created_at: string;
         review_status_text: string;
     };
 
     const columns: ColumnDef<riderRequest>[] = [
         { accessorKey: "id", header: "ID" },
-        { accessorKey: "name", header: "Name" },
-        { accessorKey: "email", header: "Email" },
-        { accessorKey: "phone_number", header: "Phone Number" },
-        { accessorKey: "review_status_text", header: "Review Status" },
         {
             accessorKey: "profile_image",
             header: "Image",
@@ -35,6 +32,21 @@ export default function Index() {
                 ) : (
                     <span>No Image</span>
                 ),
+        },
+        { accessorKey: "name", header: "Name" },
+        { accessorKey: "email", header: "Email" },
+        { accessorKey: "phone_number", header: "Phone Number" },
+        { accessorKey: "review_status_text", header: "Review Status" },
+        {
+            accessorKey: "created_at", header: "Created At",
+            cell: ({ row }) => {
+                const date = new Date(row.original.created_at);
+                return date.toLocaleDateString("en-GB", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                });
+            },
         },
         {
             accessorKey: "action",

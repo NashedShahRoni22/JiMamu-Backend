@@ -37,7 +37,8 @@ class OrderController extends Controller
                     'customer_email' => $order->customer->email ?? '',
                     'customer_image' => $order->customer->profile_image ?? '',
                     'payment_status' => $order->payment_status,
-                    'weight' => $order->weight,
+                    'weight' => $order->weight." ". Order::$WEIGHT_TYPE_NAME[$order->weight_type],
+                    'created_at' => date('Y-m-d', strtotime($order->created_at)),
                 ];
             });
 
@@ -66,6 +67,10 @@ class OrderController extends Controller
         return Inertia::render('orders/order-details', [
             'order' => $order
         ]);
+    }
+    public function status(Order $order)
+    {
+
     }
 
     private function getAddressFromCoords($lat, $lng)

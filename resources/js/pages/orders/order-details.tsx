@@ -8,6 +8,7 @@ type Order = {
     status: string | number;
     payment_status: string | number;
     weight: number;
+    weight_type: string;
     pickup_address: string,
     drop_address: string,
     package: {
@@ -77,7 +78,7 @@ export default function Show() {
                         <p><strong>Order ID:</strong> {order.order_unique_id}</p>
                         <p><strong>Status:</strong> {statusMap[Number(order.status)] || order.status}</p>
                         <p><strong>Payment Status:</strong> {paymentStatusMap[Number(order.payment_status)] || order.payment_status}</p>
-                        <p><strong>Weight:</strong> {order.weight} kg</p>
+                        <p><strong>Weight:</strong> {order.weight} {order.weight_type == 1? "kg" : 'lbs'}</p>
                     </div>
 
                     {/* Right Side */}
@@ -192,12 +193,12 @@ export default function Show() {
                 </div>
 
                 {/* Actions */}
-                <div className="mt-6">
-                    <h2 className="text-xl font-semibold mb-2">Actions</h2>
-                    <button className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-                        Update Status
-                    </button>
-                </div>
+                {/*<div className="mt-6">*/}
+                {/*    <h2 className="text-xl font-semibold mb-2">Actions</h2>*/}
+                {/*    <button className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">*/}
+                {/*        Update Status*/}
+                {/*    </button>*/}
+                {/*</div>*/}
             </div>
         </AppLayout>
     );

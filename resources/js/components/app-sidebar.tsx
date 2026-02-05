@@ -31,37 +31,40 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: 'Customer',
+        href: '/rider/pending',
         icon: LayoutGrid,
-        children: [
-            { title: 'Pending Orders', href: '/rider/pending' },
-            { title: 'Completed Orders', href: '/rider/completed' },
-            { title: 'Cancelled Orders', href: '/rider/cancelled' },
-        ],
+        // children: [
+        //     { title: 'Pending Orders', href: '/rider/pending' },
+        //     { title: 'Completed Orders', href: '/rider/completed' },
+        //     { title: 'Cancelled Orders', href: '/rider/cancelled' },
+        // ],
     },
     {
         title: 'Rider',
+        href: '/riders/rider/account/review',
         icon: LayoutGrid,
-        children: [
-            { title: 'Account Approve Request', href: '/riders/rider/account/review' },
-            { title: 'Pending Orders', href: '/rider/pending' },
-            { title: 'Completed Orders', href: '/rider/completed' },
-            { title: 'Cancelled Orders', href: '/rider/cancelled' },
-        ],
+
+        // children: [
+        //
+        //     { title: 'Pending Orders', href: '/rider/pending' },
+        //     { title: 'Completed Orders', href: '/rider/completed' },
+        //     { title: 'Cancelled Orders', href: '/rider/cancelled' },
+        // ],
     },
 
 ];
 
 const footerNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: Folder,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits',
-        icon: BookOpen,
-    },
+    // {
+    //     title: 'Repository',
+    //     href: 'https://github.com/laravel/react-starter-kit',
+    //     icon: Folder,
+    // },
+    // {
+    //     title: 'Documentation',
+    //     href: 'https://laravel.com/docs/starter-kits',
+    //     icon: BookOpen,
+    // },
 ];
 
 export function AppSidebar() {

@@ -14,6 +14,9 @@ class Order extends Model
     static $ORDER_STATUS_NAME  = [ 1 => 'pending', 2 => 'confirmed', 3 => 'picked', 4 => 'shipping', 5 => 'delivered', 6 => 'cancelled' ];
     static $ORDER_TYPE = ['national' => 1, 'international' => 2];
 
+    static  $PAYMENT_STATUS = ['unpaid' => 1, 'paid' => 2];
+    static  $PAYMENT_STATUS_NAME = [1 => 'unpaid', 2 => 'paid' ];
+
     // goods weight type
     static $WEIGHT_TYPE=['kg' => 1, 'lbs' => 2];
     static  $WEIGHT_TYPE_NAME = [1 => 'kg', 2 => 'lbs'];

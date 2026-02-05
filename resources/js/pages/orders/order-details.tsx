@@ -50,9 +50,13 @@ export default function Show() {
     // Convert numeric status to readable text if needed
     const statusMap: Record<number, string> = {
         1: "Pending",
-        2: "Processing",
-        3: "Delivered"
+        2: "Confirmed",
+        3: "Picked",
+        4: "Shipping",
+        5: "Delivered",
+        6: "cancelled"
     };
+
     const paymentStatusMap: Record<number, string> = {
         1: "Unpaid",
         2: "Paid"
@@ -76,7 +80,7 @@ export default function Show() {
                     {/* Left Side */}
                     <div>
                         <p><strong>Order ID:</strong> {order.order_unique_id}</p>
-                        <p><strong>Status:</strong> {statusMap[Number(order.status)] || order.status}</p>
+                        <p><strong>Order Status:</strong> {statusMap[Number(order.status)] || order.status}</p>
                         <p><strong>Payment Status:</strong> {paymentStatusMap[Number(order.payment_status)] || order.payment_status}</p>
                         <p><strong>Weight:</strong> {order.weight} {order.weight_type == 1? "kg" : 'lbs'}</p>
                     </div>

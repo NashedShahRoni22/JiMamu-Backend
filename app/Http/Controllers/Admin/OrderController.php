@@ -36,7 +36,7 @@ class OrderController extends Controller
                     'customer_name' => $order->customer->name ?? 'N/A',
                     'customer_email' => $order->customer->email ?? '',
                     'customer_image' => $order->customer->profile_image ?? '',
-                    'payment_status' => $order->payment_status,
+                    'payment_status' => Order::$PAYMENT_STATUS_NAME[$order->payment_status],
                     'weight' => $order->weight." ". Order::$WEIGHT_TYPE_NAME[$order->weight_type],
                     'created_at' => date('Y-m-d', strtotime($order->created_at)),
                 ];

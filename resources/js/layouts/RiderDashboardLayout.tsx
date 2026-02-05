@@ -21,9 +21,9 @@ export default function RiderDashboardLayout({ children }: RiderDashboardLayoutP
     const { auth, walletBalance, riderId } = usePage<RiderDashboardPageProps>().props;
 
     const sidebarItems = [
-        { name: "Rider Orders", route: "users.dashboard" },
-        { name: "User Orders", route: "users.dashboard.user.orders" },
-        { name: "Wallet", route: "users.dashboard" },
+        { name: "Rider Orders", route: "users.report.dashboard" },
+        { name: "User Orders", route: "users.report.dashboard.user.orders" },
+        { name: "Wallet", route: "users.report.dashboard" },
         // add more items later (Completed Orders, Wallet, etc.)
     ];
 

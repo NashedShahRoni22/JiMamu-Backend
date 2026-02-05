@@ -19,11 +19,11 @@ const mainNavItems: NavItem[] = [
         href: '/orders',
         icon: LayoutGrid,
     },
-    {
-        title: 'Cancel Orders',
-        href: '/cancel/orders',
-        icon: LayoutGrid,
-    },
+    // {
+    //     title: 'Cancel Orders',
+    //     href: '/cancel/orders',
+    //     icon: LayoutGrid,
+    // },
     {
         title: 'Banners',
         href: '/banner',

@@ -16,26 +16,34 @@ class UserDashboardController extends Controller
     {
         $rider = User::findOrFail($riderId);
 
-        // Example: get wallet balance (assuming you have a Wallet model)
         $walletBalance = Wallet::where('user_id', $rider->id)->value('balance') ?? 0;
 
         $orders = Order::where('rider_id', $riderId)
-            ->with(['orderAttempt' => function ($q) {
-                $q->latest()->limit(1);
-            }])
+            ->with([
+                'orderAttempt' => function ($q) {
+                    $q->latest()->limit(1);
+                },
+                'rider:id,name,email', // customer relation must exist
+            ])
+            ->latest()
             ->get();
 
-
-        return Inertia::render('users/dashboard/Orders', [
+        return Inertia::render('usersReport/dashboard/Orders', [
+            // 👇 Admin review করছে, তাই auth user optional
             'auth' => [
-                'user' => [
-                    'id' => $rider->id,
-                    'name' => $rider->name,
-                ],
+                'user' => auth()->check() ? [
+                    'id' => auth()->id(),
+                    'name' => auth()->user()->name,
+                ] : null,
             ],
+
             'walletBalance' => $walletBalance,
             'riderId' => $rider->id,
-            // You can also pass actual rider orders here later:
+            'rider' => [
+                'id' => $rider->id,
+                'name' => $rider->name,
+                'email' => $rider->email,
+            ],
             'orders' => $orders
         ]);
     }
@@ -54,7 +62,7 @@ class UserDashboardController extends Controller
 
             // Example: get wallet balance (assuming you have a Wallet model)
             $walletBalance = Wallet::where('user_id', $rider->id)->value('balance') ?? 0;
-            return Inertia::render('users/dashboard/UserOrders', [
+            return Inertia::render('usersReport/dashboard/UserOrders', [
                 'auth' => [
                     'user' => [
                         'id' => $rider->id,

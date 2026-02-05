@@ -60,7 +60,7 @@ export default function Index() {
                         Views |
                     </Link>
                     <Link
-                        href={`/users/dashboard/${row.original.id}`}
+                        href={`/user/report/dashboard/${row.original.id}`}
                         className="text-blue-500 hover:underline"
                     >
                         Report

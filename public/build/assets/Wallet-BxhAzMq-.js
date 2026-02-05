@@ -1,0 +1,1 @@
+import{j as t,L as a}from"./app-DjSeGF0u.js";import{R as l}from"./RiderDashboardLayout-C-kpluPn.js";/* empty css            */function i({wallet:e}){return t.jsxs(l,{children:[t.jsx(a,{title:"Wallet"}),t.jsx("h2",{className:"text-2xl font-bold mb-4",children:"Wallet Details"}),t.jsxs("p",{children:["Current balance: $",e.balance.toFixed(2)]})]})}export{i as default};

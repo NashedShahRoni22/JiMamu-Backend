@@ -6,6 +6,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\RiderAccountReviewController;
 use App\Http\Controllers\Admin\UserDashboardController;
+use Illuminate\Support\Facades\Auth;
 
 Route::get('/test', function () {
 
@@ -14,7 +15,12 @@ Route::get('/test', function () {
 
 Route::get('/admin', function () {
 
-    return Inertia::render('welcome');
+   // return Inertia::render('welcome');
+    if (Auth::check()) {
+        return redirect()->route('dashboard');
+    }
+
+    return Inertia::render('auth/login');
 })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -42,6 +48,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
     // user dashboard
     Route::prefix('users')->name('users.')->group(function () {
+        Route::get('/dashboard/{user_id}', [UserDashboardController::class, 'userDashboard'])->name('dashboard');
+        Route::get('/dashboard/orders/{user_id}', [UserDashboardController::class, 'userOrders'])->name('dashboard.user.orders');
+        Route::get('/dashboard/rider/order/{user_id}', [UserDashboardController::class, 'riderOrders'])->name('dashboard.rider.orders');
+    });
+    Route::prefix('user/report')->name('users.report.')->group(function () {
         Route::get('/dashboard/{user_id}', [UserDashboardController::class, 'userDashboard'])->name('dashboard');
         Route::get('/dashboard/orders/{user_id}', [UserDashboardController::class, 'userOrders'])->name('dashboard.user.orders');
         Route::get('/dashboard/rider/order/{user_id}', [UserDashboardController::class, 'riderOrders'])->name('dashboard.rider.orders');

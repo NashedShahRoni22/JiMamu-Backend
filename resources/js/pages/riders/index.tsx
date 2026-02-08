@@ -79,11 +79,19 @@ export default function Index() {
 
     // Filtering logic
     const filteredRiders = (riders as riderRequest[]).filter((rider) => {
-        return (
-            (phoneNumber ? rider.phone_number.toString().includes(phoneNumber) : true) &&
-            (customerEmail ? rider.email.toLowerCase().includes(customerEmail.toLowerCase()) : true) &&
-            (status ? rider.review_status_text.toLowerCase() === status.toLowerCase() : true)
-        );
+        const phoneOk = phoneNumber
+            ? (rider.phone_number ?? "").toString().includes(phoneNumber)
+            : true;
+
+        const emailOk = customerEmail
+            ? rider.email?.toLowerCase().includes(customerEmail.toLowerCase())
+            : true;
+
+        const statusOk = status
+            ? rider.review_status_text?.toLowerCase() === status.toLowerCase()
+            : true;
+
+        return phoneOk && emailOk && statusOk;
     });
 
     return (

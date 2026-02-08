@@ -54,7 +54,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
     Route::prefix('user/report')->name('users.report.')->group(function () {
         Route::get('/dashboard/{user_id}', [UserDashboardController::class, 'userDashboard'])->name('dashboard');
-        Route::get('/dashboard/orders/{user_id}', [UserDashboardController::class, 'userOrders'])->name('dashboard.user.orders');
+        Route::get('/requested/orders/{user_id}', [UserDashboardController::class, 'requestedOrder'])->name('requested.order');
+        Route::get('/wallet/{user_id}', [UserDashboardController::class, 'wallet'])->name('wallet');
         Route::get('/dashboard/rider/order/{user_id}', [UserDashboardController::class, 'riderOrders'])->name('dashboard.rider.orders');
     });
 });

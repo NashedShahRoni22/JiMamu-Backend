@@ -29,18 +29,18 @@ const mainNavItems: NavItem[] = [
         href: '/banner',
         icon: LayoutGrid,
     },
+    // {
+    //     title: 'Customer',
+    //     href: '/rider/pending',
+    //     icon: LayoutGrid,
+    //     children: [
+    //         { title: 'Pending Orders', href: '/rider/pending' },
+    //         { title: 'Completed Orders', href: '/rider/completed' },
+    //         { title: 'Cancelled Orders', href: '/rider/cancelled' },
+    //     ],
+    // },
     {
-        title: 'Customer',
-        href: '/rider/pending',
-        icon: LayoutGrid,
-        // children: [
-        //     { title: 'Pending Orders', href: '/rider/pending' },
-        //     { title: 'Completed Orders', href: '/rider/completed' },
-        //     { title: 'Cancelled Orders', href: '/rider/cancelled' },
-        // ],
-    },
-    {
-        title: 'Rider',
+        title: 'Users',
         href: '/riders/rider/account/review',
         icon: LayoutGrid,
 

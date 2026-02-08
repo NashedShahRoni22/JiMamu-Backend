@@ -4,7 +4,7 @@ import RiderDashboardLayout from "@/layouts/RiderDashboardLayout";
 import { Head } from "@inertiajs/react";
 
 // ================= Types =================
-type Rider = {
+type Customer = {
     name: string;
     email: string;
     avatar?: string;
@@ -27,7 +27,7 @@ type Order = {
     order_type: number;
     weight: number;
     created_at: string;
-    rider: Rider;
+    customer: Customer;
     order_attempt?: OrderAttempt;
 };
 
@@ -70,10 +70,6 @@ export default function Orders({ orders }: OrdersProps) {
                     String(order.order_unique_id)
                         .toLowerCase()
                         .includes(filters.order_unique_id.toLowerCase()))&&
-                (!filters.tracking ||
-                    attempt?.order_tracking_number
-                        ?.toLowerCase()
-                        .includes(filters.tracking.toLowerCase())) &&
                 (!filters.status ||
                     String(order.status) === filters.status) &&
                 (!filters.type ||
@@ -89,7 +85,7 @@ export default function Orders({ orders }: OrdersProps) {
             <RiderDashboardLayout>
                 <Head title="Orders" />
 
-                <h2 className="text-2xl font-bold mb-4">Order Delivery</h2>
+                <h2 className="text-2xl font-bold mb-4">Customer Requested Order</h2>
 
                 {/* ================= Filters ================= */}
                 <div className="grid grid-cols-2 md:grid-cols-6 gap-2 mb-4">
@@ -101,15 +97,6 @@ export default function Orders({ orders }: OrdersProps) {
                             setFilters({ ...filters, order_unique_id: e.target.value })
                         }
                     />
-
-                    {/*<input*/}
-                    {/*    className="border p-2 rounded"*/}
-                    {/*    placeholder="Tracking #"*/}
-                    {/*    value={filters.tracking}*/}
-                    {/*    onChange={(e) =>*/}
-                    {/*        setFilters({ ...filters, tracking: e.target.value })*/}
-                    {/*    }*/}
-                    {/*/>*/}
 
                     <select
                         className="border p-2 rounded"
@@ -183,13 +170,13 @@ export default function Orders({ orders }: OrdersProps) {
                                         className="hover:bg-gray-50"
                                     >
                                         <td className="border p-2">
-                                            {order.rider.name}
+                                            {order.customer.name}
                                         </td>
                                         <td className="border p-2">
-                                            {order.rider.email}
+                                            {order.customer.email}
                                         </td>
                                         <td className="border p-2">
-                                            #{order.order_unique_id}
+                                            {order.order_unique_id}
                                         </td>
                                         {/*<td className="border p-2">*/}
                                         {/*    {order.order_attempt*/}

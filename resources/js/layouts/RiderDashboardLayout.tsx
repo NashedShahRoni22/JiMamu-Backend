@@ -21,9 +21,9 @@ export default function RiderDashboardLayout({ children }: RiderDashboardLayoutP
     const { auth, walletBalance, riderId } = usePage<RiderDashboardPageProps>().props;
 
     const sidebarItems = [
-        { name: "Rider Orders", route: "users.report.dashboard" },
-        { name: "User Orders", route: "users.report.dashboard.user.orders" },
-        { name: "Wallet", route: "users.report.dashboard" },
+        { name: "Rider Delivery Orders", route: "users.report.dashboard" },
+        { name: "Requested Orders", route: "users.report.requested.order" },
+        { name: "Wallet", route: "users.report.wallet" },
         // add more items later (Completed Orders, Wallet, etc.)
     ];
 
@@ -32,15 +32,28 @@ export default function RiderDashboardLayout({ children }: RiderDashboardLayoutP
             {/* Sidebar */}
             <aside className="w-64 bg-white shadow-md p-4">
                 <h2 className="text-xl font-bold mb-4">Rider Panel</h2>
+                {/*{sidebarItems.map((item) => (*/}
+                {/*    <Link*/}
+                {/*        key={item.route}*/}
+                {/*        href={route(item.route, riderId)} // ✅ passing rider ID dynamically*/}
+                {/*        className={`block px-4 py-2 rounded mb-1 ${*/}
+                {/*            route().current(item.route)*/}
+                {/*                ? "bg-blue-500 text-white"*/}
+                {/*                : "text-gray-700 hover:bg-gray-200"*/}
+                {/*        }`}*/}
+                {/*    >*/}
+                {/*        {item.name}*/}
+                {/*    </Link>*/}
+                {/*))}*/}
                 {sidebarItems.map((item) => (
                     <Link
                         key={item.route}
-                        href={route(item.route, riderId)} // ✅ passing rider ID dynamically
+                        href={riderId ? route(item.route, riderId) : "#"}
                         className={`block px-4 py-2 rounded mb-1 ${
                             route().current(item.route)
                                 ? "bg-blue-500 text-white"
                                 : "text-gray-700 hover:bg-gray-200"
-                        }`}
+                        } ${!riderId ? "opacity-50 pointer-events-none" : ""}`}
                     >
                         {item.name}
                     </Link>

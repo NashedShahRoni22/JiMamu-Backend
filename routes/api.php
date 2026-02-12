@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\Order\OrderCancelController;
 use App\Http\Controllers\Api\Order\InternationalOrderController;
 use App\Http\Controllers\Api\Order\OrderManageController;
 use App\Http\Controllers\Admin\BannerController;
+use App\Http\Controllers\Api\Rider\BankInformationController;
 
 Route::middleware(['json.response'])->prefix('/v1')->group(function() {
     Route::post('/send/email/otp', [AuthController::class, 'sendEmailOtp']);
@@ -67,7 +68,14 @@ Route::middleware(['json.response'])->prefix('/v1')->group(function() {
             Route::get('/order/new/order/bid/list', [BidsController::class, 'newBidList']); // show
             Route::get('/order/new/bids/{order_id}', [BidsController::class, 'newBids']); // show
             Route::post('/order/apply/bids/{order_id}', [BidsController::class, 'applyBids']); // show
-            route::get('/my/order/applied/bids/{order_type}', [BidsController::class, 'myOrderAppliedBids']);
+            Route::get('/my/order/applied/bids/{order_type}', [BidsController::class, 'myOrderAppliedBids']);
+
+            // bank information
+            Route::prefix('/bank')->group(function () {
+                Route::get('index', [BankInformationController::class, 'index']);
+                Route::post('store', [BankInformationController::class, 'store']);
+                Route::put('update', [BankInformationController::class, 'update']);
+            });
 
 
             Route::get('/my/new/order/request', [MyDeliveryController::class, 'myNewOrderRequest']); // show

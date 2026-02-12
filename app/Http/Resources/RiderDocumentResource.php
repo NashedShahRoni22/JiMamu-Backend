@@ -19,7 +19,8 @@ class RiderDocumentResource extends JsonResource
             'document_type' => $this->document_type,
             'document_number' => $this->document_number,
             'document' => $this->document,
-            'review_status' => UserRider::$REVIEW_STATUS[$this->review_status]
+            'review_status' => UserRider::$REVIEW_STATUS[$this->review_status],
+            'expire_date' => $this->expire_date
         ];
     }
 }

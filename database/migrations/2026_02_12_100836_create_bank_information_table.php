@@ -11,17 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('rider_bank_information', function (Blueprint $table) {
+        Schema::create('bank_information', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id');
             $table->string('name');
             $table->string('account_number');
-            $table->string('cvc_code')->nullable();
-            $table->string('expiry_date')->nullable();
+            $table->string('institution_number', 10)->nullable();
+            $table->string('transit_number', 10)->nullable();
             $table->boolean('is_default_payment')->default(false);
-            $table->tinyInteger('type')->default(0); // card or anything else
+            $table->tinyInteger('type')->default(0); // rider/user
             $table->tinyInteger('review_status')->default(1); // pending, accepted, cancel
             $table->string('remarks')->nullable(); // if cancel with the reason the request
+            $table->string('bank_document')->nullable(); // image/pdf
 
             $table->timestamps();
             $table->softDeletes();
@@ -34,6 +35,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('rider_bank_information');
+        Schema::dropIfExists('bank_information');
     }
 };

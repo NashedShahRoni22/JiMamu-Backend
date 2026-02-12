@@ -15,6 +15,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use Carbon\Carbon;
 
 
 class ProfileUpdateController extends Controller
@@ -108,12 +109,14 @@ class ProfileUpdateController extends Controller
                     'document_type' => $request->document_type,
                     'document_number' => $request->document_number,
                     'document' => json_encode($pathName),
+                    'expire_date' => Carbon::parse($request->expire_date)->format('Y-m-d'),
                 ]);
             }else{
                 $user->userRiders()->update([
                     'document_type' => $request->document_type,
                     'document_number' => $request->document_number,
                     'document' => json_encode($pathName),
+                    'expire_date' => Carbon::parse($request->expire_date)->format('Y-m-d'),
                 ]);
             }
             // assign rider role if not assign role

@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class UserRider extends Model
 {
     static $REVIEW_STATUS = [1 => 'pending', 2 => 'approved', 3 => 'rejected'];
-    protected $fillable = ['user_id', 'document_type', 'document_number', 'document', 'review_status', 'remarks'];
+    protected $fillable = ['user_id', 'document_type', 'document_number', 'document', 'review_status', 'remarks', 'expire_date'];
 
 
     public function document() : Attribute

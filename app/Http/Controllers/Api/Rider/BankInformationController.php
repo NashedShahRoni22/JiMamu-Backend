@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Rider;
 
+use App\Exceptions\CustomException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BankInformationRequest;
 use App\Http\Resources\BankInformationResource;
@@ -29,6 +30,10 @@ class BankInformationController extends Controller
     }
     public function store(BankInformationRequest $request)
     {
+       $checkExistingDoc = BankInformation::where('user_id', auth()->id())->first();
+       if($checkExistingDoc){
+           throw new CustomException('You have already submitted a bank information!', 409);
+       }
        // return $request->all();
        $data = $request->validated();
         $user = auth()->user();

@@ -7,7 +7,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\ProfileUpdateResource;
 use App\Http\Resources\RiderProfileResource;
 use App\Http\Resources\UserProfileResource;
-use App\Models\RiderBankInformation;
 use App\Models\User;
 use App\Models\UserRider;
 use App\Services\Files\FileService;
@@ -77,7 +76,6 @@ class ProfileUpdateController extends Controller
             }
             // load relationship data
             $user->load([
-                'riderBankInformations',
                 'userRiders'
             ]);
             $data = new RiderProfileResource($user);

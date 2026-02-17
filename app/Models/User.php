@@ -59,7 +59,7 @@ class User extends Authenticatable
     public function profileImage() : Attribute
     {
         return Attribute::make(
-            get: fn($value) => $value ? asset('storage/').'/'.$value : null
+            get: fn($value) => $value ? asset('storage/').'/'.$value : asset('storage/').'/user/avatar.png',
             );
     }
     public function userRiders(){

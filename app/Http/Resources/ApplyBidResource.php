@@ -20,7 +20,6 @@ class ApplyBidResource extends JsonResource
             'phone_number' => $this->user?->phone_number,
             'profile_image' => $this->user?->profile_image,
             'bid_amount' => $this->bid_amount,
-
         ];
     }
 }

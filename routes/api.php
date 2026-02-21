@@ -74,7 +74,7 @@ Route::middleware(['json.response'])->prefix('/v1')->group(function() {
             Route::prefix('/bank')->group(function () {
                 Route::get('index', [BankInformationController::class, 'index']);
                 Route::post('store', [BankInformationController::class, 'store']);
-                Route::put('update', [BankInformationController::class, 'update']);
+                Route::put('update/{id}', [BankInformationController::class, 'update']);
             });
 
 

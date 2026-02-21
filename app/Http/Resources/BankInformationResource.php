@@ -15,12 +15,13 @@ class BankInformationResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'account_holer_name' => $this->name,
-            'account_number' => $this->account_number,
-            'institution_number' => $this->institution_number,
-            'transit_number' => $this->transit_number,
-            'bank_document' => $this->bank_document,
-            'status' => $this->status
+            'account_holer_name' => $this?->name,
+            'account_number' => $this?->account_number,
+            'institution_number' => $this?->institution_number,
+            'transit_number' => $this?->transit_number,
+            'bank_document' => $this?->bank_document,
+            'status' => $this?->status,
+
         ];
     }
 }

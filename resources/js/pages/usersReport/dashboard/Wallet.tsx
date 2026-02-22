@@ -215,7 +215,7 @@ export default function Wallet({ wallet, bankInformation }: WalletProps) {
                                         <img
                                             src={bankInformation.bank_document}
                                             alt="Bank Document"
-                                            className="mt-2 rounded border w-full"
+                                            className="mt-2 rounded border w-full max-h-64 object-contain"
                                         />
                                     </div>
                                 </div>

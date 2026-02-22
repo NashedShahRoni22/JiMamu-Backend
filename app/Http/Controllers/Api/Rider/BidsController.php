@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Rider;
 use App\Http\Controllers\Controller;
 use App\Models\Bid;
 use App\Models\Order;
+use App\Models\UserRider;
 use Illuminate\Http\Request;
 
 class BidsController extends Controller
@@ -35,6 +36,7 @@ class BidsController extends Controller
         if ($order->customer_id === auth()->id()){
             return sendResponse(false, 'You cannot apply your bids.');
         }
+
 //        $maxBidPrice = $order->orderAttempt?->fare + $order->orderAttempt?->fare * 30 / 100;
 //        $minBidPrice = $order->orderAttempt?->fare - $order->orderAttempt?->fare * 20 / 100;
 //        // check maximum
@@ -44,10 +46,12 @@ class BidsController extends Controller
 //        if($minBidPrice > $request->bid_amount){
 //            return sendResponse(false, 'Your bid amount to much low.', ['min_bid' => $minBidPrice], 422);
 //        }
-        // check exist under a order
-       if(!auth()->user()->hasRole('rider')){
-           return sendResponse(false, 'You are not eligible for rider.', null, 404);
 
+        $userRider = UserRider::where('user_id', auth()->id())->first();
+
+        // check exist under a order
+       if(!auth()->user()->hasRole('rider') && !$userRider && $order->reveiew_status === UserRider::$REVIEW_STATUS['approved']){
+           return sendResponse(false, 'You are not eligible for rider.', null, 404);
        }
 
         $findBid = Bid::where('order_id', $order->id)->where('user_id', auth()->id())->first();

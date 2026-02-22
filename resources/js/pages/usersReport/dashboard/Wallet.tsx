@@ -11,7 +11,13 @@ type WalletHistory = {
     status: string; // pending / approved / cancelled
     created_at: string; // "01-06-2025 06:23 AM"
 };
-
+type BankInformation = {
+    name: string;
+    account_number: string;
+    institution_number: string;
+    transit_number: string;
+    bank_document: string;
+};
 type Wallet = {
     balance: string;
     walletHistory: WalletHistory[];
@@ -19,10 +25,13 @@ type Wallet = {
 
 interface WalletProps {
     wallet: Wallet;
+    bankInformation: BankInformation | null;
 }
 
+
+
 // ================= Component =================
-export default function Wallet({ wallet }: WalletProps) {
+export default function Wallet({ wallet, bankInformation }: WalletProps) {
     const [filters, setFilters] = useState({
         status: "",
         from_date: "",
@@ -30,6 +39,7 @@ export default function Wallet({ wallet }: WalletProps) {
     });
 
     const history = wallet?.walletHistory ?? [];
+    const [showModal, setShowModal] = useState(false); // show modal
 
     const filteredHistory = useMemo(() => {
         return history.filter((item) => {
@@ -51,12 +61,25 @@ export default function Wallet({ wallet }: WalletProps) {
         });
     }, [history, filters]);
 
+    // bank information data destructure
+
+
+
     return (
         <AppLayout>
             <RiderDashboardLayout>
                 <Head title="Wallet" />
 
-                <h2 className="text-2xl font-bold mb-4">Wallet History</h2>
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-2xl font-bold">Wallet History</h2>
+
+                    <button
+                        onClick={() => setShowModal(true)}
+                        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                    >
+                        Bank Info
+                    </button>
+                </div>
 
                 {/* ================= Filters (Same Flow) ================= */}
                 <div className="grid grid-cols-2 md:grid-cols-6 gap-2 mb-4">
@@ -162,6 +185,55 @@ export default function Wallet({ wallet }: WalletProps) {
                         </tbody>
                     </table>
                 </div>
+                {showModal && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                        <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
+
+                            {/* Header */}
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className="text-lg font-semibold">Bank Information</h3>
+                                <button
+                                    onClick={() => setShowModal(false)}
+                                    className="text-gray-500 hover:text-gray-700"
+                                >
+                                    ✕
+                                </button>
+                            </div>
+
+                            {/* Content */}
+                            {bankInformation ? (
+                                <div className="space-y-2 text-sm">
+                                    <p><strong>Account Name:</strong> {bankInformation.name}</p>
+                                    <p><strong>Account Number:</strong> {bankInformation.account_number}</p>
+                                    <p><strong>Institution Number:</strong> {bankInformation.institution_number}</p>
+                                    <p><strong>Transit Number:</strong> {bankInformation.transit_number}</p>
+
+                                    {/* Bank Document */}
+                                    <div>
+                                        <strong>Document:</strong>
+                                        <img
+                                            src={bankInformation.bank_document}
+                                            alt="Bank Document"
+                                            className="mt-2 rounded border w-full"
+                                        />
+                                    </div>
+                                </div>
+                            ) : (
+                                <p className="text-gray-500">No bank information found</p>
+                            )}
+
+                            {/* Footer */}
+                            <div className="mt-4 text-right">
+                                <button
+                                    onClick={() => setShowModal(false)}
+                                    className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+                                >
+                                    Close
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </RiderDashboardLayout>
         </AppLayout>
     );

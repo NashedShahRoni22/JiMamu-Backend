@@ -120,8 +120,7 @@ class UserDashboardController extends Controller
 
         try {
             // Fetch user to make sure user exists
-            $user = User::findOrFail($user_id);
-
+            $user = User::with('bankInformation')->findOrFail($user_id);
             // Fetch wallet and wallet history
             $wallet = Wallet::where('user_id', $user_id)
                 ->with(['walletHistory' => function ($query) {
@@ -148,6 +147,7 @@ class UserDashboardController extends Controller
                 'wallet' => $walletData,
                 'riderId' => $user->id,
                 'walletBalance' => $walletData['balance'],
+                'bankInformation' => $user?->bankInformation
             ]);
         } catch (\Exception $e) {
             // Optional: log exception

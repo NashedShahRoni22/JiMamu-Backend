@@ -80,4 +80,9 @@ class User extends Authenticatable
     public function bankInformation(){
         return $this->hasOne(BankInformation::class, 'user_id', 'id');
     }
+    // firebase device token
+    public function deviceToken()
+    {
+        return $this->hasOne(DeviceToken::class, 'user_id', 'id');
+    }
 }

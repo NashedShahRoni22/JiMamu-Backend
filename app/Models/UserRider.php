@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class UserRider extends Model
 {
     static $REVIEW_STATUS = [1 => 'pending', 2 => 'approved', 3 => 'rejected'];
+    static $REVIEW_STATUS_NAME = ['pending' => 1, 'approved' => 2, 'rejected' => 3];
     protected $fillable = ['user_id', 'document_type', 'document_number', 'document', 'review_status', 'remarks', 'expire_date'];
 
 

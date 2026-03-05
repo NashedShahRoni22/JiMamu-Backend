@@ -9,6 +9,7 @@ use App\Http\Resources\MyOrderListResource;
 use App\Http\Resources\PackageResource;
 use App\Mail\OtpMail;
 use App\Models\Bid;
+use App\Models\DeviceToken;
 use App\Models\DistanceZone;
 use App\Models\Order;
 use App\Models\OrderAttempt;
@@ -158,7 +159,16 @@ class OrderRequestController extends Controller
 //                    'km',
 //                ]);
                 // return $nearbyRiders;
-              //$findNearByRiders =  $this->locationService->findNearbyRiders($orderRequest);
+            //  $findNearByRiders =  $this->locationService->findNearbyRiders($orderRequest);
+//                $tokens = DeviceToken::whereIn('user_id', $riders->pluck('id'))
+//                    ->pluck('token');
+//
+//                app(FcmService::class)->send(
+//                    $tokens,
+//                    'New Delivery Request',
+//                    'A customer requested a delivery nearby',
+//                    ['type' => 'new_request']
+//                );
             });
 
             return sendResponse(success: true, message: 'Successfully send order request');

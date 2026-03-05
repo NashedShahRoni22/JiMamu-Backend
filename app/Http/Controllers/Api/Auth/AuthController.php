@@ -6,6 +6,7 @@ use App\Events\OtpGenerated;
 use App\Exceptions\CustomException;
 use App\Http\Controllers\Controller;
 use App\Mail\OtpMail;
+use App\Models\DeviceToken;
 use App\Models\OtpVerify;
 use App\Models\User;
 use App\Models\Wallet;
@@ -67,6 +68,15 @@ class AuthController extends Controller
         $otpCode->delete();
         // email check
         $exitsUser = User::where('email', $request->email)->first();
+        DeviceToken::updateOrCreate(
+            [
+                'user_id' => auth()->id(),
+                'device_type' => 'android'
+            ],
+            [
+                'device_token' => $request->device_token
+            ]
+        );
         if(!$exitsUser){
             $user = User::create([
                 'email' => $request->email,
@@ -79,8 +89,11 @@ class AuthController extends Controller
             );
             $exitsUser = $user;
             $user->assignRole('user');
+
+
         }
         $token = $exitsUser->createToken('auth_token')->plainTextToken;
+
 
         return sendResponse(true, 'OTP Verified successfully.', ["token" => $token, "status" => User::$statusName[$exitsUser?->status], 'user_id'=> $exitsUser->id, 'role' => $exitsUser->getRoleNames()->toArray()]);
     }

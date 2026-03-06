@@ -61,41 +61,46 @@ class AuthController extends Controller
 
        $otpCode = OtpVerify::where('email', $request->email)->where('otp_code', $request->otp_code)->first();
 
-        if (!$otpCode || $otpCode->otp_code !== $request->otp_code || Carbon::now()->gt($otpCode->otp_expires_at)) {
-            return sendResponse(false, 'Invalid or expired OTP.', null,401);
-        }
-        // clear otp
-        $otpCode->delete();
-        // email check
-        $exitsUser = User::where('email', $request->email)->first();
-        DeviceToken::updateOrCreate(
-            [
-                'user_id' => auth()->id(),
-                'device_type' => 'android'
-            ],
-            [
-                'device_token' => $request->device_token
-            ]
-        );
-        if(!$exitsUser){
-            $user = User::create([
-                'email' => $request->email,
-                'status' => 1,
-            ]);
-            // Create wallet only if it doesn't exist
-            Wallet::firstOrCreate(
-                ['user_id' => $user->id], // condition
-                ['balance' => 0]          // defaults if creating new
+//        if (!$otpCode || $otpCode->otp_code !== $request->otp_code || Carbon::now()->gt($otpCode->otp_expires_at)) {
+//            return sendResponse(false, 'Invalid or expired OTP.', null,401);
+//        }
+        try {
+            // clear otp
+            //$otpCode->delete();
+            // email check
+            $exitsUser = User::where('email', $request->email)->first();
+
+            if(!$exitsUser){
+                $user = User::create([
+                    'email' => $request->email,
+                    'status' => 1,
+                ]);
+                // Create wallet only if it doesn't exist
+                Wallet::firstOrCreate(
+                    ['user_id' => $user->id], // condition
+                    ['balance' => 0]          // defaults if creating new
+                );
+                $exitsUser = $user;
+                $user->assignRole('user');
+
+
+            }
+            $token = $exitsUser->createToken('auth_token')->plainTextToken;
+            DeviceToken::updateOrCreate(
+                [
+                    'user_id' => $exitsUser->id,
+                    'device_type' => 'android'
+                ],
+                [
+                    'device_token' => $request->get('device_token'),
+                ]
             );
-            $exitsUser = $user;
-            $user->assignRole('user');
 
-
+            return sendResponse(true, 'OTP Verified successfully.', ["token" => $token, "status" => User::$statusName[$exitsUser?->status], 'user_id'=> $exitsUser->id, 'role' => $exitsUser->getRoleNames()->toArray()]);
+        }catch (CustomException $e){
+            return $e->getCode();
         }
-        $token = $exitsUser->createToken('auth_token')->plainTextToken;
 
-
-        return sendResponse(true, 'OTP Verified successfully.', ["token" => $token, "status" => User::$statusName[$exitsUser?->status], 'user_id'=> $exitsUser->id, 'role' => $exitsUser->getRoleNames()->toArray()]);
     }
     public function socialLogin(Request $request)
     {

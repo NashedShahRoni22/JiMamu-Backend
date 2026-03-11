@@ -2,22 +2,41 @@
 
 namespace App\Services\Notifications;
 
-use Illuminate\Support\Facades\Http;
+use Kreait\Firebase\Contract\Messaging;
+use Kreait\Firebase\Messaging\CloudMessage;
+use Kreait\Firebase\Messaging\Notification;
 
 class FcmService
 {
-    public function send($tokens, $title, $body, $data = [])
+    public function __construct(private Messaging $messaging) {}
+
+    // Single device
+    public function sendToDevice(string $token, string $title, string $body, array $data = []): void
     {
-        return Http::withHeaders([
-            'Authorization' => 'key=' . config('services.fcm.server_key'),
-            'Content-Type' => 'application/json',
-        ])->post('https://fcm.googleapis.com/fcm/send', [
-            'registration_ids' => is_array($tokens) ? $tokens : [$tokens],
-            'notification' => [
-                'title' => $title,
-                'body' => $body,
-            ],
-            'data' => $data,
-        ])->json();
+        $message = CloudMessage::withTarget('token', $token)
+            ->withNotification(Notification::create($title, $body))
+            ->withData($data);
+
+        $this->messaging->send($message);
+    }
+
+    // Multiple devices
+    public function sendToMultiple(array $tokens, string $title, string $body, array $data = []): void
+    {
+        $message = CloudMessage::new()
+            ->withNotification(Notification::create($title, $body))
+            ->withData($data);
+
+        $this->messaging->sendMulticast($message, $tokens);
+    }
+
+    // Topic
+    public function sendToTopic(string $topic, string $title, string $body, array $data = []): void
+    {
+        $message = CloudMessage::withTarget('topic', $topic)
+            ->withNotification(Notification::create($title, $body))
+            ->withData($data);
+
+        $this->messaging->send($message);
     }
 }

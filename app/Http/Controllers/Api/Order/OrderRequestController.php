@@ -29,14 +29,17 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Redis;
+use App\Services\Notifications\FcmService;
 
 class OrderRequestController extends Controller
 {
-    public function __construct(public LocationService $locationService, public StripePaymentService $stripePaymentService){
+    public function __construct(public LocationService $locationService, public StripePaymentService $stripePaymentService, public FcmService $fcmService)
+        {
 
     }
     public function orderRequest(Request $request){
          $rider = auth()->id();
+
 //       return Redis::geopos('rider_locations', "rider:$rider");
 //        $lat = 23.7611;
 //        $lng = 90.3623;
@@ -160,15 +163,11 @@ class OrderRequestController extends Controller
 //                ]);
                 // return $nearbyRiders;
             //  $findNearByRiders =  $this->locationService->findNearbyRiders($orderRequest);
-//                $tokens = DeviceToken::whereIn('user_id', $riders->pluck('id'))
-//                    ->pluck('token');
-//
-//                app(FcmService::class)->send(
-//                    $tokens,
-//                    'New Delivery Request',
-//                    'A customer requested a delivery nearby',
-//                    ['type' => 'new_request']
-//                );
+
+            //    $tokens = DeviceToken::whereIn('user_id', $riders->pluck('id'))
+            //        ->pluck('device_token');
+               $tokens = "cy66sq9xSN-OeYyoXd2TZV:APA91bFq3FfAt2OICkYoI7dfoZQ11L8zUAjgaAHXQYWsAflOuUNc0n3ctAGGcgVTtTHCMItnt1I1_kwbDO_oGin48s0CKIELBUGFSbK-zu2XeQZ7vUiqpyA"; 
+               app(FcmService::class)->sendToDevice($tokens, 'order has been created! 👋', 'Message body');
             });
 
             return sendResponse(success: true, message: 'Successfully send order request');
@@ -273,22 +272,22 @@ class OrderRequestController extends Controller
         }
 
         try {
-//            DB::transaction(function () use ($order, $bid, $riderId){
-//                $order->order()->update([
-//                    'rider_id' => $bid->user_id,
-//                   // 'status' => Order::$ORDER_STATUS['confirmed'],
-//                ]);
-////                $order->update([
-////                    'status' => OrderAttempt::$ORDER_STATUS['confirmed'],
-////                ]);
-//                $bid = Bid::where('order_id', $order->order_id)->where('user_id', $riderId)->first();
-//                $order->update([
-//                    'fare' => $bid->bid_amount,
-//                ]);
-//                $bid->update([
-//                    'status' => Bid::$STATUS['accepted']
-//                ]);
-//            });
+           DB::transaction(function () use ($order, $bid, $riderId){
+               $order->order()->update([
+                   'rider_id' => $bid->user_id,
+                   'status' => Order::$ORDER_STATUS['confirmed'],
+               ]);
+               $order->update([
+                   'status' => OrderAttempt::$ORDER_STATUS['confirmed'],
+               ]);
+               $bid = Bid::where('order_id', $order->order_id)->where('user_id', $riderId)->first();
+               $order->update([
+                   'fare' => $bid->bid_amount,
+               ]);
+               $bid->update([
+                   'status' => Bid::$STATUS['accepted']
+               ]);
+           });
             $paymentSecretKey = $this->stripePaymentService->createPaymentIntent($orderUniqueId, $orderAttemptId, $riderId);
             return sendResponse(success: true, message: 'Order has been confirmed', data: $paymentSecretKey);
         }catch (\Exception $exception){

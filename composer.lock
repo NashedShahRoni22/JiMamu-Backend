@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "efb9f38daffdc72af2cf413b78aa1658",
+    "content-hash": "f3406ad23933c3d620d1d6287ea42801",
     "packages": [
         {
             "name": "beste/clock",
@@ -2178,16 +2178,16 @@
         },
         {
             "name": "kreait/laravel-firebase",
-            "version": "6.1.0",
+            "version": "6.2.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/kreait/laravel-firebase.git",
-                "reference": "9cbb24f17a42dbcb447468f0565e65d113e535aa"
+                "url": "https://github.com/beste/laravel-firebase.git",
+                "reference": "1928f8dbf7882f24f9d33eaf5d4bee24b2663981"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/kreait/laravel-firebase/zipball/9cbb24f17a42dbcb447468f0565e65d113e535aa",
-                "reference": "9cbb24f17a42dbcb447468f0565e65d113e535aa",
+                "url": "https://api.github.com/repos/beste/laravel-firebase/zipball/1928f8dbf7882f24f9d33eaf5d4bee24b2663981",
+                "reference": "1928f8dbf7882f24f9d33eaf5d4bee24b2663981",
                 "shasum": ""
             },
             "require": {
@@ -2195,7 +2195,7 @@
                 "illuminate/notifications": "^11.0 || ^12.0",
                 "illuminate/support": "^11.0 || ^12.0",
                 "kreait/firebase-php": "^7.19",
-                "php": "~8.2.0 || ~8.3.0 || ~8.4.0",
+                "php": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
                 "symfony/cache": "^6.1.2 || ^7.0.3"
             },
             "require-dev": {
@@ -2240,8 +2240,8 @@
                 "sdk"
             ],
             "support": {
-                "issues": "https://github.com/kreait/laravel-firebase/issues",
-                "source": "https://github.com/kreait/laravel-firebase/tree/6.1.0"
+                "issues": "https://github.com/beste/laravel-firebase/issues",
+                "source": "https://github.com/beste/laravel-firebase/tree/6.2.0"
             },
             "funding": [
                 {
@@ -2253,7 +2253,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-06-14T13:25:32+00:00"
+            "time": "2025-11-28T14:26:28+00:00"
         },
         {
             "name": "laravel/cashier",
@@ -11079,5 +11079,5 @@
         "php": "^8.2"
     },
     "platform-dev": {},
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.9.0"
 }

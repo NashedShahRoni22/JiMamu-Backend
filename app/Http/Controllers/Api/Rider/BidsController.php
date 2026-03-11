@@ -50,9 +50,12 @@ class BidsController extends Controller
         $userRider = UserRider::where('user_id', auth()->id())->first();
 
         // check exist under a order
-       if(!auth()->user()->hasRole('rider') ||  $userRider?->reveiew_status !== UserRider::$REVIEW_STATUS_NAME['approved']){
-           return sendResponse(false, 'You are not eligible for rider.', null, 404);
-       }
+      if (
+            !auth()->user()->hasRole('rider') ||
+            ($userRider?->review_status !== UserRider::$REVIEW_STATUS_NAME['approved'])
+        ) {
+            return sendResponse(false, 'You are not eligible for rider.', null, 404);
+        }
 
         $findBid = Bid::where('order_id', $order->id)->where('user_id', auth()->id())->first();
         if($findBid){

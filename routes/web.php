@@ -6,13 +6,17 @@ use Inertia\Inertia;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\RiderAccountReviewController;
 use App\Http\Controllers\Admin\UserDashboardController;
+use App\Models\DeviceToken;
 use Illuminate\Support\Facades\Auth;
+use Kreait\Firebase\Contract\Messaging;
+use Kreait\Firebase\Messaging\CloudMessage;
+use Kreait\Firebase\Messaging\Notification;
+
 
 Route::get('/test', function () {
 
     return 'test';
 });
-
 Route::get('/admin', function () {
 
    // return Inertia::render('welcome');
@@ -75,6 +79,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 
 
+
+
 Route::get('/migrate', function () {
     try {
         \Illuminate\Support\Facades\Artisan::call('migrate --force');  // Run migrations without removing existing data
@@ -109,7 +115,19 @@ Route::get('/clear', function () {
     }
 });
 
+Route::get('/send-to-android', function (Messaging $messaging) {
 
+    $token = 'cy66sq9xSN-OeYyoXd2TZV:APA91bFq3FfAt2OICkYoI7dfoZQ11L8zUAjgaAHXQYWsAflOuUNc0n3ctAGGcgVTtTHCMItnt1I1_kwbDO_oGin48s0CKIELBUGFSbK-zu2XeQZ7vUiqpyA';
+
+    $message = CloudMessage::withTarget('token', $token)
+        ->withNotification(
+            Notification::create('Hello and i am comming! 👋', 'Notification from Laravel!')
+        );
+
+    $messaging->send($message);
+
+    return response()->json(['status' => '✅ Sent!']);
+});
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';

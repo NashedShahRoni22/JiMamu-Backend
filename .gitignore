@@ -9,6 +9,7 @@
 /storage/app/public
 storage/app/firebase/firebase_credentials.json
 /vendor
+firebase-credentials.json
 .env
 .env.backup
 .env.production

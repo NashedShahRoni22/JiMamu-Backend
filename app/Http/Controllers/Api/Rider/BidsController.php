@@ -4,12 +4,19 @@ namespace App\Http\Controllers\Api\Rider;
 
 use App\Http\Controllers\Controller;
 use App\Models\Bid;
+use App\Models\DeviceToken;
 use App\Models\Order;
 use App\Models\UserRider;
+use App\Services\Notifications\FcmService;
 use Illuminate\Http\Request;
+use phpseclib3\Crypt\RSA\PublicKey;
 
 class BidsController extends Controller
 {
+    public function __construct(Public FcmService $fcmService)
+    {
+
+    }
     public function newBidList()
     {
         $orderBids = Order::get();
@@ -68,6 +75,16 @@ class BidsController extends Controller
                 'user_id' => auth()->id(),
                 'bid_amount' => $request->bid_amount
             ]);
+
+            // Notifications
+             $token = DeviceToken::were('user_id', $order->customer_id)->value('device_token');
+                app(FcmService::class)->sendToDevice(
+                    $token,
+                    'New Bid Received 🏍️',
+                    'A rider has placed a bid on your order. Tap to review!',
+                    'new_bid_received',
+                    ['order_id' => '123']
+                );
             return sendResponse(true, 'Your bid has been successful.', null, 201);
         }catch (\Exception $exception){
             return sendResponse(false, 'Something went wrong!', null,422, $exception->getMessage());

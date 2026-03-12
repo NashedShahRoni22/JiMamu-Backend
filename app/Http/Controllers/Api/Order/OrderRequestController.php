@@ -163,11 +163,23 @@ class OrderRequestController extends Controller
 //                ]);
                 // return $nearbyRiders;
             //  $findNearByRiders =  $this->locationService->findNearbyRiders($orderRequest);
+            
+            //$tokens = "d87Ch6oBQbKXHnlinblYUS:APA91bFd46DoLNEpFBAHEazfwiufnM6yxTNaZzRc0aCfgGPckLCgeCq7Uo8gS1sx2IsiSeSEkFxQREXYYhqM1mOrhndaNXDK9lxYghOGl3QcVNMdhqmTF_I"; 
 
-            //    $tokens = DeviceToken::whereIn('user_id', $riders->pluck('id'))
-            //        ->pluck('device_token');
-               $tokens = "cy66sq9xSN-OeYyoXd2TZV:APA91bFq3FfAt2OICkYoI7dfoZQ11L8zUAjgaAHXQYWsAflOuUNc0n3ctAGGcgVTtTHCMItnt1I1_kwbDO_oGin48s0CKIELBUGFSbK-zu2XeQZ7vUiqpyA"; 
-               app(FcmService::class)->sendToDevice($tokens, 'order has been created! 👋', 'Message body');
+            // Get rider tokens
+            $ridersId = User::role('rider')->pluck('id');
+            $tokens = DeviceToken::whereIn('user_id', $ridersId)
+                ->pluck('device_token')
+                ->toArray();  // ← must be array
+
+            // Send
+            app(FcmService::class)->sendToMultiple(
+                $tokens,
+                'New Order Created 🛒',
+                'A new order has been created. Please check the app for details.',
+                'new_order_created',   // type
+                ['order_id' => '123']  // extra data
+            );
             });
 
             return sendResponse(success: true, message: 'Successfully send order request');
@@ -289,6 +301,21 @@ class OrderRequestController extends Controller
                ]);
            });
             $paymentSecretKey = $this->stripePaymentService->createPaymentIntent($orderUniqueId, $orderAttemptId, $riderId);
+
+            // send notification
+                // Get rider tokens
+
+                $token = DeviceToken::where('user_id', $riderId)
+                    ->value('device_token');
+    
+                // Send
+                app(FcmService::class)->sendToDevice(
+                    $token,
+                    'Your Bid Accepted ✅',
+                    'Your bid has been accepted. Please check the app for details.',
+                    'bid_accepted',   // type
+                    ['order_id' => '123']  // extra data
+                );
             return sendResponse(success: true, message: 'Order has been confirmed', data: $paymentSecretKey);
         }catch (\Exception $exception){
             return sendResponse(success: false, message: 'Something went wrong bid accept', data: null, status: 422);
@@ -401,6 +428,21 @@ class OrderRequestController extends Controller
                     'purpose_of_transaction' => WalletHistory::$PURPOSE_OF_TRANSACTION['order_completed'],
                     'transaction_type' => WalletHistory::$TRANSACTION_TYPE ['credit'],
                 ]);
+                // send notification
+                $orderStatus = Order::$ORDER_STATUS_NAME[$otpType];
+
+                $token = DeviceToken::where('user_id', $order->customer_id)
+                    ->value('device_token');
+
+                app(FcmService::class)->sendToDevice(
+                    $token,
+                    "Order {$orderStatus} ✅",
+                    "Your order has been {$orderStatus}.",
+                    'order_details', // dynamic type
+                    [
+                        'order_id' => 'sfsf',  // ← use real order id
+                    ]
+                );
             }
             return sendResponse(success: true, message: "OTP {$otpType} send successfully.");
         }catch (\Exception $e){

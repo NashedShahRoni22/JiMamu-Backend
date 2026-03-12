@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Order;
 
 use App\Http\Controllers\Controller;
+use App\Models\DeviceToken;
 use App\Models\Order;
 use App\Models\OrderCancel;
 use App\Models\OrderCancelReason;
@@ -10,11 +11,13 @@ use App\Models\Wallet;
 use App\Models\WalletHistory;
 use App\Models\RiderCancelFlag;
 use App\Models\RiderCancelReason;
+use App\Services\Notifications\FcmService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class OrderCancelController extends Controller
 {
+    public function __construct(public FcmService $fcmService){}
     // from customer order cancel
     public function cancelOrder(Request $request, $order_id){
         $order = Order::where('order_unique_id', $order_id)->first();
@@ -51,6 +54,20 @@ class OrderCancelController extends Controller
                         'status' => Order::$ORDER_STATUS['cancelled'],
                     ]);
                 });
+                  // Get rider token
+                $riderToken = DeviceToken::where('user_id', $order?->rider_id)
+                    ->value('device_token');
+
+                // Notify rider
+                app(FcmService::class)->sendToDevice(
+                    $riderToken,
+                    'Bid Cancelled ❌',
+                    'The customer has cancelled your bid. Check other available orders.',
+                    'bid_cancelled',
+                    [
+                        'order_id'   => 'test',
+                    ]
+                );
            // }
             return sendResponse(true, 'Successfully Order Has Cancelled.');
 
@@ -103,6 +120,20 @@ class OrderCancelController extends Controller
                     ]);
                 });
             }
+                // Get customer token
+                $customerToken = DeviceToken::where('user_id', $order?->customer_id)
+                    ->value('device_token');
+    
+                // Notify customer
+                app(FcmService::class)->sendToDevice(
+                    $customerToken,
+                    'Order Cancelled ❌',
+                    'The rider has cancelled your order. Please place a new order.',
+                    'order_cancelled',
+                    [
+                        'order_id'   => 'test',
+                    ]
+                );
             return sendResponse(true, 'Successfully Order Has Cancelled.');
         }catch (\Exception $exception){
             return sendResponse(false, 'Something Went Wrong', null, 422);

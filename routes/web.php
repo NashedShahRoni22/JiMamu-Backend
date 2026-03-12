@@ -117,12 +117,18 @@ Route::get('/clear', function () {
 
 Route::get('/send-to-android', function (Messaging $messaging) {
 
-    $token = 'cy66sq9xSN-OeYyoXd2TZV:APA91bFq3FfAt2OICkYoI7dfoZQ11L8zUAjgaAHXQYWsAflOuUNc0n3ctAGGcgVTtTHCMItnt1I1_kwbDO_oGin48s0CKIELBUGFSbK-zu2XeQZ7vUiqpyA';
+   // $token = 'cy66sq9xSN-OeYyoXd2TZV:APA91bFq3FfAt2OICkYoI7dfoZQ11L8zUAjgaAHXQYWsAflOuUNc0n3ctAGGcgVTtTHCMItnt1I1_kwbDO_oGin48s0CKIELBUGFSbK-zu2XeQZ7vUiqpyA';
+    $token = 'fryMYvnpTi2Tav9PAuQspt:APA91bFpfVUkLTFFlqWZP_GsJDwCRQyzTxoqPGyuG-cNERHbbuGHgsAL5N55l9HejuASUV2o227tjlTMlwIxrw9CDv51uVGoALEGt7i2Y92ZkTjkrmPLH4Y';
 
     $message = CloudMessage::withTarget('token', $token)
         ->withNotification(
-            Notification::create('Hello and i am comming! 👋', 'Notification from Laravel!')
-        );
+            Notification::create('New Order 🛒', 'You received a new order')
+        )
+        ->withData([
+            'route'    => '/orderDetails',
+            'type'     => 'new_order_created',
+            'order_id' => '123',
+        ]);
 
     $messaging->send($message);
 

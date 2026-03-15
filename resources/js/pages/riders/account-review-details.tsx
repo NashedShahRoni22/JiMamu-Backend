@@ -57,7 +57,7 @@ export default function Show() {
             <div className="w-full p-4 bg-white shadow rounded">
                 {/* Back button */}
                 <div className="mb-6">
-                    <Link href="/riders" className="text-blue-500 hover:underline">
+                    <Link href={route('riders.account.review.request')} className="text-blue-500 hover:underline">
                         &larr; Back to Riders
                     </Link>
                 </div>

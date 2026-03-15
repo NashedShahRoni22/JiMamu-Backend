@@ -52,22 +52,21 @@ export default function Index() {
             accessorKey: "action",
             header: "Action",
             cell: ({ row }) => (
-                <>
+                <div className="flex gap-2">
                     <Link
                         href={`/riders/rider/account/review/details/${row.original.id}`}
-                        className="text-blue-500 hover:underline"
+                        className="px-2 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600 transition"
                     >
-                        Views |
+                        View
                     </Link>
+
                     <Link
                         href={`/user/report/dashboard/${row.original.id}`}
-                        className="text-blue-500 hover:underline"
+                        className="px-2 py-1 text-xs bg-green-500 text-white rounded hover:bg-green-600 transition"
                     >
                         Report
                     </Link>
-                </>
-
-
+                </div>
             ),
         },
     ];

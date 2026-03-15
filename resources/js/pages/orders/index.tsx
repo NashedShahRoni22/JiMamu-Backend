@@ -52,7 +52,7 @@ export default function Index() {
             cell: ({ row }) => (
                 <Link
                     href={`/orders/show/${row.original.id}`}
-                    className="text-blue-500 hover:underline"
+                    className="px-2 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600"
                 >
                     View
                 </Link>

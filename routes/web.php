@@ -65,22 +65,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 Route::get('/migrate', function () {
     try {
         \Illuminate\Support\Facades\Artisan::call('migrate --force');  // Run migrations without removing existing data

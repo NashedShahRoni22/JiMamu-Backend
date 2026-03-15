@@ -22,6 +22,9 @@ Route::middleware(['json.response'])->prefix('/v1')->group(function() {
     Route::post('/send/email/otp', [AuthController::class, 'sendEmailOtp']);
     Route::post('/email/otp/verify', [AuthController::class, 'verifyOtp']);
     Route::post('/social/login', [AuthController::class, 'socialLogin']);
+    Route::get('test', function () {
+        return 'test';
+    });
 
     Route::post('/webhook/stripe', [StripeWebhookController::class, 'handleWebhook']);
 

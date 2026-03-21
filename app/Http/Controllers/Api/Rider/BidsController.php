@@ -83,7 +83,7 @@ class BidsController extends Controller
                     'New Bid Received 🏍️',
                     'A rider has placed a bid on your order. Tap to review!',
                     'new_bid_received',
-                    ['order_id' => '123']
+                    ['order_id' => $order_id] // order unique id 
                 );
             return sendResponse(true, 'Your bid has been successful.', null, 201);
         }catch (\Exception $exception){

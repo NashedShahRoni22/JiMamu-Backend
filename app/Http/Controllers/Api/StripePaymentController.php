@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\DeviceToken;
 use App\Models\Order;
 use App\Models\Payment;
+use App\Models\User;
 use App\Models\Wallet;
 use App\Models\WalletHistory;
+use App\Services\Notifications\FcmService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Stripe\PaymentIntent;
@@ -18,6 +21,10 @@ use Stripe\Event;
 
 class StripePaymentController extends Controller
 {
+    public function __construct(public FcmService $fcmService)
+    {
+       
+    }
     public function stripePaymentProcess($order_id){
         $order = Order::find($order_id);
         if(!$order){
@@ -116,6 +123,22 @@ class StripePaymentController extends Controller
                             'amount' => $amount,
                             'transaction_type' => WalletHistory::$TRANSACTION_TYPE['credit']
                         ]);
+
+                        // send notifications
+                        $ridersId = User::role('rider')->pluck('id');
+                        $tokens = DeviceToken::whereIn('user_id', $ridersId)
+                            ->pluck('device_token')
+                            ->toArray();  // ← must be array
+
+                        // Send
+                        app(FcmService::class)->sendToMultiple(
+                            $tokens,
+                            'New Order Created 🛒',
+                            'A new order has been created. Please check the app for details.',
+                            'new_order_created',   // type
+                            ['order_id' => $order?->order_unique_id]  // extra data
+                        );
+                        
                     }
               //  }
           //  });

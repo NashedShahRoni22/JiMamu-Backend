@@ -178,7 +178,7 @@ class OrderRequestController extends Controller
                 'New Order Created 🛒',
                 'A new order has been created. Please check the app for details.',
                 'new_order_created',   // type
-                ['order_id' => '123']  // extra data
+                ['order_id' => $orderRequest?->order_unique_id]  // extra data
             );
             });
 
@@ -266,6 +266,7 @@ class OrderRequestController extends Controller
     }
     // from rider apply bid accepted from customer
     public function orderBidAccept($orderUniqueId, $orderAttemptId, $riderId){
+
         $order =OrderAttempt::where('order_tracking_number', $orderAttemptId)
            // ->where('created_at', '>=', Carbon::now()->subMinutes(5))
             ->with('order')
@@ -314,7 +315,7 @@ class OrderRequestController extends Controller
                     'Your Bid Accepted ✅',
                     'Your bid has been accepted. Please check the app for details.',
                     'bid_accepted',   // type
-                    ['order_id' => '123']  // extra data
+                    ['order_id' => $order?->order?->order_unique_id]  // extra data
                 );
             return sendResponse(success: true, message: 'Order has been confirmed', data: $paymentSecretKey);
         }catch (\Exception $exception){
@@ -440,7 +441,7 @@ class OrderRequestController extends Controller
                     "Your order has been {$orderStatus}.",
                     'order_details', // dynamic type
                     [
-                        'order_id' => 'sfsf',  // ← use real order id
+                        'order_id' => $orderUniqueId,  // ← use real order id
                     ]
                 );
             }

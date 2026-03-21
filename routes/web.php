@@ -6,6 +6,9 @@ use Inertia\Inertia;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\RiderAccountReviewController;
 use App\Http\Controllers\Admin\UserDashboardController;
+use App\Http\Controllers\Admin\PlatformChargeController;
+use App\Http\Controllers\Admin\PackageController;
+use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Models\DeviceToken;
 use Illuminate\Support\Facades\Auth;
 use Kreait\Firebase\Contract\Messaging;
@@ -28,9 +31,7 @@ Route::get('/admin', function () {
 })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
+    Route::get('dashboard', [AdminDashboardController::class, 'dashboard'])->name('dashboard');
     Route::prefix('banner')->group(function () {
         Route::get('/', [BannerController::class, 'index'])->name('banner.index');
         Route::get('/create', [BannerController::class, 'create'])->name('banner.create');
@@ -38,6 +39,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/edit/{id}', [BannerController::class, 'edit'])->name('banner.edit');
         Route::post('/update/{id}', [BannerController::class, 'update'])->name('banner.update');
     });
+    Route::resource('platform-charge', PlatformChargeController::class);
+    Route::resource('package', PackageController::class);
 
     // order
     Route::prefix('orders')->group(function () {

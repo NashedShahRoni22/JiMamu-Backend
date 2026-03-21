@@ -29,6 +29,16 @@ const mainNavItems: NavItem[] = [
         href: '/banner',
         icon: LayoutGrid,
     },
+    {
+        title: 'Platform Charges',
+        href: '/platform-charge',
+        icon: LayoutGrid,
+    },
+    {
+        title: 'Package',
+        href: '/package',
+        icon: LayoutGrid,
+    },
     // {
     //     title: 'Customer',
     //     href: '/rider/pending',

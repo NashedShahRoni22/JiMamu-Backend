@@ -50,7 +50,7 @@ export default function Index() {
             cell: ({ row }) => (
                 <Link
                     href={route("banner.edit", { id: row.original.id })}
-                    className="text-blue-500 hover:underline"
+                    className="px-2 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600 transition"
                 >
                     Update
                 </Link>

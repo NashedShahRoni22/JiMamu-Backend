@@ -77,13 +77,13 @@ class BidsController extends Controller
             ]);
 
             // Notifications
-             $token = DeviceToken::were('user_id', $order->customer_id)->value('device_token');
+             $token = DeviceToken::where('user_id', $order->customer_id)->value('device_token');
                 app(FcmService::class)->sendToDevice(
                     $token,
                     'New Bid Received 🏍️',
                     'A rider has placed a bid on your order. Tap to review!',
                     'new_bid_received',
-                    ['order_id' => $order_id] // order unique id 
+                    ['order_id' => $order_id] // order unique id
                 );
             return sendResponse(true, 'Your bid has been successful.', null, 201);
         }catch (\Exception $exception){

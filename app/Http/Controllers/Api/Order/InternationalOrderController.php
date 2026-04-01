@@ -4,17 +4,20 @@ namespace App\Http\Controllers\Api\Order;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\MyOrderListResource;
+use App\Models\DeviceToken;
 use App\Models\Order;
 use App\Models\OrderAttempt;
 use App\Models\OrderDestination;
 use App\Models\PricingRate;
+use App\Models\User;
+use App\Services\Notifications\FcmService;
 use App\Services\Order\FareCalculatorService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class InternationalOrderController extends Controller
 {
-    public function __construct(public FareCalculatorService $fareCalculatorService){
+    public function __construct(public FareCalculatorService $fareCalculatorService, public FcmService $fcmService){
 
     }
     public function internationalOrderRequest(Request $request)
@@ -96,6 +99,19 @@ class InternationalOrderController extends Controller
 //                ]);
                 // return $nearbyRiders;
                 //$findNearByRiders =  $this->locationService->findNearbyRiders($orderRequest);
+                $ridersId = User::role('rider')->pluck('id');
+                $tokens = DeviceToken::whereIn('user_id', $ridersId)
+                    ->pluck('device_token')
+                    ->toArray();  // ← must be array
+
+                // Send
+                app(FcmService::class)->sendToMultiple(
+                    $tokens,
+                    'New Order Created 🛒',
+                    'A new order has been created. Please check the app for details.',
+                    'new_order_created',   // type
+                    ['order_id' => $orderRequest?->order_unique_id]  // extra data
+                );
             });
 
             return sendResponse(success: true, message: 'Successfully send order request');

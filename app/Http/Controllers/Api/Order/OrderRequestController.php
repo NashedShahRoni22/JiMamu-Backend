@@ -163,8 +163,8 @@ class OrderRequestController extends Controller
 //                ]);
                 // return $nearbyRiders;
             //  $findNearByRiders =  $this->locationService->findNearbyRiders($orderRequest);
-            
-            //$tokens = "d87Ch6oBQbKXHnlinblYUS:APA91bFd46DoLNEpFBAHEazfwiufnM6yxTNaZzRc0aCfgGPckLCgeCq7Uo8gS1sx2IsiSeSEkFxQREXYYhqM1mOrhndaNXDK9lxYghOGl3QcVNMdhqmTF_I"; 
+
+            //$tokens = "d87Ch6oBQbKXHnlinblYUS:APA91bFd46DoLNEpFBAHEazfwiufnM6yxTNaZzRc0aCfgGPckLCgeCq7Uo8gS1sx2IsiSeSEkFxQREXYYhqM1mOrhndaNXDK9lxYghOGl3QcVNMdhqmTF_I";
 
             // Get rider tokens
             $ridersId = User::role('rider')->pluck('id');
@@ -308,7 +308,7 @@ class OrderRequestController extends Controller
 
                 $token = DeviceToken::where('user_id', $riderId)
                     ->value('device_token');
-    
+
                 // Send
                 app(FcmService::class)->sendToDevice(
                     $token,
@@ -430,7 +430,7 @@ class OrderRequestController extends Controller
                     'transaction_type' => WalletHistory::$TRANSACTION_TYPE ['credit'],
                 ]);
                 // send notification
-                $orderStatus = Order::$ORDER_STATUS_NAME[$otpType];
+                $orderStatus = Order::$ORDER_STATUS[$otpType];
 
                 $token = DeviceToken::where('user_id', $order->customer_id)
                     ->value('device_token');

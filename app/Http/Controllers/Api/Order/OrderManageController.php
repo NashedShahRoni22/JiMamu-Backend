@@ -4,12 +4,15 @@ namespace App\Http\Controllers\Api\Order;
 
 use App\Http\Controllers\Controller;
 use App\Models\Bid;
+use App\Models\DeviceToken;
 use App\Models\Order;
 use App\Models\PricingRate;
+use App\Services\Notifications\FcmService;
 use Illuminate\Http\Request;
 
 class OrderManageController extends Controller
 {
+    public function __construct(public FcmService $fcmService){}
     // order woner and accepted rider can cancel accepted bid
     public function acceptedBidCancel($order_id, $rider_id){
          $order = Order::where('order_unique_id', $order_id)
@@ -24,6 +27,19 @@ class OrderManageController extends Controller
         try {
             $bid = $order->bids->firstWhere('user_id', $rider_id);
             $bid->forceDelete();
+            $customerToken = DeviceToken::where('user_id', $order?->rider_id)
+                ->value('device_token');
+
+            // Notify customer
+            app(FcmService::class)->sendToDevice(
+                $customerToken,
+                'Order Cancelled ❌',
+                'Your applied bid has been cancelled.',
+                'order_cancelled',
+                [
+                    'order_id'   => $order->order_unique_id,
+                ]
+            );
             return sendResponse(true, 'Order Bid cancelled successfully.');
         }catch (\Exception $e){
             return sendResponse(false, 'Something went wrong. Please try again.');

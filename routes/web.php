@@ -20,6 +20,15 @@ Route::get('/test', function () {
 
     return 'test';
 });
+Route::get('/', function () {
+
+    // return Inertia::render('welcome');
+    if (Auth::check()) {
+        return redirect()->route('dashboard');
+    }
+
+    return Inertia::render('auth/login');
+})->name('home');
 Route::get('/admin', function () {
 
    // return Inertia::render('welcome');

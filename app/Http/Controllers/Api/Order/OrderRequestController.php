@@ -285,14 +285,14 @@ class OrderRequestController extends Controller
         }
 
         try {
-           DB::transaction(function () use ($order, $bid, $riderId){
-               $order->order()->update([
-                   'rider_id' => $bid->user_id,
-                   'status' => Order::$ORDER_STATUS['confirmed'],
-               ]);
-               $order->update([
-                   'status' => OrderAttempt::$ORDER_STATUS['confirmed'],
-               ]);
+           DB::transaction(function () use ($order, $bid, $riderId, $orderUniqueId, $orderAttemptId){
+//               $order->order()->update([
+//                   'rider_id' => $bid->user_id,
+//                   'status' => Order::$ORDER_STATUS['confirmed'],
+//               ]);
+//               $order->update([
+//                   'status' => OrderAttempt::$ORDER_STATUS['confirmed'],
+//               ]);
                $bid = Bid::where('order_id', $order->order_id)->where('user_id', $riderId)->first();
                $order->update([
                    'fare' => $bid->bid_amount,
@@ -300,24 +300,26 @@ class OrderRequestController extends Controller
                $bid->update([
                    'status' => Bid::$STATUS['accepted']
                ]);
-           });
+
             $paymentSecretKey = $this->stripePaymentService->createPaymentIntent($orderUniqueId, $orderAttemptId, $riderId);
 
             // send notification
                 // Get rider tokens
+            if ($paymentSecretKey && isset($paymentSecretKey['client_secret'])) {
+                $token = DeviceToken::where('user_id', $riderId)->value('device_token');
 
-                $token = DeviceToken::where('user_id', $riderId)
-                    ->value('device_token');
-
-                // Send
-                app(FcmService::class)->sendToDevice(
-                    $token,
-                    'Your Bid Accepted ✅',
-                    'Your bid has been accepted. Please check the app for details.',
-                    'bid_accepted',   // type
-                    ['order_id' => $order?->order?->order_unique_id]  // extra data
-                );
+                if ($token) {
+                    app(FcmService::class)->sendToDevice(
+                        $token,
+                        'Your Bid Accepted ✅',
+                        'Your bid has been accepted. Please check the app for details.',
+                        'bid_accepted',
+                        ['order_id' => $order?->order?->order_unique_id]
+                    );
+                }
+            }
             return sendResponse(success: true, message: 'Order has been confirmed', data: $paymentSecretKey);
+           });
         }catch (\Exception $exception){
             return sendResponse(success: false, message: 'Something went wrong bid accept', data: null, status: 422);
         }

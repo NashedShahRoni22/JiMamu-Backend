@@ -297,9 +297,9 @@ class OrderRequestController extends Controller
                $order->update([
                    'fare' => $bid->bid_amount,
                ]);
-               $bid->update([
-                   'status' => Bid::$STATUS['accepted']
-               ]);
+//               $bid->update([
+//                   'status' => Bid::$STATUS['accepted']
+//               ]);
 
             $paymentSecretKey = $this->stripePaymentService->createPaymentIntent($orderUniqueId, $orderAttemptId, $riderId);
 

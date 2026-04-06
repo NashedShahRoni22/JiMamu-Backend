@@ -114,6 +114,7 @@ class ProfileUpdateController extends Controller
                     'document_type' => $request->document_type,
                     'document_number' => $request->document_number,
                     'document' => json_encode($pathName),
+                    'review_status' => UserRider::$REVIEW_STATUS_NAME['pending'],
                     'expire_date' => Carbon::parse($request->expire_date)->format('Y-m-d'),
                 ]);
             }

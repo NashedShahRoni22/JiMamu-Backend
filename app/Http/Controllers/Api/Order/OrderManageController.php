@@ -18,7 +18,9 @@ class OrderManageController extends Controller
          $order = Order::where('order_unique_id', $order_id)
             ->with('bids')
             ->firstOrFail();
-
+            if(!$order){
+            return sendResponse(false, 'Order not found.', 404);
+            }
 
         $bid = $order->bids->where('status', Bid::$STATUS['accepted'])->first();
         if ($bid) {
@@ -27,7 +29,7 @@ class OrderManageController extends Controller
         try {
             $bid = $order->bids->firstWhere('user_id', $rider_id);
             $bid->forceDelete();
-            $customerToken = DeviceToken::where('user_id', $order?->rider_id)
+            $customerToken = DeviceToken::where('user_id', $rider_id)
                 ->value('device_token');
 
             // Notify customer

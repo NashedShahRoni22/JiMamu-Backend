@@ -115,15 +115,55 @@ export default function Show() {
                     )}
                 </div>
 
-                {/* Actions */}
-                <div className="mt-6 flex gap-4">
-                    <Link href={route('riders.rider.account.approve', {user_id: rider.id, status_type: 2})}  className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
-                        Approve
-                    </Link>
-                    <Link href={route('riders.rider.account.approve', {user_id: rider.id, status_type: 3})} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
-                        Reject
-                    </Link>
-                </div>
+                 {/* Status + Actions Panel */}
+<div className="mt-6 border rounded-xl overflow-hidden">
+  {/* Status Row */}
+  <div className="px-5 py-4 flex items-center justify-between flex-wrap gap-2 bg-white">
+    <div>
+      <p className="text-xs text-gray-500 mb-1.5">Current review status</p>
+      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border
+        ${rider.status === 1 ? 'bg-amber-50 text-amber-800 border-amber-300' :
+          rider.status === 2 ? 'bg-green-50 text-green-800 border-green-300' :
+          'bg-red-50 text-red-800 border-red-300'}`}>
+        <span className={`w-1.5 h-1.5 rounded-full
+          ${rider.status === 1 ? 'bg-amber-500' :
+            rider.status === 2 ? 'bg-green-600' : 'bg-red-600'}`}
+        />
+        {reviewStatusMap[rider.status]}
+      </span>
+    </div>
+    <span className="text-xs text-gray-400">
+      Last updated: {new Date(rider.updated_at).toLocaleString()}
+    </span>
+  </div>
+
+  <hr className="border-t border-gray-100" />
+
+  {/* Action Buttons */}
+  <div className="px-5 py-4 bg-white">
+    <p className="text-xs text-gray-500 mb-3">Take action on this rider's account</p>
+    <div className="flex gap-2.5 flex-wrap">
+      <Link
+        href={route('riders.rider.account.approve', { user_id: rider.id, status_type: 2 })}
+        className="inline-flex items-center gap-2 px-5 py-2.5 bg-green-700 hover:bg-green-800 text-green-50 text-sm font-medium rounded-lg transition-colors"
+      >
+        <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none">
+          <path d="M3 8.5L6.5 12L13 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+        Approve Rider
+      </Link>
+      <Link
+        href={route('riders.rider.account.approve', { user_id: rider.id, status_type: 3 })}
+        className="inline-flex items-center gap-2 px-5 py-2.5 bg-white hover:bg-red-50 text-red-700 border border-red-300 text-sm font-medium rounded-lg transition-colors"
+      >
+        <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none">
+          <path d="M4 4L12 12M12 4L4 12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+        </svg>
+        Reject
+      </Link>
+    </div>
+  </div>
+</div>
             </div>
         </AppLayout>
     );

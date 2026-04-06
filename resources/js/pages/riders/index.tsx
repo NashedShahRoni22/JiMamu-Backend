@@ -97,7 +97,7 @@ export default function Index() {
         <AppLayout>
             <div className="p-4">
                 <Head title="Rider Account Review" />
-                <h1 className="text-2xl font-bold mb-4">Rider Account Review</h1>
+                <h1 className="text-2xl font-bold mb-4">User Account Review</h1>
 
                 {/* Filter Inputs */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">

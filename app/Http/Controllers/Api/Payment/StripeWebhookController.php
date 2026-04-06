@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Payment;
 
 use App\Http\Controllers\Controller;
 use App\Models\Bid;
+use App\Models\DeviceToken;
 use App\Models\OrderAttempt;
 use App\Models\Wallet;
 use App\Models\WalletHistory;
@@ -11,11 +12,16 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Stripe\Webhook;
 use App\Models\Order;
+use App\Services\Notifications\FcmService;
 use Illuminate\Support\Facades\Log;
 
 
 class StripeWebhookController extends Controller
 {
+    public function __construct(public FcmService $fcmService)
+    {
+        // No authentication middleware for webhooks
+    }
     public function handleWebhook(Request $request)
     {
         $payload = $request->getContent();
@@ -84,7 +90,17 @@ class StripeWebhookController extends Controller
                                 'transaction_type' => WalletHistory::$TRANSACTION_TYPE ['credit'],
                                 'status' => WalletHistory::$STATUS['approved']
                             ]);
+                            $token = DeviceToken::where('user_id', $riderId)->value('device_token');
 
+                            if ($token) {
+                                app(FcmService::class)->sendToDevice(
+                                    $token,
+                                    'Your Bid Accepted ✅',
+                                    'Your bid has been accepted. Please check the app for details.',
+                                    'bid_accepted',
+                                    ['order_id' => $order?->order?->order_unique_id]
+                                );
+                            } 
 
                         });
                     } else {

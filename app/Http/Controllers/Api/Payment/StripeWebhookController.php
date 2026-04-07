@@ -98,7 +98,7 @@ class StripeWebhookController extends Controller
                                     'Your Bid Accepted ✅',
                                     'Your bid has been accepted. Please check the app for details.',
                                     'bid_accepted',
-                                    ['order_id' => $order?->order?->order_unique_id]
+                                    ['order_id' => $order?->order_unique_id]
                                 );
                             } 
 

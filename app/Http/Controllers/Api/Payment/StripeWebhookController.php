@@ -59,6 +59,9 @@ class StripeWebhookController extends Controller
 //                    'status' => OrderAttempt::$ORDER_STATUS['confirmed'],
 //                ]);
                             $bid = Bid::where('order_id', $order->id)->where('user_id', $riderId)->first();
+                            Log::warning('confirmation of bid with rider ID: ' . $riderId, [
+                            'bid' => $bid,
+                        ]);
 
                             $order->update([
 

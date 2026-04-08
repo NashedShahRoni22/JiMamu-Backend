@@ -10,6 +10,7 @@ use App\Models\UserRider;
 use App\Services\Notifications\FcmService;
 use Illuminate\Http\Request;
 use phpseclib3\Crypt\RSA\PublicKey;
+use Illuminate\Support\Facades\DB;
 
 class BidsController extends Controller
 {
@@ -37,12 +38,19 @@ class BidsController extends Controller
        ];
        return sendResponse(true, 'Successfully get data.', $data);
     }
-    public function applyBids(Request $request, $order_id){
-        $order =  Order::where('order_unique_id', $order_id)->with('orderAttempt')->firstOrFail();
-        // user can not apply their own orders
-        if ($order->customer_id === auth()->id()){
-            return sendResponse(false, 'You cannot apply your bids.');
-        }
+
+
+public function applyBids(Request $request, $order_id){
+    
+    $request->validate([
+        'bid_amount' => 'required|numeric|min:0',
+    ]);
+    $order =  Order::where('order_unique_id', $order_id)->with('orderAttempt')->firstOrFail();
+
+    // user can not apply their own orders
+    if ($order->customer_id === auth()->id()){
+        return sendResponse(false, 'You cannot apply your bids.');
+    }
 
 //        $maxBidPrice = $order->orderAttempt?->fare + $order->orderAttempt?->fare * 30 / 100;
 //        $minBidPrice = $order->orderAttempt?->fare - $order->orderAttempt?->fare * 20 / 100;
@@ -54,42 +62,53 @@ class BidsController extends Controller
 //            return sendResponse(false, 'Your bid amount to much low.', ['min_bid' => $minBidPrice], 422);
 //        }
 
-        $userRider = UserRider::where('user_id', auth()->id())->first();
+    $userRider = UserRider::where('user_id', auth()->id())->first();
 
-        // check exist under a order
-      if (
-            !auth()->user()->hasRole('rider') ||
-            ($userRider?->review_status !== UserRider::$REVIEW_STATUS_NAME['approved'])
-        ) {
-            return sendResponse(false, 'You are not eligible for rider.', null, 404);
-        }
-
-        $findBid = Bid::where('order_id', $order->id)->where('user_id', auth()->id())->first();
-        if($findBid){
-            return sendResponse(false, 'You are already applied.', null, 409);
-        }
-        try {
-            Bid::create([
-                'order_id' => $order->id,
-                'order_attempt_id' => $order?->orderAttempt?->id,
-                'user_id' => auth()->id(),
-                'bid_amount' => $request->bid_amount
-            ]);
-
-            // Notifications
-             $token = DeviceToken::where('user_id', $order->customer_id)->value('device_token');
-                app(FcmService::class)->sendToDevice(
-                    $token,
-                    'New Bid Received 🏍️',
-                    'A rider has placed a bid on your order. Tap to review!',
-                    'new_bid_received',
-                    ['order_id' => $order_id] // order unique id
-                );
-            return sendResponse(true, 'Your bid has been successful.', null, 201);
-        }catch (\Exception $exception){
-            return sendResponse(false, 'Something went wrong!', null,422, $exception->getMessage());
-        }
+    // check exist under a order
+    if (
+        !auth()->user()->hasRole('rider') ||
+        ($userRider?->review_status !== UserRider::$REVIEW_STATUS_NAME['approved'])
+    ) {
+        return sendResponse(false, 'You are not eligible for rider.', null, 404);
     }
+
+    $findBid = Bid::where('order_id', $order->id)->where('user_id', auth()->id())->first();
+    if($findBid){
+        return sendResponse(false, 'You are already applied.', null, 409);
+    }
+
+    DB::beginTransaction();
+
+    try {
+        Bid::create([
+            'order_id' => $order->id,
+            'order_attempt_id' => $order?->orderAttempt?->id,
+            'user_id' => auth()->id(),
+            'bid_amount' => $request->bid_amount
+        ]);
+
+        // Notifications
+        $token = DeviceToken::where('user_id', $order->customer_id)->value('device_token');
+
+        app(FcmService::class)->sendToDevice(
+            $token,
+            'New Bid Received 🏍️',
+            'A rider has placed a bid on your order. Tap to review!',
+            'new_bid_received',
+            ['order_id' => $order_id]
+        );
+
+        DB::commit();
+
+        return sendResponse(true, 'Your bid has been successful.', null, 201);
+
+    } catch (\Exception $exception) {
+
+        DB::rollBack();
+
+        return sendResponse(false, 'Something went wrong!', null, 422, $exception->getMessage());
+    }
+}
     public function myOrderAppliedBids($order_type = 'national')
     {
         try {

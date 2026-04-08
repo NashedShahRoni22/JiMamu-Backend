@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Bid;
 use App\Models\Order;
 use App\Models\OrderAttempt;
 use App\Models\PricingRate;
@@ -25,6 +26,9 @@ class OrderAttemptsResource extends JsonResource
         }else{
             $netFare =  (float)$this->fare;
         }
+        if($order->rider_id != null){
+           $acceptedRiderBid = Bid::where('user_id', $order->rider_id)->with('user')->first();
+        };
         return [
             'status' => OrderAttempt::$ORDER_STATUS_NAME[$this->status],
             'order_tracking_number' => $this->order_tracking_number,
@@ -32,7 +36,7 @@ class OrderAttemptsResource extends JsonResource
             'fare' => $order->customer_id == auth()->id() ? $this->fare : $netFare,
             'parcel_estimate_price' => $this->parcel_estimate_price,
             'order_date' => $this->created_at->format('F j, Y, h:i:s A'),
-            'rider_bids' => ApplyBidResource::collection($this->bids)
+            'rider_bids' => $order->rider_id ==null ?ApplyBidResource::collection($this->bids): [new ApplyBidResource($acceptedRiderBid)],
         ];
     }
 }

@@ -11,6 +11,7 @@ use App\Services\Notifications\FcmService;
 use Illuminate\Http\Request;
 use phpseclib3\Crypt\RSA\PublicKey;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class BidsController extends Controller
 {
@@ -45,6 +46,7 @@ public function applyBids(Request $request, $order_id){
     $request->validate([
         'bid_amount' => 'required|numeric|min:0',
     ]);
+
     $order =  Order::where('order_unique_id', $order_id)->with('orderAttempt')->firstOrFail();
 
     // user can not apply their own orders
@@ -80,27 +82,14 @@ public function applyBids(Request $request, $order_id){
     DB::beginTransaction();
 
     try {
-        Bid::create([
+        $bid = Bid::create([
             'order_id' => $order->id,
             'order_attempt_id' => $order?->orderAttempt?->id,
             'user_id' => auth()->id(),
             'bid_amount' => $request->bid_amount
         ]);
 
-        // Notifications
-        $token = DeviceToken::where('user_id', $order->customer_id)->value('device_token');
-
-        app(FcmService::class)->sendToDevice(
-            $token,
-            'New Bid Received 🏍️',
-            'A rider has placed a bid on your order. Tap to review!',
-            'new_bid_received',
-            ['order_id' => $order_id]
-        );
-
-        DB::commit();
-
-        return sendResponse(true, 'Your bid has been successful.', null, 201);
+        DB::commit(); // ✅ commit first (important)
 
     } catch (\Exception $exception) {
 
@@ -108,6 +97,37 @@ public function applyBids(Request $request, $order_id){
 
         return sendResponse(false, 'Something went wrong!', null, 422, $exception->getMessage());
     }
+
+    // ✅ Send notification AFTER commit (best practice)
+    try {
+        $token = DeviceToken::where('user_id', $order?->customer_id)->value('device_token');
+
+        if ($token) {
+            app(FcmService::class)->sendToDevice(
+                $token,
+                'New Bid Received 🏍️',
+                'A rider has placed a bid on your order. Tap to review!',
+                'new_bid_received',
+                ['order_id' => $order?->order_unique_id]
+            );
+        }
+
+    } catch (\Exception $e) {
+
+        // 🔥 Handle invalid token
+        if (
+            str_contains($e->getMessage(), 'registration-token-not-registered') ||
+            str_contains($e->getMessage(), 'invalid-argument') ||
+            str_contains($e->getMessage(), 'invalid-registration-token')
+        ) {
+            DeviceToken::where('device_token', $token)->delete();
+        }
+
+        // লগ রাখো (important for debugging)
+        \Log::error('FCM Error: '.$e->getMessage());
+    }
+
+    return sendResponse(true, 'Your bid has been successful.', null, 201);
 }
     public function myOrderAppliedBids($order_type = 'national')
     {

@@ -437,7 +437,7 @@ class OrderRequestController extends Controller
                 app(FcmService::class)->sendToDevice(
                     $token,
                     "Order {$orderStatus} ✅",
-                    "Your order has been {$orderStatus}.",
+                    "Your parcel have been {$orderStatus} successfully!",
                     'order_details', // dynamic type
                     [
                         'order_id' => $orderUniqueId,  // ← use real order id

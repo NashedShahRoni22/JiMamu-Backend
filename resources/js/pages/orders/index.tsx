@@ -20,6 +20,37 @@ export default function Index() {
         action: string;
     };
 
+    const orderStatusBadge = (status: string) => {
+        const map: Record<string, string> = {
+            pending:   "bg-yellow-100 text-yellow-800",
+            confirmed: "bg-blue-100 text-blue-800",
+            picked:    "bg-purple-100 text-purple-800",
+            shipping:  "bg-indigo-100 text-indigo-800",
+            delivered: "bg-green-100 text-green-800",
+            cancelled: "bg-red-100 text-red-800",
+        };
+        const classes = map[status.toLowerCase()] ?? "bg-gray-100 text-gray-800";
+        return (
+            <span className={`px-2 py-1 rounded-full text-xs font-semibold capitalize ${classes}`}>
+                {status}
+            </span>
+        );
+    };
+
+    const paymentStatusBadge = (status: string) => {
+        const map: Record<string, string> = {
+            paid:      "bg-green-100 text-green-800",
+            unpaid:    "bg-red-100 text-red-800",
+            cancelled: "bg-gray-100 text-gray-800",
+        };
+        const classes = map[status.toLowerCase()] ?? "bg-gray-100 text-gray-800";
+        return (
+            <span className={`px-2 py-1 rounded-full text-xs font-semibold capitalize ${classes}`}>
+                {status}
+            </span>
+        );
+    };
+
     const columns: ColumnDef<Order>[] = [
         { accessorKey: "id", header: "ID" },
         {
@@ -34,7 +65,7 @@ export default function Index() {
                     />
                 ) : (
                     <span>No Image</span>
-                )
+                ),
         },
         { accessorKey: "customer_name", header: "Customer Name" },
         { accessorKey: "customer_email", header: "Customer Email" },
@@ -42,10 +73,15 @@ export default function Index() {
         {
             accessorKey: "status",
             header: "Order Status",
+            cell: ({ row }) => orderStatusBadge(row.original.status),
         },
-        { accessorKey: "payment_status", header: "Payment Status" },
+        {
+            accessorKey: "payment_status",
+            header: "Payment Status",
+            cell: ({ row }) => paymentStatusBadge(row.original.payment_status),
+        },
         { accessorKey: "weight", header: "Weight" },
-        {accessorKey: "created_at", header: "Order Date"},
+        { accessorKey: "created_at", header: "Order Date" },
         {
             accessorKey: "action",
             header: "Action",
@@ -60,19 +96,15 @@ export default function Index() {
         },
     ];
 
-    // Filter state
     const [orderId, setOrderId] = useState("");
     const [customerEmail, setCustomerEmail] = useState("");
     const [status, setStatus] = useState("");
 
-    // Filtering logic
     const filteredOrders = (orders as Order[]).filter((order) => {
         return (
             (orderId ? order.order_unique_id.includes(orderId) : true) &&
             (customerEmail
-                ? order.customer_email
-                    .toLowerCase()
-                    .includes(customerEmail.toLowerCase())
+                ? order.customer_email.toLowerCase().includes(customerEmail.toLowerCase())
                 : true) &&
             (status ? order.status.toLowerCase() === status.toLowerCase() : true)
         );
@@ -84,7 +116,6 @@ export default function Index() {
                 <Head title="Orders" />
                 <h1 className="text-2xl font-bold mb-4">Orders</h1>
 
-                {/* Filter Inputs */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                     <input
                         type="text"
@@ -113,7 +144,6 @@ export default function Index() {
                         <option value="delivered">Delivered</option>
                         <option value="cancelled">Cancelled</option>
                     </select>
-
                     <button
                         onClick={() => {
                             setOrderId("");
@@ -124,8 +154,8 @@ export default function Index() {
                     >
                         Clear Filters
                     </button>
-
                 </div>
+
                 <DataTable columns={columns} data={filteredOrders} />
             </div>
         </AppLayout>

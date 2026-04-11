@@ -4,7 +4,14 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid } from 'lucide-react';
+import {
+    LayoutGrid,
+    ShoppingBag,
+    Image,
+    CircleDollarSign,
+    Package,
+    Users,
+} from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -13,69 +20,34 @@ const mainNavItems: NavItem[] = [
         href: '/dashboard',
         icon: LayoutGrid,
     },
-
     {
         title: 'Orders',
         href: '/orders',
-        icon: LayoutGrid,
+        icon: ShoppingBag,
     },
-    // {
-    //     title: 'Cancel Orders',
-    //     href: '/cancel/orders',
-    //     icon: LayoutGrid,
-    // },
     {
         title: 'Banners',
         href: '/banner',
-        icon: LayoutGrid,
+        icon: Image,
     },
     {
         title: 'Platform Charges',
         href: '/platform-charge',
-        icon: LayoutGrid,
+        icon: CircleDollarSign,
     },
     {
         title: 'Package',
         href: '/package',
-        icon: LayoutGrid,
+        icon: Package,
     },
-    // {
-    //     title: 'Customer',
-    //     href: '/rider/pending',
-    //     icon: LayoutGrid,
-    //     children: [
-    //         { title: 'Pending Orders', href: '/rider/pending' },
-    //         { title: 'Completed Orders', href: '/rider/completed' },
-    //         { title: 'Cancelled Orders', href: '/rider/cancelled' },
-    //     ],
-    // },
     {
         title: 'Users',
         href: '/riders/rider/account/review',
-        icon: LayoutGrid,
-
-        // children: [
-        //
-        //     { title: 'Pending Orders', href: '/rider/pending' },
-        //     { title: 'Completed Orders', href: '/rider/completed' },
-        //     { title: 'Cancelled Orders', href: '/rider/cancelled' },
-        // ],
+        icon: Users,
     },
-
 ];
 
-const footerNavItems: NavItem[] = [
-    // {
-    //     title: 'Repository',
-    //     href: 'https://github.com/laravel/react-starter-kit',
-    //     icon: Folder,
-    // },
-    // {
-    //     title: 'Documentation',
-    //     href: 'https://laravel.com/docs/starter-kits',
-    //     icon: BookOpen,
-    // },
-];
+const footerNavItems: NavItem[] = [];
 
 export function AppSidebar() {
     return (

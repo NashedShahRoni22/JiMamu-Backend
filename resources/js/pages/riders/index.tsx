@@ -17,6 +17,20 @@ export default function Index() {
         review_status_text: string;
     };
 
+    const reviewStatusBadge = (status: string) => {
+        const map: Record<string, string> = {
+            pending:  "bg-yellow-100 text-yellow-800",
+            approved: "bg-green-100 text-green-800",
+            rejected: "bg-red-100 text-red-800",
+        };
+        const classes = map[status?.toLowerCase()] ?? "bg-gray-100 text-gray-800";
+        return (
+            <span className={`px-2 py-1 rounded-full text-xs font-semibold capitalize ${classes}`}>
+                {status}
+            </span>
+        );
+    };
+
     const columns: ColumnDef<riderRequest>[] = [
         { accessorKey: "id", header: "ID" },
         {
@@ -36,9 +50,14 @@ export default function Index() {
         { accessorKey: "name", header: "Name" },
         { accessorKey: "email", header: "Email" },
         { accessorKey: "phone_number", header: "Phone Number" },
-        { accessorKey: "review_status_text", header: "Review Status" },
         {
-            accessorKey: "created_at", header: "Created At",
+            accessorKey: "review_status_text",
+            header: "Review Status",
+            cell: ({ row }) => reviewStatusBadge(row.original.review_status_text),
+        },
+        {
+            accessorKey: "created_at",
+            header: "Created At",
             cell: ({ row }) => {
                 const date = new Date(row.original.created_at);
                 return date.toLocaleDateString("en-GB", {
@@ -59,7 +78,6 @@ export default function Index() {
                     >
                         View
                     </Link>
-
                     <Link
                         href={`/user/report/dashboard/${row.original.id}`}
                         className="px-2 py-1 text-xs bg-green-500 text-white rounded hover:bg-green-600 transition"
@@ -71,21 +89,17 @@ export default function Index() {
         },
     ];
 
-    // Filter state
     const [phoneNumber, setPhoneNumber] = useState("");
     const [customerEmail, setCustomerEmail] = useState("");
     const [status, setStatus] = useState("");
 
-    // Filtering logic
     const filteredRiders = (riders as riderRequest[]).filter((rider) => {
         const phoneOk = phoneNumber
             ? (rider.phone_number ?? "").toString().includes(phoneNumber)
             : true;
-
         const emailOk = customerEmail
             ? rider.email?.toLowerCase().includes(customerEmail.toLowerCase())
             : true;
-
         const statusOk = status
             ? rider.review_status_text?.toLowerCase() === status.toLowerCase()
             : true;
@@ -99,7 +113,6 @@ export default function Index() {
                 <Head title="Rider Account Review" />
                 <h1 className="text-2xl font-bold mb-4">User Account Review</h1>
 
-                {/* Filter Inputs */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                     <input
                         type="text"
@@ -125,7 +138,6 @@ export default function Index() {
                         <option value="approved">Approved</option>
                         <option value="rejected">Rejected</option>
                     </select>
-
                     <button
                         onClick={() => {
                             setPhoneNumber("");

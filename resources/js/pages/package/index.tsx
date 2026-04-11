@@ -126,27 +126,26 @@ export default function PackageIndex({ packages }: Props) {
                                             </span>
                                         </td>
                                         <td className="px-4 py-3">
-                                            <div className="flex items-center gap-3">
+                                            <div className="flex items-center gap-2">
                                                 <Link
                                                     href={route('package.edit', item.id)}
-                                                    className="text-gray-600 underline-offset-2 hover:text-gray-900 hover:underline"
+                                                    className="px-2 py-1 text-xs font-medium bg-blue-500 text-white rounded hover:bg-blue-600 transition"
                                                 >
                                                     Edit
                                                 </Link>
 
                                                 {confirmId === item.id ? (
-                                                    <span className="flex items-center gap-2">
-                                                        <span className="text-gray-500">Sure?</span>
+                                                    <span className="flex items-center gap-1">
                                                         <button
                                                             onClick={() => handleDelete(item.id)}
                                                             disabled={deletingId === item.id}
-                                                            className="text-red-600 underline-offset-2 hover:underline disabled:opacity-50"
+                                                            className="px-2 py-1 text-xs font-medium bg-red-500 text-white rounded hover:bg-red-600 transition disabled:opacity-50"
                                                         >
-                                                            {deletingId === item.id ? 'Deleting...' : 'Yes'}
+                                                            {deletingId === item.id ? '...' : 'Yes'}
                                                         </button>
                                                         <button
                                                             onClick={() => setConfirmId(null)}
-                                                            className="text-gray-500 underline-offset-2 hover:underline"
+                                                            className="px-2 py-1 text-xs font-medium bg-gray-400 text-white rounded hover:bg-gray-500 transition"
                                                         >
                                                             No
                                                         </button>
@@ -154,7 +153,7 @@ export default function PackageIndex({ packages }: Props) {
                                                 ) : (
                                                     <button
                                                         onClick={() => setConfirmId(item.id)}
-                                                        className="text-red-500 underline-offset-2 hover:text-red-700 hover:underline"
+                                                        className="px-2 py-1 text-xs font-medium bg-red-500 text-white rounded hover:bg-red-600 transition"
                                                     >
                                                         Delete
                                                     </button>

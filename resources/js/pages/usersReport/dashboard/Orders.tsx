@@ -89,7 +89,7 @@ export default function Orders({ orders }: OrdersProps) {
             <RiderDashboardLayout>
                 <Head title="Orders" />
 
-                <h2 className="text-2xl font-bold mb-4">Orders Reports</h2>
+                <h2 className="text-2xl font-bold mb-4">Delivery Reports</h2>
 
                 {/* ================= Filters ================= */}
                 <div className="grid grid-cols-2 md:grid-cols-6 gap-2 mb-4">

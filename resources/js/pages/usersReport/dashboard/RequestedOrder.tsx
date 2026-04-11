@@ -45,9 +45,25 @@ const ORDER_STATUS_NAME: Record<number, string> = {
     6: "Cancelled",
 };
 
+const ORDER_STATUS_BADGE: Record<number, string> = {
+    1: "bg-yellow-100 text-yellow-800",
+    2: "bg-blue-100 text-blue-800",
+    3: "bg-purple-100 text-purple-800",
+    4: "bg-indigo-100 text-indigo-800",
+    5: "bg-green-100 text-green-800",
+    6: "bg-red-100 text-red-800",
+};
+
 const PAYMENT_STATUS_NAME: Record<number, string> = {
-    0: "Unpaid",
     1: "Paid",
+    2: "Unpaid",
+    3: "Cancelled",
+};
+
+const PAYMENT_STATUS_BADGE: Record<number, string> = {
+    1: "bg-green-100 text-green-800",
+    2: "bg-red-100 text-red-800",
+    3: "bg-gray-100 text-gray-800",
 };
 
 // ================= Component =================
@@ -69,7 +85,7 @@ export default function Orders({ orders }: OrdersProps) {
                 (!filters.order_unique_id ||
                     String(order.order_unique_id)
                         .toLowerCase()
-                        .includes(filters.order_unique_id.toLowerCase()))&&
+                        .includes(filters.order_unique_id.toLowerCase())) &&
                 (!filters.status ||
                     String(order.status) === filters.status) &&
                 (!filters.type ||
@@ -125,7 +141,8 @@ export default function Orders({ orders }: OrdersProps) {
                     >
                         <option value="">All Payments</option>
                         <option value="1">Paid</option>
-                        <option value="0">Unpaid</option>
+                        <option value="2">Unpaid</option>
+                        <option value="3">Cancelled</option>
                     </select>
 
                     <button
@@ -183,19 +200,20 @@ export default function Orders({ orders }: OrdersProps) {
                                         {/*        ?.order_tracking_number || "-"}*/}
                                         {/*</td>*/}
                                         <td className="border p-2">
-                                            ${ order?.order_attempt?.fare}
+                                            {order?.order_attempt?.fare ? `$${order.order_attempt.fare}` : "-"}
                                         </td>
                                         <td className="border p-2">
                                             {order.weight} kg
                                         </td>
                                         <td className="border p-2">
-                                            {ORDER_STATUS_NAME[order.status]}
+                                            <span className={`px-2 py-1 rounded-full text-xs font-semibold ${ORDER_STATUS_BADGE[order.status] ?? "bg-gray-100 text-gray-800"}`}>
+                                                {ORDER_STATUS_NAME[order.status] ?? "Unknown"}
+                                            </span>
                                         </td>
                                         <td className="border p-2">
-                                            {PAYMENT_STATUS_NAME[
-                                                order.order_attempt
-                                                    ?.payment_status || 0
-                                            ]}
+                                            <span className={`px-2 py-1 rounded-full text-xs font-semibold ${PAYMENT_STATUS_BADGE[order.order_attempt?.payment_status ?? 2] ?? "bg-gray-100 text-gray-800"}`}>
+                                                {PAYMENT_STATUS_NAME[order.order_attempt?.payment_status ?? 2] ?? "Unknown"}
+                                            </span>
                                         </td>
                                         <td className="border p-2">
                                             {new Date(
@@ -203,8 +221,7 @@ export default function Orders({ orders }: OrdersProps) {
                                             ).toLocaleDateString()}
                                         </td>
                                         <td className="border p-2 text-center">
-                                            <a
-                                                href={`/orders/show/${order.id}`}
+                                               <a href={`/orders/show/${order.id}`}
                                                 className="inline-flex items-center px-3 py-1 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700"
                                             >
                                                 View
@@ -215,7 +232,7 @@ export default function Orders({ orders }: OrdersProps) {
                             ) : (
                                 <tr>
                                     <td
-                                        colSpan={8}
+                                        colSpan={9}
                                         className="text-center p-4 text-gray-500"
                                     >
                                         No orders found
